@@ -40,7 +40,6 @@ export default function WordShooter({ onExit }) {
   const [trendingTopics, setTrendingTopics] = useState([]);
   const [loadingTrending, setLoadingTrending] = useState(false);
   const canvasRef = useRef(null);
-  const gameStateRef = useRef(null);
 
   useEffect(() => {
     const fetchTrending = async () => {
@@ -110,6 +109,8 @@ export default function WordShooter({ onExit }) {
     const canvas = canvasRef.current;
     const ctx = canvas.getContext('2d');
     
+    let animationFrameId;
+
     function resize() {
       canvas.width = window.innerWidth;
       canvas.height = window.innerHeight;
@@ -125,7 +126,6 @@ export default function WordShooter({ onExit }) {
       spawnTimer: 0, spawnRate: 120, wordQueue: [...wordData].sort(() => Math.random() - 0.5),
       factTimer: 0, currentFact: null
     };
-    gameStateRef.current = state;
 
     for(let i=0; i<300; i++) {
       state.stars.push({ x: Math.random() * canvas.width, y: Math.random() * canvas.height, size: Math.random() * 2 + 0.5, speed: Math.random() * 1.5 + 0.3, opacity: Math.random() * 0.5 + 0.3 });
@@ -231,7 +231,7 @@ export default function WordShooter({ onExit }) {
       ctx.shadowBlur = 15;
       ctx.shadowColor = ast.color;
       ctx.beginPath();
-      ctx.roundRect(-w/2, -h/2, w, h, r);
+      ctx.roundRect(-w/2, -h/2, w, h, [r]);
       ctx.fill();
       ctx.shadowBlur = 0;
       ctx.fillStyle = '#ffffff';
@@ -267,7 +267,7 @@ export default function WordShooter({ onExit }) {
         ctx.fillStyle = '#9ca3af';
         ctx.fillText('Press P to resume | ESC to exit', w/2, h/2 + 20);
         ctx.restore();
-        requestAnimationFrame(gameLoop);
+        animationFrameId = requestAnimationFrame(gameLoop);
         return;
       }
       
@@ -364,12 +364,17 @@ export default function WordShooter({ onExit }) {
         return;
       }
       
-      requestAnimationFrame(gameLoop);
+      animationFrameId = requestAnimationFrame(gameLoop);
     }
 
     gameLoop();
 
-    return () => { window.removeEventListener('resize', resize); window.removeEventListener('keydown', handleKeyDown); window.removeEventListener('keyup', handleKeyUp); };
+    return () => {
+      window.removeEventListener('resize', resize);
+      window.removeEventListener('keydown', handleKeyDown);
+      window.removeEventListener('keyup', handleKeyUp);
+      cancelAnimationFrame(animationFrameId);
+    };
   }, [screen, wordData, onExit]);
 
   const toggleFullscreen = async () => {
@@ -452,21 +457,11 @@ export default function WordShooter({ onExit }) {
               <Button key={deck.id} onClick={() => handleStartGame(deck)} className="h-24 text-left justify-start p-6 bg-gradient-to-r from-purple-600 to-purple-700 text-white">
                 <div><div className="text-xl mb-1">{deck.label}</div><div className="text-xs opacity-80">{deck.topic?.slice(0, 40)}...</div></div>
               </Button>
-            )))}
-            {activeTab === 'education' && filteredDecks(PRESET_DECKS.education).map(deck => (
-              <Button key={deck.id} onClick={() => handleStartGame(deck)} className="h-24 text-left justify-start p-6 bg-gradient-to-r from-blue-500 to-blue-600 text-white">
-                <div><div className="text-xl mb-1">{deck.label}</div><div className="text-xs opacity-80">{deck.topic?.slice(0, 40)}...</div></div>
-              </Button>
-            ))}
-            {activeTab === 'planet' && filteredDecks(PRESET_DECKS.planet).map(deck => (
-              <Button key={deck.id} onClick={() => handleStartGame(deck)} className="h-24 text-left justify-start p-6 bg-gradient-to-r from-green-500 to-green-600 text-white">
-                <div><div className="text-xl mb-1">{deck.label}</div><div className="text-xs opacity-80">{deck.topic?.slice(0, 40)}...</div></div>
-              </Button>
-            ))}
-            {activeTab === 'enhance' && filteredDecks(PRESET_DECKS.enhance).map(deck => (
-              <Button key={deck.id} onClick={() => handleStartGame(deck)} className="h-24 text-left justify-start p-6 bg-gradient-to-r from-purple-500 to-purple-600 text-white">
-                <div><div className="text-xl mb-1">{deck.label}</div><div className="text-xs opacity-80">{deck.topic?.slice(0, 40)}...</div></div>
-              </Button>
+            ))) }
+            { activeTab !== 'trending' && filteredDecks(PRESET_DECKS[activeTab] || []).map(deck => (
+                <Button key={deck.id} onClick={() => handleStartGame(deck)} className={`h-24 text-left justify-start p-6 text-white bg-gradient-to-r ${activeTab === 'education' ? 'from-blue-500 to-blue-600' : activeTab === 'planet' ? 'from-green-500 to-green-600' : 'from-purple-500 to-purple-600'}`}>
+                    <div><div className="text-xl mb-1">{deck.label}</div><div className="text-xs opacity-80">{deck.topic?.slice(0, 40)}...</div></div>
+                </Button>
             ))}
           </div>
         </Card>
@@ -483,15 +478,7 @@ export default function WordShooter({ onExit }) {
               <h3 className="text-lg font-bold mb-2 text-white">{item.title}</h3>
               <p className="text-sm text-gray-400">{item.desc}</p>
             </Card>
-          ))}
-        </div>
-
-        <div className="mt-8 p-6 rounded-xl bg-black border border-gray-700">
-          <h3 className="font-bold mb-4 flex items-center gap-2 text-white"><Zap className="w-5 h-5 text-blue-500" /> Controls</h3>
-          <div className="grid grid-cols-2 gap-4 text-sm text-gray-400">
-            <div><p><strong className="text-white">Movement:</strong> ← → or A/D</p><p><strong className="text-white">Shoot:</strong> Spacebar</p><p><strong className="text-white">Bomb:</strong> B</p></div>
-            <div><p><strong className="text-white">Pause:</strong> P</p><p><strong className="text-white">Fullscreen:</strong> F11</p><p><strong className="text-white">Exit:</strong> ESC</p></div>
-          </div>
+          )) }
         </div>
       </div>
     </div>

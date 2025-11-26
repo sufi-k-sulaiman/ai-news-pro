@@ -2,7 +2,9 @@ import React, { useState, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
 import { base44 } from '@/api/base44Client';
-import { Search, Globe, Paperclip, Mic, AudioLines, Sparkles, Bot, Lightbulb, FileText, Image, Loader2, X, ExternalLink, Download, Menu, ChevronLeft, Home, Users, Settings, HelpCircle, BookOpen, Ban, Copy } from 'lucide-react';
+import { Search, Globe, Paperclip, Mic, Sparkles, Bot, Lightbulb, FileText, Image, Loader2, X, ExternalLink, Download, Menu, ChevronLeft, Home, Users, Settings, HelpCircle, BookOpen, ArrowRight } from 'lucide-react';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import ReactMarkdown from 'react-markdown';
@@ -25,7 +27,11 @@ export default function AIHub() {
     const [isLoading, setIsLoading] = useState(false);
     const [results, setResults] = useState(null);
     const [isListening, setIsListening] = useState(false);
+    const [showUrlModal, setShowUrlModal] = useState(false);
+    const [webUrl, setWebUrl] = useState('');
+    const [attachedFiles, setAttachedFiles] = useState([]);
     const recognitionRef = useRef(null);
+    const fileInputRef = useRef(null);
 
     const menuItems = [
         { icon: Sparkles, label: "AI Hub", href: createPageUrl('AIHub'), active: true },
@@ -52,7 +58,7 @@ export default function AIHub() {
 
         const recognition = new SpeechRecognition();
         recognitionRef.current = recognition;
-        recognition.continuous = false;
+        recognition.continuous = true;
         recognition.interimResults = true;
 
         recognition.onstart = () => setIsListening(true);
@@ -63,6 +69,41 @@ export default function AIHub() {
         recognition.onerror = () => setIsListening(false);
         recognition.onend = () => setIsListening(false);
         recognition.start();
+    };
+
+    const handleAddWebUrl = () => {
+        if (webUrl.trim()) {
+            setQuery(prev => prev + (prev ? '\n' : '') + `[Web: ${webUrl}]`);
+            setWebUrl('');
+            setShowUrlModal(false);
+        }
+    };
+
+    const handleFileAttach = async (e) => {
+        const files = Array.from(e.target.files);
+        const textFiles = files.filter(f => 
+            f.type.includes('text') || 
+            f.type.includes('pdf') || 
+            f.type.includes('word') ||
+            f.type.includes('document') ||
+            f.name.endsWith('.txt') ||
+            f.name.endsWith('.md') ||
+            f.name.endsWith('.csv')
+        );
+
+        for (const file of textFiles) {
+            try {
+                const { file_url } = await base44.integrations.Core.UploadFile({ file });
+                setAttachedFiles(prev => [...prev, { name: file.name, url: file_url }]);
+            } catch (err) {
+                console.error('File upload error:', err);
+            }
+        }
+        e.target.value = '';
+    };
+
+    const removeAttachedFile = (index) => {
+        setAttachedFiles(prev => prev.filter((_, i) => i !== index));
     };
 
     const handleSubmit = async () => {
@@ -276,42 +317,29 @@ export default function AIHub() {
                                     rows={2}
                                 />
                                 
-                                <div className="flex items-center justify-between mt-4 pt-4 border-t border-gray-100">
-                                    <div className="flex items-center gap-1">
-                                        <Button
-                                            variant="ghost"
-                                            size="icon"
-                                            className="rounded-lg"
-                                            style={{ backgroundColor: '#E0E7FF' }}
-                                            title="Search mode"
-                                        >
-                                            <Search className="w-5 h-5" style={{ color: '#6B4EE6' }} />
-                                        </Button>
-                                        <Button 
-                                            variant="ghost" 
-                                            size="icon" 
-                                            className="rounded-lg hover:bg-gray-100"
-                                            title="Disable suggestions"
-                                        >
-                                            <Ban className="w-5 h-5 text-gray-500" />
-                                        </Button>
-                                        <div className="w-px h-6 bg-gray-200 mx-1" />
-                                        <Button 
-                                            variant="ghost" 
-                                            size="icon" 
-                                            className="rounded-lg hover:bg-gray-100"
-                                            title="Get ideas"
-                                        >
-                                            <Lightbulb className="w-5 h-5 text-gray-500" />
-                                        </Button>
+                                {/* Attached Files */}
+                                {attachedFiles.length > 0 && (
+                                    <div className="flex flex-wrap gap-2 mt-3">
+                                        {attachedFiles.map((file, i) => (
+                                            <div key={i} className="flex items-center gap-2 px-3 py-1 bg-purple-50 rounded-full text-sm">
+                                                <FileText className="w-4 h-4" style={{ color: '#6B4EE6' }} />
+                                                <span className="text-gray-700 max-w-[150px] truncate">{file.name}</span>
+                                                <button onClick={() => removeAttachedFile(i)} className="hover:text-red-500">
+                                                    <X className="w-4 h-4" />
+                                                </button>
+                                            </div>
+                                        ))}
                                     </div>
-                                    
+                                )}
+
+                                <div className="flex items-center justify-end mt-4 pt-4 border-t border-gray-100">
                                     <div className="flex items-center gap-2">
                                         <Button 
                                             variant="ghost" 
                                             size="icon" 
                                             className="rounded-lg hover:bg-gray-100"
-                                            title="Search web"
+                                            title="Add web URL"
+                                            onClick={() => setShowUrlModal(true)}
                                         >
                                             <Globe className="w-5 h-5 text-gray-500" />
                                         </Button>
@@ -319,18 +347,19 @@ export default function AIHub() {
                                             variant="ghost" 
                                             size="icon" 
                                             className="rounded-lg hover:bg-gray-100"
-                                            title="Copy to clipboard"
-                                        >
-                                            <Copy className="w-5 h-5 text-gray-500" />
-                                        </Button>
-                                        <Button 
-                                            variant="ghost" 
-                                            size="icon" 
-                                            className="rounded-lg hover:bg-gray-100"
-                                            title="Attach file"
+                                            title="Attach document"
+                                            onClick={() => fileInputRef.current?.click()}
                                         >
                                             <Paperclip className="w-5 h-5 text-gray-500" />
                                         </Button>
+                                        <input
+                                            ref={fileInputRef}
+                                            type="file"
+                                            accept=".txt,.pdf,.doc,.docx,.md,.csv,.rtf"
+                                            multiple
+                                            onChange={handleFileAttach}
+                                            className="hidden"
+                                        />
                                         <Button 
                                             variant="ghost" 
                                             size="icon" 
@@ -350,7 +379,7 @@ export default function AIHub() {
                                             {isLoading ? (
                                                 <Loader2 className="w-5 h-5 animate-spin" />
                                             ) : (
-                                                <AudioLines className="w-5 h-5" />
+                                                <ArrowRight className="w-5 h-5" />
                                             )}
                                         </Button>
                                     </div>
@@ -504,6 +533,26 @@ export default function AIHub() {
                     </div>
                 </main>
             </div>
+
+            {/* URL Modal */}
+            <Dialog open={showUrlModal} onOpenChange={setShowUrlModal}>
+                <DialogContent className="sm:max-w-md">
+                    <DialogHeader>
+                        <DialogTitle>Add Web URL</DialogTitle>
+                    </DialogHeader>
+                    <div className="flex gap-2">
+                        <Input
+                            value={webUrl}
+                            onChange={(e) => setWebUrl(e.target.value)}
+                            placeholder="https://example.com"
+                            onKeyDown={(e) => e.key === 'Enter' && handleAddWebUrl()}
+                        />
+                        <Button onClick={handleAddWebUrl} style={{ backgroundColor: '#6B4EE6' }} className="text-white">
+                            Add
+                        </Button>
+                    </div>
+                </DialogContent>
+            </Dialog>
 
             {/* Footer */}
             <footer className="py-6 bg-white border-t border-gray-200">

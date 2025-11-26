@@ -1,19 +1,30 @@
 import React, { useState } from 'react';
-import { CheckCircle, Lock, Play, Star, Trophy, Zap } from 'lucide-react';
+import { 
+    CheckCircle, Lock, Play, Star, Trophy, Zap, BookOpen,
+    Brain, Shield, Users, GraduationCap, Cpu, Leaf, Heart, Building2,
+    Scale, Telescope, Mountain, Waves, Cloud, TreePine, Bug, Flower2,
+    Microscope, Dna, Activity, Smile, Footprints, Cog, FlaskConical,
+    Rocket, Factory, Monitor, Code, Database, Bot, HardDrive, BarChart3,
+    Network, TrendingUp, Landmark, Skull, Lightbulb, Languages, BookText,
+    PenTool, Palette, Music, Film
+} from 'lucide-react';
 import IslandSVG from './IslandSVG';
-import * as LucideIcons from 'lucide-react';
+
+// Icon mapping for dynamic icon rendering
+const ICON_MAP = {
+    BookOpen, Brain, Shield, Users, GraduationCap, Cpu, Leaf, Heart, Building2,
+    Scale, Telescope, Mountain, Waves, Cloud, TreePine, Bug, Flower2,
+    Microscope, Dna, Activity, Smile, Footprints, Cog, FlaskConical,
+    Rocket, Factory, Monitor, Code, Database, Bot, HardDrive, BarChart3,
+    Network, TrendingUp, Landmark, Skull, Lightbulb, Languages, BookText,
+    PenTool, Palette, Music, Film, Star, Trophy, Zap
+};
 
 export default function LearningIslandCard({ topic, index, progress = 0, onExplore, locked = false }) {
     const [hovered, setHovered] = useState(false);
     
     // Get icon component dynamically
-    const getIcon = () => {
-        const iconName = topic.icon || 'BookOpen';
-        const Icon = LucideIcons[iconName] || LucideIcons.BookOpen;
-        return Icon;
-    };
-    
-    const Icon = getIcon();
+    const Icon = ICON_MAP[topic.icon] || BookOpen;
     const isCompleted = progress >= 100;
     const xpReward = 100 + (index * 25);
     

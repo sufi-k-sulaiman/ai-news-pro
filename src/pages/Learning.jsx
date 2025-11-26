@@ -46,17 +46,21 @@ export default function Learning() {
     const nextRank = RANKS.find(r => r.minXP > totalXP);
     const xpToNextRank = nextRank ? nextRank.minXP - totalXP : 0;
 
-    // Generate sub-topics when subjects change
+    // Generate sub-topics when subjects change - use ref to track current request
+    const requestIdRef = React.useRef(0);
+    
     useEffect(() => {
         if (selectedSubjects.length > 0) {
-            generateSubTopics();
+            const currentRequestId = ++requestIdRef.current;
+            generateSubTopics(currentRequestId);
         } else {
             setSubTopics([]);
         }
-    }, [selectedSubjects]);
+    }, [JSON.stringify(selectedSubjects.map(s => s.id))]);
 
-    const generateSubTopics = async () => {
+    const generateSubTopics = async (requestId) => {
         setLoadingTopics(true);
+        setSubTopics([]);
         try {
             const subjectNames = selectedSubjects.map(s => s.name).join(', ');
             
@@ -101,14 +105,17 @@ export default function Learning() {
                 };
             });
 
-            setSubTopics(topicsWithColors);
-            
-            // Initialize progress for new topics
-            const newProgress = {};
-            topicsWithColors.forEach(t => {
-                newProgress[t.id] = userProgress[t.id] || Math.floor(Math.random() * 30);
-            });
-            setUserProgress(newProgress);
+            // Only update if this is still the current request
+            if (requestId === requestIdRef.current) {
+                setSubTopics(topicsWithColors);
+                
+                // Initialize progress for new topics
+                const newProgress = {};
+                topicsWithColors.forEach(t => {
+                    newProgress[t.id] = userProgress[t.id] || Math.floor(Math.random() * 30);
+                });
+                setUserProgress(newProgress);
+            }
             
         } catch (error) {
             console.error('Error generating topics:', error);
@@ -117,9 +124,13 @@ export default function Learning() {
                 { id: `${subject.id}-1`, name: `Introduction to ${subject.name}`, description: 'Core fundamentals', color: subject.color, icon: subject.icon, difficulty: 'Beginner', estimatedHours: 4 },
                 { id: `${subject.id}-2`, name: `Advanced ${subject.name}`, description: 'Deep dive into concepts', color: subject.color, icon: subject.icon, difficulty: 'Advanced', estimatedHours: 8 },
             ]).slice(0, 10);
-            setSubTopics(fallbackTopics);
+            if (requestId === requestIdRef.current) {
+                setSubTopics(fallbackTopics);
+            }
         } finally {
-            setLoadingTopics(false);
+            if (requestId === requestIdRef.current) {
+                setLoadingTopics(false);
+            }
         }
     };
 

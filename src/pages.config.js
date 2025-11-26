@@ -11,6 +11,7 @@ import SearchResults from './pages/SearchResults';
 import Markets from './pages/Markets';
 import Learning from './pages/Learning';
 import Tasks from './pages/Tasks';
+import Intelligence from './pages/Intelligence';
 
 
 export const PAGES = {
@@ -27,6 +28,7 @@ export const PAGES = {
     "Markets": Markets,
     "Learning": Learning,
     "Tasks": Tasks,
+    "Intelligence": Intelligence,
 }
 
 export const pagesConfig = {

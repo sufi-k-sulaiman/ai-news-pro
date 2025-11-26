@@ -1,7 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
-import { Sparkles, Radio, Settings, Brain, FileText, BarChart3, GraduationCap, ListTodo } from "lucide-react";
+import { Sparkles, Radio, Settings, Brain, FileText, BarChart3, GraduationCap, ListTodo, Lightbulb } from "lucide-react";
 import PageLayout from '../components/PageLayout';
 
 const pages = [
@@ -25,6 +25,13 @@ const pages = [
         icon: Brain, 
         description: 'AI-powered knowledge visualization and exploration',
         color: 'from-pink-600 to-rose-600'
+    },
+    { 
+        name: 'Intelligence', 
+        href: createPageUrl('Intelligence'), 
+        icon: Lightbulb, 
+        description: 'AI predictive analytics and scenario modeling',
+        color: 'from-indigo-600 to-purple-600'
     },
     { 
         name: 'Resume Builder', 

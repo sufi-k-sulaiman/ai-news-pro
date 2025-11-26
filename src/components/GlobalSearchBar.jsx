@@ -62,8 +62,13 @@ export default function GlobalSearchBar({
 
     const handleSubmit = (e) => {
         e?.preventDefault();
-        if (query.trim() && onSearch) {
-            onSearch(query.trim());
+        if (query.trim()) {
+            if (onSearch) {
+                onSearch(query.trim());
+            } else {
+                // Navigate to search results page if no handler provided
+                window.location.href = `${createPageUrl('SearchResults')}?q=${encodeURIComponent(query.trim())}`;
+            }
             setIsFocused(false);
         }
     };

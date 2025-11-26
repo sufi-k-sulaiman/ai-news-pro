@@ -7,6 +7,7 @@ import Settings from './pages/Settings';
 import Template from './pages/Template';
 import MindMap from './pages/MindMap';
 import ResumeBuilder from './pages/ResumeBuilder';
+import SearchResults from './pages/SearchResults';
 
 
 export const PAGES = {
@@ -19,6 +20,7 @@ export const PAGES = {
     "Template": Template,
     "MindMap": MindMap,
     "ResumeBuilder": ResumeBuilder,
+    "SearchResults": SearchResults,
 }
 
 export const pagesConfig = {

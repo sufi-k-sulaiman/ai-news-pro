@@ -5,7 +5,8 @@ import { base44 } from '@/api/base44Client';
 import { 
     Upload, FileText, Sparkles, Download, Eye, Plus, Trash2, 
     User, Mail, Phone, MapPin, Linkedin, Globe, Briefcase, 
-    GraduationCap, Award, Loader2, Check, ChevronLeft, Menu
+    GraduationCap, Award, Loader2, Check, ChevronLeft, Menu,
+    Save, RefreshCw, Pencil, X, Lightbulb
 } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -16,17 +17,10 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { LOGO_URL, menuItems, footerLinks } from '../components/NavigationConfig';
 import GlobalSearchBar from '../components/GlobalSearchBar';
-
-const TEMPLATES = [
-    { id: 'modern-pro', name: 'Modern Professional', category: 'Modern', color: '#6B4EE6' },
-    { id: 'clean-minimal', name: 'Clean Minimal', category: 'Modern', color: '#3B82F6' },
-    { id: 'bold-impact', name: 'Bold Impact', category: 'Modern', color: '#EC4899' },
-    { id: 'tech-forward', name: 'Tech Forward', category: 'Modern', color: '#10B981' },
-    { id: 'executive', name: 'Executive Classic', category: 'Classic', color: '#1F2937' },
-    { id: 'traditional', name: 'Traditional Pro', category: 'Classic', color: '#374151' },
-    { id: 'creative', name: 'Creative Canvas', category: 'Creative', color: '#F59E0B' },
-    { id: 'designer', name: 'Designer Portfolio', category: 'Creative', color: '#8B5CF6' },
-];
+import { TemplateSelector, RESUME_TEMPLATES } from '../components/resume/ResumeTemplates';
+import ResumePreview from '../components/resume/ResumePreview';
+import ATSAnalysis from '../components/resume/ATSAnalysis';
+import ExportOptions from '../components/resume/ExportOptions';
 
 export default function ResumeBuilder() {
     const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -34,12 +28,15 @@ export default function ResumeBuilder() {
     const [isGenerating, setIsGenerating] = useState(false);
     const [generatedResume, setGeneratedResume] = useState(null);
     const [showPreview, setShowPreview] = useState(false);
-    const [selectedTemplate, setSelectedTemplate] = useState('modern-pro');
+    const [selectedTemplate, setSelectedTemplate] = useState('modern-professional');
+    const [atsAnalysis, setAtsAnalysis] = useState(null);
+    const [isAnalyzing, setIsAnalyzing] = useState(false);
     const fileInputRef = useRef(null);
 
     // Form state
     const [formData, setFormData] = useState({
         fullName: '',
+        title: '',
         email: '',
         phone: '',
         location: '',
@@ -58,11 +55,7 @@ export default function ResumeBuilder() {
     // Responsive sidebar
     React.useEffect(() => {
         const handleResize = () => {
-            if (window.innerWidth >= 768) {
-                setSidebarOpen(true);
-            } else {
-                setSidebarOpen(false);
-            }
+            setSidebarOpen(window.innerWidth >= 768);
         };
         handleResize();
         window.addEventListener('resize', handleResize);
@@ -102,6 +95,7 @@ export default function ResumeBuilder() {
                     type: "object",
                     properties: {
                         fullName: { type: "string" },
+                        title: { type: "string" },
                         email: { type: "string" },
                         phone: { type: "string" },
                         location: { type: "string" },
@@ -116,6 +110,7 @@ export default function ResumeBuilder() {
                 setFormData(prev => ({
                     ...prev,
                     fullName: extracted.output.fullName || prev.fullName,
+                    title: extracted.output.title || prev.title,
                     email: extracted.output.email || prev.email,
                     phone: extracted.output.phone || prev.phone,
                     location: extracted.output.location || prev.location,
@@ -132,6 +127,7 @@ export default function ResumeBuilder() {
         try {
             const prompt = `Generate a professional ${formData.toneLevel} resume for:
 Name: ${formData.fullName}
+Title: ${formData.title}
 Email: ${formData.email}
 Phone: ${formData.phone}
 Location: ${formData.location}
@@ -145,11 +141,11 @@ ${formData.jobPostingUrl ? `Target Job Posting: ${formData.jobPostingUrl}` : ''}
 ${formData.talkingPoints.length > 0 ? `Key Points to Emphasize:\n${formData.talkingPoints.join('\n')}` : ''}
 
 Generate a ${formData.pageLength} page resume with:
-- Professional summary
-- Work experience with achievements
-- Education
-- Skills section
-- ${formData.generateCoverLetter ? 'Also generate a cover letter' : ''}`;
+- Professional summary (2-3 sentences)
+- Work experience with quantified achievements (use metrics, percentages, dollar amounts)
+- Education with degrees and years
+- Skills section with 8-12 relevant skills
+${formData.generateCoverLetter ? '- Also generate a cover letter' : ''}`;
 
             const response = await base44.integrations.Core.InvokeLLM({
                 prompt,
@@ -166,8 +162,20 @@ Generate a ${formData.pageLength} page resume with:
                 }
             });
 
-            setGeneratedResume(response);
+            const resumeData = {
+                ...formData,
+                summary: response?.summary || '',
+                experience: response?.experience || [],
+                education: response?.education || [],
+                skills: response?.skills || [],
+                coverLetter: response?.coverLetter || ''
+            };
+
+            setGeneratedResume(resumeData);
             setActiveTab('resume');
+            
+            // Auto-run ATS analysis
+            analyzeResume(resumeData);
         } catch (error) {
             console.error('Resume generation error:', error);
         } finally {
@@ -175,7 +183,71 @@ Generate a ${formData.pageLength} page resume with:
         }
     };
 
-    const template = TEMPLATES.find(t => t.id === selectedTemplate);
+    const analyzeResume = async (resumeData) => {
+        setIsAnalyzing(true);
+        try {
+            const response = await base44.integrations.Core.InvokeLLM({
+                prompt: `Analyze this resume for ATS compatibility and HR standards:
+Name: ${resumeData.fullName}
+Summary: ${resumeData.summary}
+Experience: ${JSON.stringify(resumeData.experience)}
+Skills: ${resumeData.skills?.join(', ')}
+${formData.jobPostingUrl ? `Job Posting URL: ${formData.jobPostingUrl}` : ''}
+
+Provide:
+1. ATS score (0-100)
+2. Matched keywords from the job posting
+3. Suggested keywords to add
+4. Detailed scoring for readability, relevance, consistency, impact, and engagement`,
+                add_context_from_internet: !!formData.jobPostingUrl,
+                response_json_schema: {
+                    type: "object",
+                    properties: {
+                        atsScore: { type: "number" },
+                        matchedKeywords: { type: "array", items: { type: "string" } },
+                        suggestedKeywords: { type: "array", items: { type: "string" } },
+                        sentenceSimplicity: { type: "number" },
+                        bulletPointUsage: { type: "number" },
+                        jargonAvoidance: { type: "number" },
+                        skillsAlignment: { type: "number" },
+                        industryTerms: { type: "number" },
+                        quantifiedAchievements: { type: "number" },
+                        formatUniformity: { type: "number" },
+                        grammarSpelling: { type: "number" },
+                        tenseConsistency: { type: "number" },
+                        quantifiedResults: { type: "number" },
+                        scopeOfWork: { type: "number" },
+                        careerGrowth: { type: "number" },
+                        actionVerbs: { type: "number" },
+                        valueProposition: { type: "number" },
+                        professionalSummary: { type: "number" }
+                    }
+                }
+            });
+
+            setAtsAnalysis(response);
+        } catch (error) {
+            console.error('Analysis error:', error);
+        } finally {
+            setIsAnalyzing(false);
+        }
+    };
+
+    const addKeywordToResume = (keyword) => {
+        if (generatedResume && !generatedResume.skills?.includes(keyword)) {
+            setGeneratedResume(prev => ({
+                ...prev,
+                skills: [...(prev.skills || []), keyword]
+            }));
+        }
+    };
+
+    const handleExport = (format) => {
+        console.log('Exporting as:', format);
+        // Export implementation would go here
+    };
+
+    const template = RESUME_TEMPLATES.find(t => t.id === selectedTemplate) || RESUME_TEMPLATES[0];
 
     return (
         <div className="min-h-screen flex flex-col bg-gray-50">
@@ -244,9 +316,9 @@ Generate a ${formData.pageLength} page resume with:
 
                             {/* Builder Tab */}
                             <TabsContent value="builder">
-                                <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                                <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
                                     {/* Left Column - Career Info */}
-                                    <div className="lg:col-span-1 space-y-6">
+                                    <div className="lg:col-span-4 space-y-6">
                                         <div className="bg-white rounded-2xl border border-gray-200 p-6">
                                             <h2 className="font-semibold text-gray-900 mb-4">Career Information</h2>
                                             
@@ -256,29 +328,37 @@ Generate a ${formData.pageLength} page resume with:
                                                 className="border-2 border-dashed border-gray-300 rounded-xl p-6 text-center cursor-pointer hover:border-purple-400 hover:bg-purple-50 transition-colors mb-4"
                                             >
                                                 <Upload className="w-8 h-8 text-gray-400 mx-auto mb-2" />
-                                                <p className="text-sm text-gray-600">Upload existing resume</p>
-                                                <p className="text-xs text-gray-400">PDF, DOC, TXT</p>
+                                                <p className="text-sm font-medium text-gray-600">Upload existing resume</p>
+                                                <p className="text-xs text-gray-400">(PDF, DOC, TXT)</p>
                                             </div>
                                             <input ref={fileInputRef} type="file" accept=".pdf,.doc,.docx,.txt" onChange={handleFileUpload} className="hidden" />
 
                                             {/* Job URL */}
                                             <div className="mb-4">
+                                                <div className="flex items-center gap-2 mb-1">
+                                                    <Globe className="w-4 h-4 text-gray-400" />
+                                                    <label className="text-sm text-gray-600">Job Posting URL</label>
+                                                </div>
                                                 <Input
                                                     placeholder="Paste job posting URL..."
                                                     value={formData.jobPostingUrl}
                                                     onChange={(e) => handleInputChange('jobPostingUrl', e.target.value)}
-                                                    className="h-12"
                                                 />
                                             </div>
 
                                             {/* Career Writeup */}
                                             <div>
-                                                <label className="text-sm font-medium text-gray-700 mb-2 block">Career Write-up</label>
+                                                <div className="flex items-center justify-between mb-1">
+                                                    <label className="text-sm font-medium text-gray-700">Career Write-up</label>
+                                                    <button className="text-xs text-purple-600 flex items-center gap-1 hover:underline">
+                                                        <Lightbulb className="w-3 h-3" /> Example
+                                                    </button>
+                                                </div>
                                                 <Textarea
                                                     placeholder="Paste your career history, achievements, skills..."
                                                     value={formData.careerWriteup}
                                                     onChange={(e) => handleInputChange('careerWriteup', e.target.value)}
-                                                    className="min-h-[150px]"
+                                                    className="min-h-[120px]"
                                                 />
                                             </div>
                                         </div>
@@ -288,17 +368,18 @@ Generate a ${formData.pageLength} page resume with:
                                             <h2 className="font-semibold text-gray-900 mb-4">Contact Information</h2>
                                             <div className="grid grid-cols-2 gap-3">
                                                 <Input placeholder="Full Name" value={formData.fullName} onChange={(e) => handleInputChange('fullName', e.target.value)} />
+                                                <Input placeholder="Job Title" value={formData.title} onChange={(e) => handleInputChange('title', e.target.value)} />
                                                 <Input placeholder="Email" value={formData.email} onChange={(e) => handleInputChange('email', e.target.value)} />
                                                 <Input placeholder="Phone" value={formData.phone} onChange={(e) => handleInputChange('phone', e.target.value)} />
                                                 <Input placeholder="Location" value={formData.location} onChange={(e) => handleInputChange('location', e.target.value)} />
                                                 <Input placeholder="LinkedIn" value={formData.linkedin} onChange={(e) => handleInputChange('linkedin', e.target.value)} />
-                                                <Input placeholder="Portfolio" value={formData.portfolio} onChange={(e) => handleInputChange('portfolio', e.target.value)} />
+                                                <Input placeholder="Portfolio" className="col-span-2" value={formData.portfolio} onChange={(e) => handleInputChange('portfolio', e.target.value)} />
                                             </div>
                                         </div>
                                     </div>
 
                                     {/* Middle Column - Settings */}
-                                    <div className="lg:col-span-1 space-y-6">
+                                    <div className="lg:col-span-4 space-y-6">
                                         <div className="bg-white rounded-2xl border border-gray-200 p-6">
                                             <h2 className="font-semibold text-gray-900 mb-4">Resume Settings</h2>
                                             
@@ -349,11 +430,11 @@ Generate a ${formData.pageLength} page resume with:
                                                     onKeyDown={(e) => e.key === 'Enter' && addTalkingPoint()}
                                                     className="mb-3"
                                                 />
-                                                <div className="space-y-2">
+                                                <div className="space-y-2 max-h-[200px] overflow-y-auto">
                                                     {formData.talkingPoints.map((point, i) => (
                                                         <div key={i} className="flex items-center gap-2 p-2 bg-gray-50 rounded-lg">
                                                             <Check className="w-4 h-4 text-green-500 flex-shrink-0" />
-                                                            <span className="text-sm text-gray-700 flex-1">{point}</span>
+                                                            <span className="text-sm text-gray-700 flex-1 line-clamp-2">{point}</span>
                                                             <button onClick={() => removeTalkingPoint(i)} className="text-gray-400 hover:text-red-500">
                                                                 <Trash2 className="w-4 h-4" />
                                                             </button>
@@ -375,34 +456,12 @@ Generate a ${formData.pageLength} page resume with:
                                     </div>
 
                                     {/* Right Column - Templates */}
-                                    <div className="lg:col-span-1">
-                                        <div className="bg-white rounded-2xl border border-gray-200 p-6">
-                                            <h2 className="font-semibold text-gray-900 mb-4">Choose Template ({TEMPLATES.length} designs)</h2>
-                                            
-                                            {['Modern', 'Classic', 'Creative'].map(category => (
-                                                <div key={category} className="mb-6">
-                                                    <h3 className="text-sm font-medium text-gray-600 mb-3">{category}</h3>
-                                                    <div className="grid grid-cols-2 gap-3">
-                                                        {TEMPLATES.filter(t => t.category === category).map(t => (
-                                                            <div
-                                                                key={t.id}
-                                                                onClick={() => setSelectedTemplate(t.id)}
-                                                                className={`p-3 rounded-xl border-2 cursor-pointer transition-all ${selectedTemplate === t.id ? 'border-purple-500 bg-purple-50' : 'border-gray-200 hover:border-gray-300'}`}
-                                                            >
-                                                                <div className="aspect-[3/4] rounded-lg mb-2 flex items-center justify-center" style={{ backgroundColor: `${t.color}15` }}>
-                                                                    <div className="w-full px-2">
-                                                                        <div className="h-2 rounded mb-1" style={{ backgroundColor: t.color, width: '60%' }} />
-                                                                        <div className="h-1 bg-gray-200 rounded mb-1" />
-                                                                        <div className="h-1 bg-gray-200 rounded mb-1 w-3/4" />
-                                                                        <div className="h-1 bg-gray-200 rounded w-1/2" />
-                                                                    </div>
-                                                                </div>
-                                                                <p className="text-xs font-medium text-gray-700 truncate">{t.name}</p>
-                                                            </div>
-                                                        ))}
-                                                    </div>
-                                                </div>
-                                            ))}
+                                    <div className="lg:col-span-4">
+                                        <div className="bg-white rounded-2xl border border-gray-200 p-6 max-h-[calc(100vh-200px)] overflow-y-auto">
+                                            <TemplateSelector 
+                                                selectedTemplate={selectedTemplate} 
+                                                onSelect={setSelectedTemplate} 
+                                            />
                                         </div>
                                     </div>
                                 </div>
@@ -411,78 +470,42 @@ Generate a ${formData.pageLength} page resume with:
                             {/* Resume Tab */}
                             <TabsContent value="resume">
                                 {generatedResume ? (
-                                    <div className="bg-white rounded-2xl border border-gray-200 p-6 md:p-8 max-w-3xl mx-auto">
-                                        <div className="flex justify-end mb-4">
-                                            <Button variant="outline" onClick={() => setShowPreview(true)}>
-                                                <Eye className="w-4 h-4 mr-2" /> Preview
-                                            </Button>
-                                        </div>
-
-                                        {/* Resume Content */}
-                                        <div className="border-l-4 pl-6" style={{ borderColor: template?.color }}>
-                                            <h1 className="text-3xl font-bold text-gray-900 mb-1">{formData.fullName}</h1>
-                                            <div className="flex flex-wrap gap-4 text-sm text-gray-600 mb-6">
-                                                {formData.email && <span className="flex items-center gap-1"><Mail className="w-4 h-4" /> {formData.email}</span>}
-                                                {formData.phone && <span className="flex items-center gap-1"><Phone className="w-4 h-4" /> {formData.phone}</span>}
-                                                {formData.location && <span className="flex items-center gap-1"><MapPin className="w-4 h-4" /> {formData.location}</span>}
-                                            </div>
-
-                                            {generatedResume.summary && (
-                                                <div className="mb-6">
-                                                    <h2 className="text-lg font-semibold text-gray-800 mb-2">Professional Summary</h2>
-                                                    <p className="text-gray-700">{generatedResume.summary}</p>
-                                                </div>
-                                            )}
-
-                                            {generatedResume.experience?.length > 0 && (
-                                                <div className="mb-6">
-                                                    <h2 className="text-lg font-semibold text-gray-800 mb-3 flex items-center gap-2">
-                                                        <Briefcase className="w-5 h-5" style={{ color: template?.color }} /> Experience
-                                                    </h2>
-                                                    {generatedResume.experience.map((exp, i) => (
-                                                        <div key={i} className="mb-4">
-                                                            <h3 className="font-semibold text-gray-900">{exp.title}</h3>
-                                                            <p className="text-sm text-gray-600">{exp.company} • {exp.duration}</p>
-                                                            <ul className="mt-2 space-y-1">
-                                                                {exp.achievements?.map((a, j) => (
-                                                                    <li key={j} className="text-sm text-gray-700 flex items-start gap-2">
-                                                                        <span className="w-1.5 h-1.5 rounded-full mt-2 flex-shrink-0" style={{ backgroundColor: template?.color }} />
-                                                                        {a}
-                                                                    </li>
-                                                                ))}
-                                                            </ul>
-                                                        </div>
-                                                    ))}
-                                                </div>
-                                            )}
-
-                                            {generatedResume.education?.length > 0 && (
-                                                <div className="mb-6">
-                                                    <h2 className="text-lg font-semibold text-gray-800 mb-3 flex items-center gap-2">
-                                                        <GraduationCap className="w-5 h-5" style={{ color: template?.color }} /> Education
-                                                    </h2>
-                                                    {generatedResume.education.map((edu, i) => (
-                                                        <div key={i} className="mb-2">
-                                                            <h3 className="font-semibold text-gray-900">{edu.degree}</h3>
-                                                            <p className="text-sm text-gray-600">{edu.school} • {edu.year}</p>
-                                                        </div>
-                                                    ))}
-                                                </div>
-                                            )}
-
-                                            {generatedResume.skills?.length > 0 && (
-                                                <div>
-                                                    <h2 className="text-lg font-semibold text-gray-800 mb-3 flex items-center gap-2">
-                                                        <Award className="w-5 h-5" style={{ color: template?.color }} /> Skills
-                                                    </h2>
-                                                    <div className="flex flex-wrap gap-2">
-                                                        {generatedResume.skills.map((skill, i) => (
-                                                            <span key={i} className="px-3 py-1 rounded-full text-sm" style={{ backgroundColor: `${template?.color}15`, color: template?.color }}>
-                                                                {skill}
-                                                            </span>
-                                                        ))}
+                                    <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                                        {/* Resume Preview */}
+                                        <div className="lg:col-span-2">
+                                            <div className="bg-white rounded-2xl border border-gray-200 p-4">
+                                                <div className="flex items-center justify-between mb-4">
+                                                    <h2 className="font-semibold text-gray-900">Resume Preview</h2>
+                                                    <div className="flex gap-2">
+                                                        <Button variant="outline" size="sm" onClick={() => setShowPreview(true)}>
+                                                            <Eye className="w-4 h-4 mr-1" /> Full View
+                                                        </Button>
+                                                        <Button variant="outline" size="sm">
+                                                            <Save className="w-4 h-4 mr-1" /> Save
+                                                        </Button>
                                                     </div>
                                                 </div>
+                                                <ResumePreview 
+                                                    data={generatedResume} 
+                                                    templateId={selectedTemplate}
+                                                    className="rounded-xl overflow-hidden border border-gray-200"
+                                                />
+                                            </div>
+                                        </div>
+
+                                        {/* Analysis Panel */}
+                                        <div className="lg:col-span-1">
+                                            {isAnalyzing ? (
+                                                <div className="bg-white rounded-2xl border border-gray-200 p-6 text-center">
+                                                    <Loader2 className="w-8 h-8 text-purple-600 mx-auto mb-3 animate-spin" />
+                                                    <p className="text-gray-600">Analyzing your resume...</p>
+                                                </div>
+                                            ) : (
+                                                <ATSAnalysis 
+                                                    analysis={atsAnalysis}
+                                                    onAddKeyword={addKeywordToResume}
+                                                    onRefresh={() => analyzeResume(generatedResume)}
+                                                />
                                             )}
                                         </div>
                                     </div>
@@ -500,21 +523,19 @@ Generate a ${formData.pageLength} page resume with:
 
                             {/* Export Tab */}
                             <TabsContent value="export">
-                                <div className="bg-white rounded-2xl border border-gray-200 p-6 max-w-xl mx-auto text-center">
-                                    <Download className="w-16 h-16 text-purple-600 mx-auto mb-4" />
-                                    <h2 className="text-xl font-semibold text-gray-800 mb-2">Export Your Resume</h2>
-                                    <p className="text-gray-500 mb-6">Download your resume in various formats</p>
-                                    <div className="space-y-3">
-                                        <Button variant="outline" className="w-full justify-start" disabled={!generatedResume}>
-                                            <FileText className="w-5 h-5 mr-3" /> Download as PDF
-                                        </Button>
-                                        <Button variant="outline" className="w-full justify-start" disabled={!generatedResume}>
-                                            <FileText className="w-5 h-5 mr-3" /> Download as DOCX
-                                        </Button>
-                                        <Button variant="outline" className="w-full justify-start" disabled={!generatedResume}>
-                                            <Globe className="w-5 h-5 mr-3" /> Share Online Link
-                                        </Button>
-                                    </div>
+                                <div className="max-w-xl mx-auto">
+                                    {generatedResume ? (
+                                        <ExportOptions onExport={handleExport} isGenerating={isGenerating} />
+                                    ) : (
+                                        <div className="bg-white rounded-2xl border border-gray-200 p-12 text-center">
+                                            <Download className="w-16 h-16 text-gray-300 mx-auto mb-4" />
+                                            <h2 className="text-xl font-semibold text-gray-800 mb-2">Generate a Resume First</h2>
+                                            <p className="text-gray-500 mb-4">You need to generate a resume before exporting</p>
+                                            <Button onClick={() => setActiveTab('builder')} className="bg-purple-600 hover:bg-purple-700">
+                                                Go to Builder
+                                            </Button>
+                                        </div>
+                                    )}
                                 </div>
                             </TabsContent>
                         </Tabs>
@@ -537,11 +558,21 @@ Generate a ${formData.pageLength} page resume with:
                 </div>
             </footer>
 
-            {/* Preview Dialog */}
+            {/* Full Preview Dialog */}
             <Dialog open={showPreview} onOpenChange={setShowPreview}>
-                <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
-                    <div className="p-8 bg-white">
-                        <p className="text-center text-gray-500">Full preview coming soon...</p>
+                <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto p-0">
+                    <div className="sticky top-0 bg-white border-b border-gray-200 p-4 flex items-center justify-between z-10">
+                        <h2 className="font-semibold text-gray-900">Full Resume Preview</h2>
+                        <Button variant="ghost" size="icon" onClick={() => setShowPreview(false)}>
+                            <X className="w-5 h-5" />
+                        </Button>
+                    </div>
+                    <div className="p-4">
+                        <ResumePreview 
+                            data={generatedResume} 
+                            templateId={selectedTemplate}
+                            className="mx-auto max-w-2xl"
+                        />
                     </div>
                 </DialogContent>
             </Dialog>

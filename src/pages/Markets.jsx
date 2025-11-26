@@ -33,18 +33,44 @@ const FILTER_OPTIONS = {
     aiIndex: { label: 'AI Index', options: ['Any', '90+', '80+', '70+', '60+'] },
 };
 
-// Stock universe - will be enriched with live AI data
+// Stock universe - 200 stocks enriched with live AI data
 const STOCK_UNIVERSE = [
-    'AAPL', 'MSFT', 'GOOGL', 'AMZN', 'NVDA', 'META', 'TSLA', 'BRK.B', 'JPM', 'V',
-    'JNJ', 'WMT', 'PG', 'MA', 'HD', 'CVX', 'MRK', 'ABBV', 'PEP', 'KO',
-    'COST', 'TMO', 'AVGO', 'MCD', 'CSCO', 'ACN', 'ABT', 'DHR', 'NEE', 'LIN',
-    'ADBE', 'CRM', 'NKE', 'TXN', 'PM', 'UNP', 'RTX', 'QCOM', 'HON', 'LOW',
-    'INTC', 'AMD', 'IBM', 'ORCL', 'NOW', 'INTU', 'SNOW', 'PLTR', 'CRWD', 'NET',
-    'BA', 'CAT', 'GE', 'MMM', 'UPS', 'DE', 'LMT', 'GD', 'NOC', 'RTX',
+    // Tech Giants
+    'AAPL', 'MSFT', 'GOOGL', 'AMZN', 'NVDA', 'META', 'TSLA', 'AVGO', 'ORCL', 'ADBE',
+    'CRM', 'CSCO', 'ACN', 'IBM', 'INTC', 'AMD', 'QCOM', 'TXN', 'NOW', 'INTU',
+    'AMAT', 'MU', 'LRCX', 'KLAC', 'SNPS', 'CDNS', 'MRVL', 'ADI', 'NXPI', 'MCHP',
+    // Cloud & Software
+    'SNOW', 'PLTR', 'CRWD', 'NET', 'DDOG', 'ZS', 'OKTA', 'MDB', 'TEAM', 'WDAY',
+    'PANW', 'FTNT', 'SPLK', 'ZM', 'DOCU', 'TWLO', 'SQ', 'SHOP', 'SPOT', 'UBER',
+    // Finance
+    'BRK.B', 'JPM', 'V', 'MA', 'BAC', 'WFC', 'GS', 'MS', 'C', 'SCHW',
+    'BLK', 'AXP', 'PYPL', 'COF', 'USB', 'PNC', 'TFC', 'SPGI', 'MCO', 'ICE',
+    'CME', 'MSCI', 'FIS', 'FISV', 'GPN', 'ADP', 'PAYX', 'FI', 'COIN', 'HOOD',
+    // Healthcare
+    'JNJ', 'UNH', 'PFE', 'LLY', 'MRK', 'ABBV', 'TMO', 'ABT', 'DHR', 'BMY',
+    'AMGN', 'GILD', 'REGN', 'VRTX', 'MRNA', 'BIIB', 'ISRG', 'MDT', 'SYK', 'BSX',
+    'ZBH', 'EW', 'DXCM', 'ILMN', 'A', 'IQV', 'CI', 'HUM', 'CVS', 'MCK',
+    // Consumer
+    'WMT', 'PG', 'HD', 'COST', 'KO', 'PEP', 'MCD', 'NKE', 'SBUX', 'LOW',
+    'TGT', 'TJX', 'ROST', 'DG', 'DLTR', 'ORLY', 'AZO', 'BKNG', 'ABNB', 'MAR',
+    'HLT', 'YUM', 'DPZ', 'CMG', 'LULU', 'GPS', 'ANF', 'DECK', 'CROX', 'BIRD',
+    // Media & Entertainment
+    'DIS', 'NFLX', 'CMCSA', 'WBD', 'PARA', 'FOX', 'RBLX', 'TTWO', 'EA', 'ATVI',
+    // Telecom
+    'T', 'VZ', 'TMUS', 'CHTR', 'LUMN',
+    // Energy
     'XOM', 'CVX', 'COP', 'EOG', 'SLB', 'PSX', 'VLO', 'MPC', 'OXY', 'HAL',
-    'BAC', 'WFC', 'GS', 'MS', 'C', 'SCHW', 'BLK', 'AXP', 'PYPL', 'SQ',
-    'PFE', 'LLY', 'UNH', 'AMGN', 'GILD', 'BMY', 'REGN', 'VRTX', 'MRNA', 'BIIB',
-    'DIS', 'NFLX', 'CMCSA', 'T', 'VZ', 'TMUS', 'CHTR', 'WBD', 'PARA', 'FOX'
+    'DVN', 'PXD', 'FANG', 'HES', 'BKR', 'KMI', 'WMB', 'OKE', 'ET', 'EPD',
+    // Industrials
+    'BA', 'CAT', 'GE', 'MMM', 'UPS', 'DE', 'LMT', 'GD', 'NOC', 'RTX',
+    'HON', 'UNP', 'CSX', 'NSC', 'FDX', 'WM', 'RSG', 'EMR', 'ETN', 'ITW',
+    'PH', 'ROK', 'DOV', 'IR', 'XYL', 'SWK', 'FAST', 'GWW', 'CTAS', 'PAYX',
+    // Materials
+    'LIN', 'APD', 'SHW', 'ECL', 'DD', 'NEM', 'FCX', 'NUE', 'VMC', 'MLM',
+    // Real Estate
+    'AMT', 'PLD', 'CCI', 'EQIX', 'SPG', 'PSA', 'DLR', 'O', 'WELL', 'AVB',
+    // Utilities
+    'NEE', 'DUK', 'SO', 'D', 'AEP', 'EXC', 'SRE', 'XEL', 'ED', 'WEC'
 ];
 
 export default function Markets() {
@@ -257,8 +283,8 @@ Return accurate, realistic financial data.`,
                         <Link to={createPageUrl('Home')} className="flex items-center gap-3 hover:opacity-80">
                             <img src={LOGO_URL} alt="1cPublishing" className="h-10 w-10 object-contain" />
                             <div className="hidden sm:block">
-                                <span className="text-xl font-bold text-gray-900">Markets Pro</span>
-                                <p className="text-xs font-medium text-purple-600">AI Powered</p>
+                                <span className="text-xl font-bold text-gray-900">1cPublishing</span>
+                                <p className="text-xs font-medium text-purple-600">Ai Markets</p>
                             </div>
                         </Link>
                     </div>
@@ -357,16 +383,46 @@ Return accurate, realistic financial data.`,
                     {!isLoading && filteredStocks.length === 0 && (
                         <div className="text-center py-20">
                             <BarChart3 className="w-16 h-16 text-gray-300 mx-auto mb-4" />
-                            <p className="text-gray-500">No stocks match your filters</p>
+                            <p className="text-gray-500 mb-4">No stocks match your current filters</p>
+                            <Button 
+                                onClick={() => {
+                                    setFilters({
+                                        market: 'All Markets',
+                                        sector: 'All Sectors',
+                                        industry: 'All Industries',
+                                        moat: 'Any',
+                                        roe: 'Any',
+                                        pe: 'Any',
+                                        zscore: 'Any',
+                                        eps: 'Any',
+                                        dividend: 'Any',
+                                        aiIndex: 'Any'
+                                    });
+                                    setActivePreset('suggested');
+                                    setSearchQuery('');
+                                }}
+                                variant="outline"
+                            >
+                                Clear All Filters
+                            </Button>
                         </div>
                     )}
                 </main>
             </div>
 
-            <footer className="py-4 bg-white border-t border-gray-200">
-                <div className="max-w-6xl mx-auto px-4 text-center text-sm text-gray-500 flex items-center justify-center gap-2">
-                    <Sparkles className="w-4 h-4 text-purple-600" />
-                    Powered by AI • Real-time market intelligence
+            <footer className="py-6 bg-white border-t border-gray-200">
+                <div className="max-w-6xl mx-auto px-4">
+                    <div className="flex flex-col md:flex-row justify-between items-center gap-4">
+                        <img src={LOGO_URL} alt="1cPublishing" className="h-8 w-8 object-contain grayscale" />
+                        <nav className="flex flex-wrap justify-center gap-6 text-sm">
+                            {footerLinks.map((link, i) => (
+                                <a key={i} href={link.href} className="text-gray-600 hover:text-purple-600 transition-colors">{link.label}</a>
+                            ))}
+                        </nav>
+                    </div>
+                    <div className="mt-4 pt-4 border-t border-gray-200 text-center text-sm text-gray-500">
+                        © 2025 1cPublishing.com
+                    </div>
                 </div>
             </footer>
 

@@ -297,11 +297,11 @@ export default function AIHub() {
                         </Button>
                         <div className="flex items-center gap-3">
                             <Link to={createPageUrl('Home')} className="flex items-center gap-3 hover:opacity-80">
-                                <img src={LOGO_URL} alt="1cPublishing" className="h-10 w-10 object-contain" />
-                                <div>
-                                    <span className="text-xl font-bold text-black">1cPublishing</span>
-                                    <p className="text-xs font-medium" style={{ color: '#6B4EE6' }}>AI Powered</p>
-                                </div>
+                              <img src={LOGO_URL} alt="1cPublishing" className="h-10 w-10 object-contain" />
+                              <div>
+                                  <span className="text-xl font-bold text-black">1cPublishing</span>
+                                  <p className="text-xs font-medium" style={{ color: '#6B4EE6' }}>Ai Hub</p>
+                              </div>
                             </Link>
                             </div>
                             </div>

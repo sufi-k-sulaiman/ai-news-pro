@@ -51,7 +51,7 @@ export default function PageLayout({ children, activePage, onSearch, searchPlace
                             <img src={LOGO_URL} alt="1cPublishing" className="h-10 w-10 object-contain" />
                             <div className="hidden sm:block">
                                 <span className="text-xl font-bold text-black">1cPublishing</span>
-                                <p className="text-xs font-medium text-purple-600">AI Powered</p>
+                                    <p className="text-xs font-medium text-purple-600">Ai Powered</p>
                             </div>
                         </Link>
                     </div>

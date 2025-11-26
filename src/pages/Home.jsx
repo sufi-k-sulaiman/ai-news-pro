@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
-import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Search, Mic, MicOff, Menu, ChevronLeft, Home as HomeIcon, FileText, Users, Settings, HelpCircle, BookOpen, Loader2, Sparkles } from "lucide-react";
+import { Menu, ChevronLeft, Home as HomeIcon, FileText, Settings, BookOpen, Sparkles, Radio, BarChart3 } from "lucide-react";
+import SmartSearchBar from '../components/SmartSearchBar';
 
 const LOGO_URL = "https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/692729a5f5180fbd43f297e9/868a98750_1cPublishing-logo.png";
 
@@ -12,15 +12,18 @@ export default function Home() {
     const [searchQuery, setSearchQuery] = useState("");
 
     const menuItems = [
-        { icon: HomeIcon, label: "Home", href: createPageUrl('Home') },
+        { icon: HomeIcon, label: "Home", href: createPageUrl('Home'), active: true },
         { icon: Sparkles, label: "AI Hub", href: createPageUrl('AIHub') },
-        { icon: FileText, label: "SearchPods", href: createPageUrl('SearchPods') },
-        { icon: BookOpen, label: "Dashboard", href: createPageUrl('DashboardComponents') },
-        { icon: Settings, label: "Test Functions", href: createPageUrl('TestFunctions') },
+        { icon: Radio, label: "SearchPods", href: createPageUrl('SearchPods') },
+        { icon: BarChart3, label: "Dashboard", href: createPageUrl('DashboardComponents') },
+        { icon: Settings, label: "Settings", href: createPageUrl('Settings') },
     ];
+    
+    const [blackWhiteMode] = useState(() => localStorage.getItem('blackWhiteMode') === 'true');
+    const [hideIcons] = useState(() => localStorage.getItem('hideIcons') === 'true');
 
     return (
-        <div className="min-h-screen flex flex-col bg-white">
+        <div className={`min-h-screen flex flex-col bg-white ${blackWhiteMode ? 'grayscale' : ''}`}>
             {/* Header */}
             <header className="bg-white shadow-sm sticky top-0 z-50 border-b border-gray-200">
                 <div className="flex items-center justify-between px-4 py-3">
@@ -44,18 +47,11 @@ export default function Home() {
                     </div>
 
                     {/* Search Bar */}
-                    <div className="flex-1 max-w-2xl mx-8 relative">
-                        <div className="relative flex items-center">
-                            <Search className="absolute left-4 w-5 h-5 text-gray-400" />
-                            <Input
-                                type="text"
-                                placeholder="Search publications, authors, documents..."
-                                value={searchQuery}
-                                onChange={(e) => setSearchQuery(e.target.value)}
-                                className="w-full pl-12 pr-12 py-6 text-lg rounded-full border-2 border-gray-200 focus:border-purple-500 focus:ring-purple-500"
-                            />
-                        </div>
-                    </div>
+                    <SmartSearchBar 
+                        onSearch={(q) => console.log('Search:', q)}
+                        placeholder="Search publications, authors, documents..."
+                        className="flex-1 max-w-2xl mx-8"
+                    />
 
                     <div className="w-32" />
                 </div>
@@ -71,9 +67,13 @@ export default function Home() {
                             <Link
                                 key={index}
                                 to={item.href}
-                                className="flex items-center gap-3 px-4 py-3 rounded-lg transition-colors text-gray-700 hover:bg-purple-50 hover:text-purple-600"
+                                className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-colors ${
+                                    item.active 
+                                        ? 'bg-purple-100 text-purple-700'
+                                        : 'text-gray-700 hover:bg-purple-50 hover:text-purple-600'
+                                }`}
                             >
-                                <item.icon className="w-5 h-5" style={{ color: '#6B4EE6' }} />
+                                {!hideIcons && <item.icon className="w-5 h-5" style={{ color: '#6B4EE6' }} />}
                                 <span className="font-medium">{item.label}</span>
                             </Link>
                         ))}

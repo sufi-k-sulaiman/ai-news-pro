@@ -1,26 +1,25 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
 import { base44 } from '@/api/base44Client';
 import { 
-    Search, Play, Pause, SkipBack, SkipForward, Volume2,
+    Play, Pause, SkipBack, SkipForward, Volume2, VolumeX,
     Sparkles, Home, Radio, Menu, ChevronLeft, Loader2,
     ChevronRight, Plus, Cpu, BookOpen, Film, Trophy, Building2, Plane,
     BarChart3, Settings
 } from 'lucide-react';
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { Slider } from "@/components/ui/slider";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import SmartSearchBar from '../components/SmartSearchBar';
 
 const LOGO_URL = "https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/692729a5f5180fbd43f297e9/868a98750_1cPublishing-logo.png";
 
 const VOICE_OPTIONS = [
-    { id: 'alloy', name: 'Alloy', description: 'Neutral & balanced' },
-    { id: 'echo', name: 'Echo', description: 'Warm & friendly' },
-    { id: 'nova', name: 'Nova', description: 'Friendly & upbeat' },
-    { id: 'onyx', name: 'Onyx', description: 'Deep & authoritative' },
+    { id: 'default', name: 'Default', description: 'System voice' },
+    { id: 'female', name: 'Female', description: 'Higher pitch' },
+    { id: 'male', name: 'Male', description: 'Lower pitch' },
 ];
 
 const CATEGORY_ICONS = {
@@ -51,7 +50,6 @@ const menuItems = [
 
 export default function SearchPods() {
     const [sidebarOpen, setSidebarOpen] = useState(true);
-    const [searchQuery, setSearchQuery] = useState('');
     const [categories, setCategories] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
     const [showPlayer, setShowPlayer] = useState(false);
@@ -59,41 +57,28 @@ export default function SearchPods() {
     const [isPlaying, setIsPlaying] = useState(false);
     const [currentTime, setCurrentTime] = useState(0);
     const [duration, setDuration] = useState(300);
-    const [selectedVoice, setSelectedVoice] = useState('nova');
-    const [playbackSpeed, setPlaybackSpeed] = useState('1x');
+    const [volume, setVolume] = useState(80);
+    const [isMuted, setIsMuted] = useState(false);
+    const [selectedVoice, setSelectedVoice] = useState('default');
+    const [playbackSpeed, setPlaybackSpeed] = useState(1);
     const [generatingCategory, setGeneratingCategory] = useState(null);
     const [currentCaption, setCurrentCaption] = useState('');
     const [captions, setCaptions] = useState([]);
-    const [equalizerBars, setEqualizerBars] = useState(Array(12).fill(20));
+    const [isGeneratingAudio, setIsGeneratingAudio] = useState(false);
     const [hideIcons] = useState(() => localStorage.getItem('hideIcons') === 'true');
+    const [blackWhiteMode] = useState(() => localStorage.getItem('blackWhiteMode') === 'true');
+    
+    // Equalizer state
+    const [bass, setBass] = useState(50);
+    const [mid, setMid] = useState(50);
+    const [treble, setTreble] = useState(50);
+    
+    const speechRef = useRef(null);
+    const captionIndexRef = useRef(0);
 
     useEffect(() => {
         loadCategories();
     }, []);
-
-    useEffect(() => {
-        let interval;
-        if (isPlaying) {
-            interval = setInterval(() => {
-                setEqualizerBars(prev => prev.map(() => Math.random() * 60 + 20));
-                setCurrentTime(prev => {
-                    const next = prev + 1;
-                    if (next >= duration) {
-                        setIsPlaying(false);
-                        return duration;
-                    }
-                    // Update caption
-                    const captionObj = captions.find((c, i) => {
-                        const nextC = captions[i + 1];
-                        return next >= c.time && (!nextC || next < nextC.time);
-                    });
-                    if (captionObj) setCurrentCaption(captionObj.text);
-                    return next;
-                });
-            }, 1000);
-        }
-        return () => clearInterval(interval);
-    }, [isPlaying, duration, captions]);
 
     const loadCategories = async () => {
         setIsLoading(true);
@@ -204,58 +189,110 @@ export default function SearchPods() {
         setCurrentEpisode(episode);
         setShowPlayer(true);
         setCurrentTime(0);
-        setCurrentCaption('Generating podcast content...');
         setIsPlaying(false);
+        setIsGeneratingAudio(true);
+        setCurrentCaption('Generating podcast content...');
 
         try {
-            // Generate podcast script with captions
+            // Generate podcast script
             const scriptResponse = await base44.integrations.Core.InvokeLLM({
-                prompt: `Create a 5-minute podcast script about "${episode.title}". 
-                Include engaging content with facts and insights.
-                Break it into caption segments (sentences) with timestamps.`,
+                prompt: `Create a detailed 5-minute podcast script about "${episode.title}". 
+                Write it as natural spoken content with engaging facts, insights, and a conversational tone.
+                Split into sentences for captions.`,
                 add_context_from_internet: true,
                 response_json_schema: {
                     type: "object",
                     properties: {
-                        captions: {
+                        script: { type: "string" },
+                        sentences: {
                             type: "array",
-                            items: {
-                                type: "object",
-                                properties: {
-                                    text: { type: "string" },
-                                    time: { type: "number" }
-                                }
-                            }
-                        },
-                        totalDuration: { type: "number" }
+                            items: { type: "string" }
+                        }
                     }
                 }
             });
 
-            const generatedCaptions = scriptResponse?.captions || [
-                { text: "Welcome to this episode about " + episode.title, time: 0 },
-                { text: "Let's dive into the topic.", time: 5 }
-            ];
+            const sentences = scriptResponse?.sentences || scriptResponse?.script?.split(/[.!?]+/).filter(s => s.trim()) || [];
+            setCaptions(sentences);
+            setDuration(sentences.length * 4); // ~4 seconds per sentence
+            setIsGeneratingAudio(false);
             
-            setCaptions(generatedCaptions);
-            setDuration(scriptResponse?.totalDuration || 300);
-            setCurrentCaption(generatedCaptions[0]?.text || '');
-            setIsPlaying(true);
+            // Start playing with TTS
+            startAudioPlayback(sentences);
+
         } catch (error) {
             console.error('Error generating script:', error);
-            setCaptions([{ text: "Welcome to " + episode.title, time: 0 }]);
-            setCurrentCaption("Welcome to " + episode.title);
-            setDuration(300);
+            setIsGeneratingAudio(false);
+            const fallback = [`Welcome to this episode about ${episode.title}`, 'Let us explore this fascinating topic together.'];
+            setCaptions(fallback);
+            startAudioPlayback(fallback);
+        }
+    };
+
+    const startAudioPlayback = (sentences) => {
+        if (!('speechSynthesis' in window)) {
+            alert('Text-to-speech not supported in this browser');
+            return;
+        }
+
+        window.speechSynthesis.cancel();
+        captionIndexRef.current = 0;
+        setIsPlaying(true);
+        speakNextSentence(sentences);
+    };
+
+    const speakNextSentence = (sentences) => {
+        if (captionIndexRef.current >= sentences.length) {
+            setIsPlaying(false);
+            return;
+        }
+
+        const sentence = sentences[captionIndexRef.current];
+        setCurrentCaption(sentence);
+        setCurrentTime(captionIndexRef.current * 4);
+
+        const utterance = new SpeechSynthesisUtterance(sentence);
+        utterance.rate = playbackSpeed;
+        utterance.volume = isMuted ? 0 : volume / 100;
+        
+        // Voice selection
+        const voices = window.speechSynthesis.getVoices();
+        if (selectedVoice === 'female') {
+            const femaleVoice = voices.find(v => v.name.includes('Female') || v.name.includes('Samantha') || v.name.includes('Victoria'));
+            if (femaleVoice) utterance.voice = femaleVoice;
+        } else if (selectedVoice === 'male') {
+            const maleVoice = voices.find(v => v.name.includes('Male') || v.name.includes('Daniel') || v.name.includes('Alex'));
+            if (maleVoice) utterance.voice = maleVoice;
+        }
+
+        utterance.onend = () => {
+            captionIndexRef.current++;
+            if (isPlaying) {
+                speakNextSentence(sentences);
+            }
+        };
+
+        speechRef.current = utterance;
+        window.speechSynthesis.speak(utterance);
+    };
+
+    const togglePlayPause = () => {
+        if (isPlaying) {
+            window.speechSynthesis.pause();
+            setIsPlaying(false);
+        } else {
+            if (window.speechSynthesis.paused) {
+                window.speechSynthesis.resume();
+            } else {
+                speakNextSentence(captions);
+            }
             setIsPlaying(true);
         }
     };
 
-    const handleSearch = async (e) => {
-        e.preventDefault();
-        if (!searchQuery.trim()) return;
-        
+    const handleSearch = async (query) => {
         const episode = {
-            title: searchQuery,
+            title: query,
             category: 'Search',
             duration: '5:00',
             plays: 0
@@ -263,7 +300,7 @@ export default function SearchPods() {
         
         try {
             const img = await base44.integrations.Core.GenerateImage({
-                prompt: `Podcast thumbnail for "${searchQuery}" - professional light style`
+                prompt: `Podcast thumbnail for "${query}" - professional style`
             });
             episode.thumbnail = img?.url;
         } catch {}
@@ -277,8 +314,14 @@ export default function SearchPods() {
         return `${mins}:${secs.toString().padStart(2, '0')}`;
     };
 
+    const closePlayer = () => {
+        window.speechSynthesis.cancel();
+        setShowPlayer(false);
+        setIsPlaying(false);
+    };
+
     return (
-        <div className="min-h-screen flex flex-col bg-gray-50">
+        <div className={`min-h-screen flex flex-col bg-gray-50 ${blackWhiteMode ? 'grayscale' : ''}`}>
             {/* Header */}
             <header className="bg-white sticky top-0 z-50 border-b border-gray-200 shadow-sm">
                 <div className="flex items-center justify-between px-4 py-3">
@@ -300,17 +343,11 @@ export default function SearchPods() {
                         </div>
                     </div>
 
-                    <form onSubmit={handleSearch} className="flex-1 max-w-xl mx-8">
-                        <div className="relative">
-                            <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
-                            <Input
-                                value={searchQuery}
-                                onChange={(e) => setSearchQuery(e.target.value)}
-                                placeholder="Search for any topic..."
-                                className="pl-12 pr-4 py-3 rounded-full border-gray-200 focus:border-purple-500"
-                            />
-                        </div>
-                    </form>
+                    <SmartSearchBar 
+                        onSearch={handleSearch}
+                        placeholder="Search for any topic..."
+                        className="flex-1 max-w-xl mx-8"
+                    />
 
                     <div className="w-20" />
                 </div>
@@ -429,12 +466,12 @@ export default function SearchPods() {
             </div>
 
             {/* Player Modal */}
-            <Dialog open={showPlayer} onOpenChange={setShowPlayer}>
-                <DialogContent className="max-w-2xl p-0 bg-white border-gray-200 overflow-hidden">
+            <Dialog open={showPlayer} onOpenChange={closePlayer}>
+                <DialogContent className="max-w-2xl p-0 bg-white border-gray-200 overflow-hidden max-h-[90vh] overflow-y-auto">
                     <div className="p-6">
                         {/* Header */}
                         <div className="flex items-center justify-between mb-6">
-                            <button onClick={() => setShowPlayer(false)} className="text-gray-400 hover:text-gray-600">
+                            <button onClick={closePlayer} className="text-gray-400 hover:text-gray-600">
                                 <ChevronLeft className="w-6 h-6" />
                             </button>
                             <span className="text-sm text-gray-500 uppercase tracking-wider">Now Playing</span>
@@ -443,7 +480,7 @@ export default function SearchPods() {
 
                         {/* Album Art */}
                         <div className="flex justify-center mb-6">
-                            <div className="w-56 h-56 rounded-2xl bg-gray-100 overflow-hidden relative shadow-lg">
+                            <div className="w-48 h-48 rounded-2xl bg-gray-100 overflow-hidden relative shadow-lg">
                                 {currentEpisode?.thumbnail ? (
                                     <img src={currentEpisode.thumbnail} alt={currentEpisode?.title} className="w-full h-full object-cover" />
                                 ) : (
@@ -460,64 +497,75 @@ export default function SearchPods() {
                             <p className="text-sm text-purple-600">{currentEpisode?.category}</p>
                         </div>
 
-                        {/* Equalizer */}
-                        <div className="flex items-end justify-center gap-1 h-12 mb-4">
-                            {equalizerBars.map((height, i) => (
-                                <div
-                                    key={i}
-                                    className="w-2 bg-purple-500 rounded-t transition-all duration-150"
-                                    style={{ height: isPlaying ? `${height}%` : '20%' }}
-                                />
-                            ))}
-                        </div>
+                        {/* Loading State */}
+                        {isGeneratingAudio && (
+                            <div className="flex items-center justify-center gap-3 py-4">
+                                <Loader2 className="w-5 h-5 animate-spin text-purple-600" />
+                                <span className="text-gray-600">Generating audio content...</span>
+                            </div>
+                        )}
 
-                        {/* Braille Animation */}
-                        <div className="flex justify-center gap-3 mb-4">
-                            {[...Array(6)].map((_, groupIndex) => (
-                                <div key={groupIndex} className="grid grid-cols-2 gap-0.5">
-                                    {[...Array(6)].map((_, dotIndex) => (
-                                        <div 
-                                            key={dotIndex}
-                                            className={`w-1.5 h-1.5 rounded-full transition-all duration-200 ${
-                                                isPlaying && Math.random() > 0.5 ? 'bg-purple-500' : 'bg-gray-300'
-                                            }`}
-                                        />
-                                    ))}
+                        {/* Equalizer Controls */}
+                        <div className="bg-gray-50 rounded-xl p-4 mb-4">
+                            <h4 className="text-sm font-medium text-gray-700 mb-3">Equalizer</h4>
+                            <div className="grid grid-cols-3 gap-4">
+                                <div>
+                                    <label className="text-xs text-gray-500 block mb-1">Bass</label>
+                                    <Slider value={[bass]} max={100} onValueChange={([v]) => setBass(v)} />
+                                    <span className="text-xs text-gray-400">{bass}%</span>
                                 </div>
-                            ))}
+                                <div>
+                                    <label className="text-xs text-gray-500 block mb-1">Mid</label>
+                                    <Slider value={[mid]} max={100} onValueChange={([v]) => setMid(v)} />
+                                    <span className="text-xs text-gray-400">{mid}%</span>
+                                </div>
+                                <div>
+                                    <label className="text-xs text-gray-500 block mb-1">Treble</label>
+                                    <Slider value={[treble]} max={100} onValueChange={([v]) => setTreble(v)} />
+                                    <span className="text-xs text-gray-400">{treble}%</span>
+                                </div>
+                            </div>
                         </div>
 
                         {/* Live Caption */}
-                        <div className="bg-gray-100 rounded-xl p-4 mb-6 min-h-[80px] flex items-center justify-center">
+                        <div className="bg-purple-50 rounded-xl p-4 mb-6 min-h-[80px] flex items-center justify-center border border-purple-100">
                             <p className="text-center text-gray-700 leading-relaxed">{currentCaption}</p>
                         </div>
 
-                        {/* Voice Selector */}
-                        <div className="flex justify-center gap-4 mb-6">
+                        {/* Voice & Volume */}
+                        <div className="flex items-center gap-4 mb-6">
                             <Select value={selectedVoice} onValueChange={setSelectedVoice}>
-                                <SelectTrigger className="w-40 bg-gray-50 border-gray-200">
+                                <SelectTrigger className="w-32 bg-gray-50 border-gray-200">
                                     <SelectValue />
                                 </SelectTrigger>
                                 <SelectContent>
                                     {VOICE_OPTIONS.map(voice => (
                                         <SelectItem key={voice.id} value={voice.id}>
-                                            <div>
-                                                <div className="font-medium">{voice.name}</div>
-                                                <div className="text-xs text-gray-400">{voice.description}</div>
-                                            </div>
+                                            {voice.name}
                                         </SelectItem>
                                     ))}
                                 </SelectContent>
                             </Select>
+                            
+                            <div className="flex items-center gap-2 flex-1">
+                                <button onClick={() => setIsMuted(!isMuted)}>
+                                    {isMuted ? <VolumeX className="w-5 h-5 text-gray-400" /> : <Volume2 className="w-5 h-5 text-gray-600" />}
+                                </button>
+                                <Slider
+                                    value={[isMuted ? 0 : volume]}
+                                    max={100}
+                                    onValueChange={([v]) => { setVolume(v); setIsMuted(false); }}
+                                    className="flex-1"
+                                />
+                            </div>
                         </div>
 
                         {/* Progress Bar */}
                         <div className="mb-6">
                             <Slider
                                 value={[currentTime]}
-                                max={duration}
+                                max={duration || 100}
                                 step={1}
-                                onValueChange={([val]) => setCurrentTime(val)}
                                 className="w-full"
                             />
                             <div className="flex justify-between text-xs text-gray-500 mt-2">
@@ -534,7 +582,8 @@ export default function SearchPods() {
                             <Button
                                 size="icon"
                                 className="w-16 h-16 rounded-full bg-purple-600 text-white hover:bg-purple-700"
-                                onClick={() => setIsPlaying(!isPlaying)}
+                                onClick={togglePlayPause}
+                                disabled={isGeneratingAudio}
                             >
                                 {isPlaying ? <Pause className="w-7 h-7" /> : <Play className="w-7 h-7 ml-1" />}
                             </Button>
@@ -545,7 +594,7 @@ export default function SearchPods() {
 
                         {/* Speed Controls */}
                         <div className="flex justify-center gap-2">
-                            {['0.5x', '0.75x', '1x', '1.25x', '1.5x', '2x'].map((speed) => (
+                            {[0.5, 0.75, 1, 1.25, 1.5, 2].map((speed) => (
                                 <button
                                     key={speed}
                                     onClick={() => setPlaybackSpeed(speed)}
@@ -555,7 +604,7 @@ export default function SearchPods() {
                                             : 'text-gray-500 hover:bg-gray-100'
                                     }`}
                                 >
-                                    {speed}
+                                    {speed}x
                                 </button>
                             ))}
                         </div>

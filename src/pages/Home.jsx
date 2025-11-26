@@ -1,7 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
-import { Sparkles, Radio, Settings, Brain, FileText, BarChart3, GraduationCap } from "lucide-react";
+import { Sparkles, Radio, Settings, Brain, FileText, BarChart3, GraduationCap, ListTodo } from "lucide-react";
 import PageLayout from '../components/PageLayout';
 
 const pages = [
@@ -46,6 +46,13 @@ const pages = [
         icon: GraduationCap, 
         description: 'Navigate knowledge islands with progress tracking',
         color: 'from-emerald-600 to-teal-600'
+    },
+    { 
+        name: 'Tasks', 
+        href: createPageUrl('Tasks'), 
+        icon: ListTodo, 
+        description: 'Track initiatives across all departments',
+        color: 'from-violet-600 to-purple-600'
     },
     { 
         name: 'Settings', 

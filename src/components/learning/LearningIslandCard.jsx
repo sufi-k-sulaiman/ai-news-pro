@@ -81,10 +81,10 @@ export default function LearningIslandCard({ topic, index, progress = 0, onExplo
                 {/* Progress bar */}
                 {progress > 0 && !isCompleted && (
                     <div className="mt-2 mx-auto w-24">
-                        <div className="h-1.5 bg-gray-200 rounded-full overflow-hidden">
+                        <div className="h-1.5 bg-purple-100 rounded-full overflow-hidden">
                             <div 
-                                className="h-full rounded-full transition-all"
-                                style={{ width: `${progress}%`, backgroundColor: topic.color }}
+                                className="h-full rounded-full transition-all bg-purple-600"
+                                style={{ width: `${progress}%` }}
                             />
                         </div>
                         <p className="text-xs text-gray-500 mt-0.5">{progress}% complete</p>

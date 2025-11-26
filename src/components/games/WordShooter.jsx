@@ -2,31 +2,31 @@ import React, { useState, useEffect, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
-import { Maximize2, Minimize2, Loader2, Zap, Book, Layers, Play, Search, X } from "lucide-react";
+import { Maximize2, Minimize2, Loader2, Zap, Book, Layers, Play, Pause, Search, X } from "lucide-react";
 import { base44 } from "@/api/base44Client";
 
 const PRESET_DECKS = {
   trending: [],
   education: [
-    { id: 'math', label: '📐 Mathematics', topic: 'Mathematics concepts and terminology' },
-    { id: 'science', label: '🔬 Science', topic: 'Scientific concepts and research terms' },
-    { id: 'history', label: '📜 History', topic: 'Historical events and terminology' },
-    { id: 'literature', label: '📚 Literature', topic: 'Literary terms and concepts' },
-    { id: 'geography', label: '🌎 Geography', topic: 'Geographical terms and concepts' },
+    { id: 'math', label: 'Mathematics', topic: 'Mathematics concepts and terminology' },
+    { id: 'science', label: 'Science', topic: 'Scientific concepts and research terms' },
+    { id: 'history', label: 'History', topic: 'Historical events and terminology' },
+    { id: 'literature', label: 'Literature', topic: 'Literary terms and concepts' },
+    { id: 'geography', label: 'Geography', topic: 'Geographical terms and concepts' },
   ],
   planet: [
-    { id: 'climate', label: '🌍 Climate Change', topic: 'Climate change and global warming terms' },
-    { id: 'co2', label: '💨 CO2 & Emissions', topic: 'Carbon emissions and greenhouse gases' },
-    { id: 'water', label: '💧 Water Issues', topic: 'Water pollution, conservation, and management' },
-    { id: 'air', label: '🌫️ Air Quality', topic: 'Air pollution and atmospheric science' },
-    { id: 'biodiversity', label: '🦋 Biodiversity', topic: 'Species conservation and ecosystems' },
+    { id: 'climate', label: 'Climate Change', topic: 'Climate change and global warming terms' },
+    { id: 'co2', label: 'CO2 & Emissions', topic: 'Carbon emissions and greenhouse gases' },
+    { id: 'water', label: 'Water Issues', topic: 'Water pollution, conservation, and management' },
+    { id: 'air', label: 'Air Quality', topic: 'Air pollution and atmospheric science' },
+    { id: 'biodiversity', label: 'Biodiversity', topic: 'Species conservation and ecosystems' },
   ],
   enhance: [
-    { id: 'critical', label: '🧠 Critical Thinking', topic: 'Critical thinking and logic concepts' },
-    { id: 'philosophy', label: '💭 Philosophy', topic: 'Philosophical concepts and terminology' },
-    { id: 'psychology', label: '🧑‍🔬 Psychology', topic: 'Psychology and human behavior terms' },
-    { id: 'tech', label: '💻 Technology', topic: 'Technology and innovation terminology' },
-    { id: 'ai', label: '🤖 Artificial Intelligence', topic: 'AI and machine learning concepts' },
+    { id: 'critical', label: 'Critical Thinking', topic: 'Critical thinking and logic concepts' },
+    { id: 'philosophy', label: 'Philosophy', topic: 'Philosophical concepts and terminology' },
+    { id: 'psychology', label: 'Psychology', topic: 'Psychology and human behavior terms' },
+    { id: 'tech', label: 'Technology', topic: 'Technology and innovation terminology' },
+    { id: 'ai', label: 'Artificial Intelligence', topic: 'AI and machine learning concepts' },
   ]
 };
 
@@ -457,12 +457,12 @@ export default function WordShooter({ onExit }) {
               <Button key={deck.id} onClick={() => handleStartGame(deck)} className="h-24 text-left justify-start p-6 bg-gradient-to-r from-purple-600 to-purple-700 text-white">
                 <div><div className="text-xl mb-1">{deck.label}</div><div className="text-xs opacity-80">{deck.topic?.slice(0, 40)}...</div></div>
               </Button>
-            ))) }
+            )))}
             { activeTab !== 'trending' && filteredDecks(PRESET_DECKS[activeTab] || []).map(deck => (
                 <Button key={deck.id} onClick={() => handleStartGame(deck)} className={`h-24 text-left justify-start p-6 text-white bg-gradient-to-r ${activeTab === 'education' ? 'from-blue-500 to-blue-600' : activeTab === 'planet' ? 'from-green-500 to-green-600' : 'from-purple-500 to-purple-600'}`}>
                     <div><div className="text-xl mb-1">{deck.label}</div><div className="text-xs opacity-80">{deck.topic?.slice(0, 40)}...</div></div>
                 </Button>
-            ))}
+            )))}
           </div>
         </Card>
 

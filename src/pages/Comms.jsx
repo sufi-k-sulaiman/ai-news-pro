@@ -57,8 +57,15 @@ export default function Comms() {
     const [emailData, setEmailData] = useState({ to: '', subject: '', body: '' });
     const [conferenceNumbers, setConferenceNumbers] = useState(['', '']);
     const [callNumber, setCallNumber] = useState('');
+    const [smsNumber, setSmsNumber] = useState('');
+    const [showUsersPanel, setShowUsersPanel] = useState(true);
     const queryClient = useQueryClient();
     const messagesEndRef = useRef(null);
+
+    const { data: appUsers = [] } = useQuery({
+        queryKey: ['appUsers'],
+        queryFn: () => base44.entities.User.list(),
+    });
 
     const { data: contacts = [] } = useQuery({
         queryKey: ['contacts'],
@@ -131,12 +138,14 @@ export default function Comms() {
     };
 
     const sendSMS = async () => {
-        if (!selectedContact?.phone || !smsContent.trim()) return;
+        const targetPhone = smsNumber || selectedContact?.phone;
+        if (!targetPhone || !smsContent.trim()) return;
         setLoading(true);
         try {
-            await base44.functions.invoke('twilioCall', { action: 'sms', to: selectedContact.phone, message: smsContent });
+            await base44.functions.invoke('twilioCall', { action: 'sms', to: targetPhone, message: smsContent });
             setShowSMSModal(false);
             setSmsContent('');
+            setSmsNumber('');
             setToast({ message: 'SMS sent', type: 'success' });
             queryClient.invalidateQueries({ queryKey: ['messages'] });
         } catch (e) {
@@ -405,11 +414,11 @@ export default function Comms() {
             <Dialog open={showSMSModal} onOpenChange={setShowSMSModal}>
                 <DialogContent className="max-w-md">
                     <h3 className="text-lg font-semibold mb-4 flex items-center gap-2"><MessageSquare className="w-5 h-5 text-blue-600" /> Send SMS</h3>
-                    <p className="text-sm text-gray-500 mb-2">To: {selectedContact?.phone || 'Select a contact'}</p>
+                    <Input placeholder="Phone number (+1...)" value={smsNumber || selectedContact?.phone || ''} onChange={e => setSmsNumber(e.target.value)} className="mb-3" />
                     <Textarea placeholder="Type your message..." value={smsContent} onChange={e => setSmsContent(e.target.value)} rows={4} />
                     <div className="flex justify-end gap-2 mt-4">
-                        <Button variant="outline" onClick={() => setShowSMSModal(false)}>Cancel</Button>
-                        <Button onClick={sendSMS} disabled={loading || !smsContent.trim() || !selectedContact?.phone} className="bg-blue-600 hover:bg-blue-700">
+                        <Button variant="outline" onClick={() => { setShowSMSModal(false); setSmsNumber(''); }}>Cancel</Button>
+                        <Button onClick={sendSMS} disabled={loading || !smsContent.trim() || (!smsNumber && !selectedContact?.phone)} className="bg-blue-600 hover:bg-blue-700">
                             {loading ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : <Send className="w-4 h-4 mr-2" />} Send SMS
                         </Button>
                     </div>

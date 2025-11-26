@@ -60,9 +60,9 @@ export default function LearningIslandCard({ topic, index, progress = 0, onExplo
                 />
             </div>
             
-            {/* Icon overlay */}
+            {/* Icon overlay - positioned on the platform */}
             <div 
-                className="absolute top-[72px] left-1/2 -translate-x-1/2 w-11 h-11 rounded-full flex items-center justify-center shadow-lg transition-transform"
+                className="absolute top-[85px] left-1/2 w-11 h-11 rounded-full flex items-center justify-center shadow-lg transition-transform z-10"
                 style={{ 
                     backgroundColor: topic.color,
                     transform: hovered ? 'translate(-50%, -4px)' : 'translate(-50%, 0)'

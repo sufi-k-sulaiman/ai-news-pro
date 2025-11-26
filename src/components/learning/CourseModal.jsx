@@ -384,14 +384,16 @@ export default function CourseModal({ isOpen, onClose, topic, onComplete }) {
 
     useEffect(() => {
         if (isOpen && topic) {
-            generateCourseContent();
             setCompletedLessons([]);
             setUserXP(0);
             setEarnedAchievements([]);
+            setCourseData(null);
+            generateCourseContent();
         }
     }, [isOpen, topic]);
 
     const generateCourseContent = async () => {
+        if (!topic) return;
         setLoading(true);
         try {
             // Generate curriculum
@@ -456,15 +458,26 @@ export default function CourseModal({ isOpen, onClose, topic, onComplete }) {
                 }
             });
 
-            // Generate images for each unit
+            // Prepare units with unique IDs for lessons
+            const unitsWithIds = (response?.units || []).map((unit, uIndex) => ({
+                ...unit,
+                lessons: (unit.lessons || []).map((lesson, lIndex) => ({
+                    ...lesson,
+                    id: lesson.id || `unit${uIndex}-lesson${lIndex}`,
+                    xp: lesson.xp || 25 + (lIndex * 5)
+                }))
+            }));
+
+            // Generate images for each unit (in parallel, but don't block if fails)
             const unitsWithImages = await Promise.all(
-                (response?.units || []).map(async (unit, i) => {
+                unitsWithIds.map(async (unit, i) => {
                     try {
                         const imgResponse = await base44.integrations.Core.GenerateImage({
-                            prompt: `Educational illustration for ${topic.name} course, unit: ${unit.title}. Modern, clean, professional educational style with subtle ${topic.color} color theme. Abstract learning concept visualization.`
+                            prompt: `Educational illustration for ${topic.name} course, unit: ${unit.title}. Modern, clean, professional educational style. Abstract learning concept visualization.`
                         });
                         return { ...unit, imageUrl: imgResponse?.url };
                     } catch (e) {
+                        console.log('Image generation skipped for unit:', unit.title);
                         return unit;
                     }
                 })
@@ -482,6 +495,77 @@ export default function CourseModal({ isOpen, onClose, topic, onComplete }) {
             });
         } catch (error) {
             console.error('Error generating course:', error);
+            // Fallback course data
+            setCourseData({
+                title: `${topic.name} Fundamentals`,
+                description: `Master the core concepts of ${topic.name} through interactive lessons and hands-on projects.`,
+                totalDuration: '12 hours',
+                difficulty: 'Beginner to Intermediate',
+                learningOutcomes: [
+                    `Understand fundamental concepts of ${topic.name}`,
+                    'Apply knowledge to real-world scenarios',
+                    'Complete hands-on projects and assessments',
+                    'Earn a certificate of completion'
+                ],
+                units: [
+                    {
+                        title: 'Introduction & Foundations',
+                        description: 'Get started with the basics',
+                        duration: '2 hours',
+                        xp: 150,
+                        lessons: [
+                            { id: 'u0-l0', title: 'Welcome & Course Overview', type: 'video', duration: '10 min', xp: 25 },
+                            { id: 'u0-l1', title: 'Core Concepts Explained', type: 'reading', duration: '15 min', xp: 30 },
+                            { id: 'u0-l2', title: 'Key Terminology', type: 'reading', duration: '10 min', xp: 25 },
+                            { id: 'u0-l3', title: 'Knowledge Check', type: 'quiz', duration: '5 min', xp: 50 },
+                        ]
+                    },
+                    {
+                        title: 'Core Principles',
+                        description: 'Deep dive into essential principles',
+                        duration: '3 hours',
+                        xp: 200,
+                        lessons: [
+                            { id: 'u1-l0', title: 'Fundamental Principles', type: 'video', duration: '20 min', xp: 40 },
+                            { id: 'u1-l1', title: 'Case Studies', type: 'reading', duration: '15 min', xp: 35 },
+                            { id: 'u1-l2', title: 'Practical Applications', type: 'video', duration: '25 min', xp: 45 },
+                            { id: 'u1-l3', title: 'Practice Exercise', type: 'exercise', duration: '20 min', xp: 50 },
+                            { id: 'u1-l4', title: 'Module Quiz', type: 'quiz', duration: '10 min', xp: 60 },
+                        ]
+                    },
+                    {
+                        title: 'Advanced Topics',
+                        description: 'Explore advanced concepts and techniques',
+                        duration: '4 hours',
+                        xp: 250,
+                        lessons: [
+                            { id: 'u2-l0', title: 'Advanced Theory', type: 'video', duration: '30 min', xp: 50 },
+                            { id: 'u2-l1', title: 'Expert Insights', type: 'reading', duration: '20 min', xp: 40 },
+                            { id: 'u2-l2', title: 'Complex Scenarios', type: 'video', duration: '25 min', xp: 45 },
+                            { id: 'u2-l3', title: 'Hands-on Project', type: 'exercise', duration: '45 min', xp: 75 },
+                            { id: 'u2-l4', title: 'Advanced Quiz', type: 'quiz', duration: '15 min', xp: 70 },
+                        ]
+                    },
+                    {
+                        title: 'Real-World Applications',
+                        description: 'Apply your knowledge to practical scenarios',
+                        duration: '3 hours',
+                        xp: 300,
+                        lessons: [
+                            { id: 'u3-l0', title: 'Industry Applications', type: 'video', duration: '25 min', xp: 45 },
+                            { id: 'u3-l1', title: 'Best Practices', type: 'reading', duration: '15 min', xp: 35 },
+                            { id: 'u3-l2', title: 'Capstone Project', type: 'exercise', duration: '60 min', xp: 100 },
+                            { id: 'u3-l3', title: 'Final Assessment', type: 'quiz', duration: '20 min', xp: 100 },
+                        ]
+                    }
+                ],
+                achievements: [
+                    { id: 'first', name: 'First Steps', description: 'Complete your first lesson', icon: 'star', requirement: 1 },
+                    { id: 'five', name: 'Getting Started', description: 'Complete 5 lessons', icon: 'flame', requirement: 5 },
+                    { id: 'unit', name: 'Unit Master', description: 'Complete a full unit', icon: 'trophy', requirement: 4 },
+                    { id: 'scholar', name: 'Scholar', description: 'Complete the entire course', icon: 'medal', requirement: 18 },
+                ]
+            });
         } finally {
             setLoading(false);
         }

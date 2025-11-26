@@ -1,18 +1,10 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
-import { Sparkles, Radio, Settings, Menu, ChevronLeft, Brain } from 'lucide-react';
+import { Menu, ChevronLeft } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 import SmartSearchBar from './SmartSearchBar';
-
-const LOGO_URL = "https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/692729a5f5180fbd43f297e9/868a98750_1cPublishing-logo.png";
-
-const menuItems = [
-    { icon: Sparkles, label: "AI Hub", href: createPageUrl('AIHub') },
-    { icon: Radio, label: "SearchPods", href: createPageUrl('SearchPods') },
-    { icon: Brain, label: "MindMap", href: createPageUrl('MindMap') },
-    { icon: Settings, label: "Settings", href: createPageUrl('Settings') },
-];
+import { LOGO_URL, menuItems, footerLinks } from './NavigationConfig';
 
 export default function PageLayout({ children, activePage, onSearch, searchPlaceholder = "Search anything..." }) {
     const [sidebarOpen, setSidebarOpen] = useState(true);
@@ -85,10 +77,9 @@ export default function PageLayout({ children, activePage, onSearch, searchPlace
                     <div className="flex flex-col md:flex-row justify-between items-center gap-4">
                         <img src={LOGO_URL} alt="1cPublishing" className="h-8 w-8 object-contain grayscale" />
                         <nav className="flex flex-wrap justify-center gap-6 text-sm">
-                            <a href="#" className="text-gray-600 hover:text-purple-600 transition-colors">Contact Us</a>
-                            <a href="#" className="text-gray-600 hover:text-purple-600 transition-colors">Governance</a>
-                            <a href="#" className="text-gray-600 hover:text-purple-600 transition-colors">Cookie Policy</a>
-                            <a href="#" className="text-gray-600 hover:text-purple-600 transition-colors">Terms of Use</a>
+                            {footerLinks.map((link, i) => (
+                                <a key={i} href={link.href} className="text-gray-600 hover:text-purple-600 transition-colors">{link.label}</a>
+                            ))}
                         </nav>
                     </div>
                     <div className="mt-4 pt-4 border-t border-gray-200 text-center text-sm text-gray-500">

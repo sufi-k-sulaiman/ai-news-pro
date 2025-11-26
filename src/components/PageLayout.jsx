@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
-import { Sparkles, Radio, Settings, Menu, ChevronLeft } from 'lucide-react';
+import { Sparkles, Radio, Settings, Menu, ChevronLeft, Brain } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 import SmartSearchBar from './SmartSearchBar';
 
@@ -10,6 +10,7 @@ const LOGO_URL = "https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/pub
 const menuItems = [
     { icon: Sparkles, label: "AI Hub", href: createPageUrl('AIHub') },
     { icon: Radio, label: "SearchPods", href: createPageUrl('SearchPods') },
+    { icon: Brain, label: "MindMap", href: createPageUrl('MindMap') },
     { icon: Settings, label: "Settings", href: createPageUrl('Settings') },
 ];
 

@@ -1,7 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
-import { Sparkles, Radio, Settings } from "lucide-react";
+import { Sparkles, Radio, Settings, Brain } from "lucide-react";
 import PageLayout from '../components/PageLayout';
 
 const pages = [
@@ -18,6 +18,13 @@ const pages = [
         icon: Radio, 
         description: 'AI-generated podcasts on any topic with voice playback',
         color: 'from-blue-600 to-cyan-600'
+    },
+    { 
+        name: 'MindMap', 
+        href: createPageUrl('MindMap'), 
+        icon: Brain, 
+        description: 'AI-powered knowledge visualization and exploration',
+        color: 'from-pink-600 to-rose-600'
     },
     { 
         name: 'Settings', 

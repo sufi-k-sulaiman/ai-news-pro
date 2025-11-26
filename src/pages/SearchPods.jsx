@@ -11,6 +11,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { Slider } from "@/components/ui/slider";
+import { Progress } from "@/components/ui/progress";
 
 const LOGO_URL = "https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/692729a5f5180fbd43f297e9/868a98750_1cPublishing-logo.png";
 
@@ -22,6 +23,28 @@ const CATEGORIES = [
     { id: 'business', name: 'Business', color: '#8B5CF6', episodes: 14 },
     { id: 'science', name: 'Science', color: '#06B6D4', episodes: 9 },
 ];
+
+// Clean text from HTML, markdown, and other formatting
+const cleanTextForSpeech = (text) => {
+    if (!text) return '';
+    return text
+        .replace(/<[^>]*>/g, '') // Remove HTML tags
+        .replace(/\*\*([^*]+)\*\*/g, '$1') // Remove bold markdown
+        .replace(/\*([^*]+)\*/g, '$1') // Remove italic markdown
+        .replace(/__([^_]+)__/g, '$1') // Remove underline markdown
+        .replace(/_([^_]+)_/g, '$1') // Remove underline markdown
+        .replace(/#+\s*/g, '') // Remove headers
+        .replace(/\[([^\]]+)\]\([^)]+\)/g, '$1') // Convert links to text
+        .replace(/`([^`]+)`/g, '$1') // Remove code formatting
+        .replace(/```[\s\S]*?```/g, '') // Remove code blocks
+        .replace(/&nbsp;/g, ' ')
+        .replace(/&amp;/g, '&')
+        .replace(/&lt;/g, '<')
+        .replace(/&gt;/g, '>')
+        .replace(/&quot;/g, '"')
+        .replace(/\s+/g, ' ')
+        .trim();
+};
 
 const QUICK_TOPICS = [
     'AI trends', 'Morning motivation', 'Sleep story', 'Health tips', 'World news', 'Book summary'
@@ -59,6 +82,8 @@ export default function SearchPods() {
     const [currentCaption, setCurrentCaption] = useState('');
     const [playbackSpeed, setPlaybackSpeed] = useState(1);
     const [audioError, setAudioError] = useState(null);
+    const [loadingProgress, setLoadingProgress] = useState(0);
+    const [isLoadingPods, setIsLoadingPods] = useState(true);
     
     const sentencesRef = useRef([]);
     const currentIndexRef = useRef(0);
@@ -82,6 +107,21 @@ export default function SearchPods() {
             window.speechSynthesis?.cancel();
             if (timerRef.current) clearInterval(timerRef.current);
         };
+    }, []);
+
+    // Simulate initial loading
+    useEffect(() => {
+        const timer = setInterval(() => {
+            setLoadingProgress(prev => {
+                if (prev >= 100) {
+                    clearInterval(timer);
+                    setIsLoadingPods(false);
+                    return 100;
+                }
+                return prev + 20;
+            });
+        }, 300);
+        return () => clearInterval(timer);
     }, []);
 
     const loadCategoryEpisodes = async (categoryId) => {
@@ -181,7 +221,10 @@ export default function SearchPods() {
                 add_context_from_internet: true
             });
 
-            const text = script || `Welcome to this episode about ${episode.title}. Let me share some interesting insights with you today.`;
+            const rawText = script || `Welcome to this episode about ${episode.title}. Let me share some interesting insights with you today.`;
+            
+            // Clean the text before processing
+            const text = cleanTextForSpeech(rawText);
             
             // Split into sentences more carefully
             const sentences = text
@@ -430,6 +473,22 @@ export default function SearchPods() {
                 {/* Main Content */}
                 <main className="flex-1 overflow-auto">
                     <div className="max-w-7xl mx-auto px-4 md:px-6 py-8 space-y-8">
+                        {/* Loading State */}
+                        {isLoadingPods && (
+                            <div className="bg-white rounded-2xl border border-gray-200 p-8">
+                                <div className="flex flex-col items-center justify-center gap-4">
+                                    <Radio className="w-12 h-12 text-purple-600 animate-pulse" />
+                                    <h3 className="text-lg font-semibold text-gray-800">Loading SearchPods...</h3>
+                                    <div className="w-full max-w-md">
+                                        <Progress value={loadingProgress} className="h-2" />
+                                    </div>
+                                    <p className="text-sm text-gray-500">{loadingProgress}% complete</p>
+                                </div>
+                            </div>
+                        )}
+
+                        {!isLoadingPods && (
+                        <>
                         {/* Trending Section */}
                         <div className="bg-gradient-to-br from-purple-50 to-blue-50 rounded-2xl border border-purple-200 p-6">
                             <div className="flex items-center gap-3 mb-6">
@@ -566,6 +625,8 @@ export default function SearchPods() {
                                 </div>
                             ))}
                         </div>
+                        </>
+                        )}
                     </div>
                 </main>
             </div>
@@ -624,9 +685,18 @@ export default function SearchPods() {
                             </div>
                         )}
 
-                        {/* Live Caption */}
-                        <div className="bg-purple-50 rounded-xl p-4 mb-6 min-h-[80px] flex items-center justify-center border border-purple-100">
-                            <p className="text-center text-gray-700 leading-relaxed text-sm">{currentCaption}</p>
+                        {/* Live Caption with typing indicator */}
+                        <div className="bg-purple-50 rounded-xl p-4 mb-6 min-h-[80px] border border-purple-100">
+                            <div className="flex items-start gap-2">
+                                {isPlaying && (
+                                    <div className="flex gap-1 mt-1">
+                                        <span className="w-2 h-2 bg-purple-500 rounded-full animate-bounce" style={{ animationDelay: '0ms' }} />
+                                        <span className="w-2 h-2 bg-purple-500 rounded-full animate-bounce" style={{ animationDelay: '150ms' }} />
+                                        <span className="w-2 h-2 bg-purple-500 rounded-full animate-bounce" style={{ animationDelay: '300ms' }} />
+                                    </div>
+                                )}
+                                <p className="flex-1 text-center text-gray-700 leading-relaxed text-sm">{currentCaption}</p>
+                            </div>
                         </div>
 
                         {/* Volume */}

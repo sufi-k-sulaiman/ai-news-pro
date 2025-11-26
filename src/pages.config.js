@@ -9,6 +9,7 @@ import MindMap from './pages/MindMap';
 import ResumeBuilder from './pages/ResumeBuilder';
 import SearchResults from './pages/SearchResults';
 import Markets from './pages/Markets';
+import Islands from './pages/Islands';
 
 
 export const PAGES = {
@@ -23,6 +24,7 @@ export const PAGES = {
     "ResumeBuilder": ResumeBuilder,
     "SearchResults": SearchResults,
     "Markets": Markets,
+    "Islands": Islands,
 }
 
 export const pagesConfig = {

@@ -5,7 +5,8 @@ import { base44 } from '@/api/base44Client';
 import { 
     X, Play, CheckCircle, Lock, Star, Trophy, Zap, Clock, 
     BookOpen, Video, FileText, HelpCircle, Award, Target,
-    ChevronRight, ChevronLeft, Flame, Medal, Loader2, ArrowRight, Check
+    ChevronRight, ChevronLeft, Flame, Medal, Loader2, ArrowRight, Check,
+    Maximize2, Minimize2
 } from 'lucide-react';
 
 const THEME = {
@@ -28,6 +29,7 @@ export default function CourseModal({ isOpen, onClose, topic, onComplete }) {
     const [quizAnswers, setQuizAnswers] = useState({});
     const [showQuizResults, setShowQuizResults] = useState(false);
     const [expandedUnits, setExpandedUnits] = useState({});
+    const [isFullscreen, setIsFullscreen] = useState(false);
 
     useEffect(() => {
         if (isOpen && topic) {
@@ -224,14 +226,14 @@ export default function CourseModal({ isOpen, onClose, topic, onComplete }) {
 
     return (
         <Dialog open={isOpen} onOpenChange={onClose}>
-            <DialogContent className="max-w-4xl max-h-[90vh] overflow-hidden p-0">
+            <DialogContent className={`${isFullscreen ? 'max-w-full w-full h-full max-h-full rounded-none' : 'max-w-4xl max-h-[90vh]'} overflow-hidden p-0 transition-all`}>
                 {loading ? (
                     <div className="flex flex-col items-center justify-center py-20">
                         <Loader2 className="w-12 h-12 animate-spin mb-4" style={{ color: topic.color }} />
                         <p className="text-gray-600">Generating curriculum...</p>
                     </div>
                 ) : (
-                    <div className="flex flex-col h-[85vh]">
+                    <div className={`flex flex-col ${isFullscreen ? 'h-full' : 'h-[85vh]'}`}>
                         {/* Header */}
                         <div className="p-4 text-white flex-shrink-0" style={{ background: `linear-gradient(135deg, ${topic.color}, ${THEME.secondary})` }}>
                             <div className="flex items-center justify-between">
@@ -246,13 +248,16 @@ export default function CourseModal({ isOpen, onClose, topic, onComplete }) {
                                         <h2 className="font-bold text-lg">{view === 'lesson' ? currentLesson?.title : courseData?.title}</h2>
                                     </div>
                                 </div>
-                                <div className="flex items-center gap-3">
+                                <div className="flex items-center gap-2">
                                     <div className="flex items-center gap-1 px-3 py-1 bg-white/20 rounded-full">
                                         <Zap className="w-4 h-4" />
                                         <span className="font-bold">{userXP} XP</span>
                                     </div>
+                                    <Button variant="ghost" size="icon" onClick={() => setIsFullscreen(!isFullscreen)} className="text-white hover:bg-white/20">
+                                        {isFullscreen ? <Minimize2 className="w-5 h-5" /> : <Maximize2 className="w-5 h-5" />}
+                                    </Button>
                                     <Button variant="ghost" size="icon" onClick={onClose} className="text-white hover:bg-white/20">
-                                        <X className="w-5 h-5" />
+                                        <X className="w-6 h-6" />
                                     </Button>
                                 </div>
                             </div>
@@ -369,9 +374,13 @@ export default function CourseModal({ isOpen, onClose, topic, onComplete }) {
                                             )}
                                         </div>
                                     ) : (
-                                        <div className="prose prose-sm max-w-none">
-                                            <p className="text-lg text-gray-600 mb-6">{lessonContent?.introduction}</p>
-                                            <div className="whitespace-pre-wrap mb-6">{lessonContent?.content}</div>
+                                        <div className="max-w-none">
+                                            <p className="text-lg text-gray-600 mb-6 leading-relaxed">{lessonContent?.introduction}</p>
+                                            <div className="mb-6 text-gray-700 leading-relaxed">
+                                                {lessonContent?.content?.split('\n').map((paragraph, i) => (
+                                                    paragraph.trim() ? <p key={i} className="mb-4">{paragraph}</p> : null
+                                                ))}
+                                            </div>
                                             
                                             {lessonContent?.keyPoints?.length > 0 && (
                                                 <div className="p-4 rounded-xl mb-6" style={{ backgroundColor: `${topic.color}10` }}>

@@ -101,7 +101,7 @@ export default function PageLayout({ children, activePage, onSearch, searchPlace
                             {!hideIcons && <img src={LOGO_URL} alt="1cPublishing" className="h-10 w-10 object-contain" />}
                             <div className="hidden sm:block">
                                 <span className={`text-xl font-bold ${theme === 'dark' ? 'text-white' : 'text-black'}`}>1cPublishing</span>
-                                <p className="text-xs font-medium text-purple-600">{activePage === 'Learning' ? 'Learning Archipelago' : 'Ai Powered'}</p>
+                                <p className="text-xs font-medium text-purple-600">{activePage === 'Learning' ? 'Learning Archipelago' : activePage === 'Tasks' ? 'Task Management' : 'Ai Powered'}</p>
                             </div>
                         </Link>
                     </div>

@@ -1,276 +1,313 @@
 import React from 'react';
 
-// 8 unique island designs inspired by the reference image
+// Top-down island designs inspired by reference images
 const IslandDesigns = {
-    // Island 1: Grassy with pond and small trees
-    GrassyPond: ({ color }) => (
-        <svg viewBox="0 0 200 160" className="w-full h-full">
-            {/* Water base */}
-            <ellipse cx="100" cy="145" rx="90" ry="15" fill="#7DD3FC" opacity="0.6" />
-            <ellipse cx="100" cy="140" rx="85" ry="12" fill="#38BDF8" opacity="0.4" />
+    // Island 1: Beach with palm trees (simple)
+    BeachPalms: ({ color }) => (
+        <svg viewBox="0 0 160 120" className="w-full h-full">
+            {/* Outer water ring */}
+            <path d="M80,110 C125,110 145,85 140,60 C135,35 115,15 80,15 C45,15 25,35 20,60 C15,85 35,110 80,110" 
+                fill="#7DD3FC" />
+            <path d="M80,105 C120,105 138,82 133,60 C128,38 110,20 80,20 C50,20 32,38 27,60 C22,82 40,105 80,105" 
+                fill="#38BDF8" />
             
-            {/* Sand/beach ring */}
-            <ellipse cx="100" cy="125" rx="80" ry="20" fill="#FCD34D" />
-            <ellipse cx="100" cy="122" rx="75" ry="18" fill="#FBBF24" />
-            
-            {/* Main grass island */}
-            <ellipse cx="100" cy="115" rx="70" ry="22" fill="#4ADE80" />
-            <ellipse cx="100" cy="110" rx="65" ry="20" fill="#22C55E" />
+            {/* Sandy beach */}
+            <path d="M80,100 C115,100 130,78 126,58 C122,40 105,25 80,25 C55,25 38,40 34,58 C30,78 45,100 80,100" 
+                fill="#FDE68A" />
+            <path d="M80,95 C110,95 122,75 119,58 C116,42 102,30 80,30 C58,30 44,42 41,58 C38,75 50,95 80,95" 
+                fill="#FCD34D" />
             
             {/* Grass patches */}
-            <ellipse cx="70" cy="105" rx="25" ry="12" fill="#16A34A" opacity="0.6" />
-            <ellipse cx="130" cy="108" rx="20" ry="10" fill="#15803D" opacity="0.5" />
+            <ellipse cx="65" cy="55" rx="12" ry="8" fill="#4ADE80" />
+            <ellipse cx="95" cy="60" rx="10" ry="6" fill="#22C55E" />
+            <ellipse cx="80" cy="70" rx="8" ry="5" fill="#4ADE80" />
             
-            {/* Pond */}
-            <ellipse cx="65" cy="100" rx="18" ry="8" fill="#67E8F9" />
-            <ellipse cx="63" cy="98" rx="8" ry="4" fill="#A5F3FC" opacity="0.7" />
+            {/* Palm tree shadows */}
+            <ellipse cx="55" cy="50" rx="8" ry="4" fill="#166534" opacity="0.3" />
+            <ellipse cx="105" cy="55" rx="7" ry="3" fill="#166534" opacity="0.3" />
             
-            {/* Small bushes/trees */}
-            <circle cx="120" cy="95" r="8" fill="#166534" />
-            <circle cx="115" cy="90" r="6" fill="#15803D" />
-            <circle cx="125" cy="88" r="7" fill="#166534" />
-            <circle cx="140" cy="100" r="5" fill="#22C55E" />
+            {/* Palm trees (top view - radiating fronds) */}
+            <g transform="translate(55, 45)">
+                <circle cx="0" cy="0" r="3" fill="#92400E" />
+                <path d="M0,0 L-12,-5" stroke="#22C55E" strokeWidth="3" strokeLinecap="round" />
+                <path d="M0,0 L-10,8" stroke="#22C55E" strokeWidth="3" strokeLinecap="round" />
+                <path d="M0,0 L5,-12" stroke="#16A34A" strokeWidth="3" strokeLinecap="round" />
+                <path d="M0,0 L12,-3" stroke="#22C55E" strokeWidth="3" strokeLinecap="round" />
+                <path d="M0,0 L8,10" stroke="#16A34A" strokeWidth="3" strokeLinecap="round" />
+            </g>
             
-            {/* Grass tufts */}
-            <path d="M50,105 Q52,95 54,105" stroke="#15803D" strokeWidth="2" fill="none" />
-            <path d="M90,100 Q92,92 94,100" stroke="#166534" strokeWidth="2" fill="none" />
+            <g transform="translate(105, 50)">
+                <circle cx="0" cy="0" r="2.5" fill="#78350F" />
+                <path d="M0,0 L-10,-4" stroke="#22C55E" strokeWidth="2.5" strokeLinecap="round" />
+                <path d="M0,0 L-8,7" stroke="#16A34A" strokeWidth="2.5" strokeLinecap="round" />
+                <path d="M0,0 L4,-10" stroke="#22C55E" strokeWidth="2.5" strokeLinecap="round" />
+                <path d="M0,0 L10,-2" stroke="#16A34A" strokeWidth="2.5" strokeLinecap="round" />
+            </g>
         </svg>
     ),
 
-    // Island 2: Mountain with pine trees
-    MountainPines: ({ color }) => (
-        <svg viewBox="0 0 200 160" className="w-full h-full">
+    // Island 2: Rocky mountain island
+    RockyMountain: ({ color }) => (
+        <svg viewBox="0 0 160 120" className="w-full h-full">
             {/* Water */}
-            <ellipse cx="100" cy="148" rx="95" ry="12" fill="#7DD3FC" opacity="0.5" />
+            <path d="M80,110 C130,110 150,80 145,55 C140,30 115,10 80,10 C45,10 20,30 15,55 C10,80 30,110 80,110" 
+                fill="#7DD3FC" />
+            <path d="M80,105 C125,105 143,77 138,55 C133,33 110,15 80,15 C50,15 27,33 22,55 C17,77 35,105 80,105" 
+                fill="#38BDF8" />
             
             {/* Beach */}
-            <ellipse cx="100" cy="135" rx="85" ry="18" fill="#FCD34D" />
+            <path d="M80,98 C118,98 133,73 129,55 C125,37 105,22 80,22 C55,22 35,37 31,55 C27,73 42,98 80,98" 
+                fill="#FDE68A" />
             
             {/* Grass base */}
-            <ellipse cx="100" cy="128" rx="78" ry="22" fill="#4ADE80" />
-            <ellipse cx="100" cy="122" rx="72" ry="20" fill="#22C55E" />
+            <path d="M80,92 C112,92 125,70 122,55 C119,40 100,28 80,28 C60,28 41,40 38,55 C35,70 48,92 80,92" 
+                fill="#4ADE80" />
             
-            {/* Mountain */}
-            <path d="M100,35 L145,110 L55,110 Z" fill="#6B7280" />
-            <path d="M100,35 L125,85 L100,90 L75,85 Z" fill="#9CA3AF" />
-            <path d="M100,35 L110,55 L100,60 L90,55 Z" fill="#D1D5DB" />
+            {/* Mountain rocks (top view) */}
+            <path d="M65,45 L80,35 L95,45 L90,60 L70,60 Z" fill="#78716C" />
+            <path d="M70,48 L80,40 L90,48 L87,58 L73,58 Z" fill="#A8A29E" />
+            <path d="M75,50 L80,45 L85,50 L83,56 L77,56 Z" fill="#D6D3D1" />
             
-            {/* Pine trees - left side */}
-            <path d="M55,115 L60,85 L65,115 Z" fill="#166534" />
-            <path d="M57,100 L60,75 L63,100 Z" fill="#15803D" />
-            <rect x="58" y="115" width="4" height="8" fill="#92400E" />
+            {/* Vegetation around rocks */}
+            <ellipse cx="55" cy="65" rx="8" ry="5" fill="#22C55E" />
+            <ellipse cx="105" cy="62" rx="7" ry="4" fill="#16A34A" />
+            <ellipse cx="80" cy="75" rx="10" ry="5" fill="#22C55E" />
             
-            <path d="M70,118 L77,82 L84,118 Z" fill="#166534" />
-            <path d="M72,100 L77,70 L82,100 Z" fill="#15803D" />
-            <rect x="75" y="118" width="4" height="8" fill="#78350F" />
-            
-            {/* Pine trees - right side */}
-            <path d="M125,118 L132,85 L139,118 Z" fill="#166534" />
-            <path d="M127,102 L132,75 L137,102 Z" fill="#15803D" />
-            <rect x="130" y="118" width="4" height="8" fill="#92400E" />
-            
-            <path d="M140,115 L145,90 L150,115 Z" fill="#166534" />
-            <rect x="143" y="115" width="4" height="6" fill="#78350F" />
+            {/* Trees (top view circles) */}
+            <circle cx="50" cy="58" r="5" fill="#166534" />
+            <circle cx="110" cy="55" r="4" fill="#166534" />
+            <circle cx="65" cy="78" r="4" fill="#15803D" />
+            <circle cx="95" cy="80" r="5" fill="#166534" />
         </svg>
     ),
 
-    // Island 3: Tropical palm island (small beach)
-    TropicalPalm: ({ color }) => (
-        <svg viewBox="0 0 200 160" className="w-full h-full">
-            {/* Water */}
-            <ellipse cx="100" cy="145" rx="85" ry="15" fill="#38BDF8" opacity="0.5" />
-            <ellipse cx="100" cy="142" rx="80" ry="12" fill="#7DD3FC" opacity="0.4" />
-            
-            {/* Sand island */}
-            <ellipse cx="100" cy="130" rx="65" ry="20" fill="#FDE68A" />
-            <ellipse cx="100" cy="125" rx="60" ry="18" fill="#FCD34D" />
-            <ellipse cx="100" cy="122" rx="55" ry="15" fill="#FBBF24" />
-            
-            {/* Palm tree trunk */}
-            <path d="M95,125 Q85,80 90,50" stroke="#92400E" strokeWidth="6" fill="none" strokeLinecap="round" />
-            <path d="M95,125 Q85,80 90,50" stroke="#A16207" strokeWidth="4" fill="none" strokeLinecap="round" />
-            
-            {/* Palm fronds */}
-            <path d="M90,50 Q60,40 40,55" stroke="#22C55E" strokeWidth="4" fill="none" strokeLinecap="round" />
-            <path d="M90,50 Q65,35 50,40" stroke="#16A34A" strokeWidth="3" fill="none" strokeLinecap="round" />
-            <path d="M90,50 Q110,30 140,45" stroke="#22C55E" strokeWidth="4" fill="none" strokeLinecap="round" />
-            <path d="M90,50 Q120,35 145,35" stroke="#16A34A" strokeWidth="3" fill="none" strokeLinecap="round" />
-            <path d="M90,50 Q85,25 80,15" stroke="#4ADE80" strokeWidth="3" fill="none" strokeLinecap="round" />
-            <path d="M90,50 Q100,30 115,25" stroke="#4ADE80" strokeWidth="3" fill="none" strokeLinecap="round" />
-            
-            {/* Second smaller palm */}
-            <path d="M130,128 Q140,100 135,80" stroke="#78350F" strokeWidth="4" fill="none" strokeLinecap="round" />
-            <path d="M135,80 Q115,75 100,85" stroke="#22C55E" strokeWidth="3" fill="none" strokeLinecap="round" />
-            <path d="M135,80 Q150,70 165,75" stroke="#22C55E" strokeWidth="3" fill="none" strokeLinecap="round" />
-            <path d="M135,80 Q140,65 145,55" stroke="#4ADE80" strokeWidth="2" fill="none" strokeLinecap="round" />
-        </svg>
-    ),
-
-    // Island 4: Rocky mountain with bushes
-    RockyMountain: ({ color }) => (
-        <svg viewBox="0 0 200 160" className="w-full h-full">
-            {/* Water */}
-            <ellipse cx="100" cy="148" rx="92" ry="12" fill="#7DD3FC" opacity="0.5" />
+    // Island 3: Tropical with hut
+    TropicalHut: ({ color }) => (
+        <svg viewBox="0 0 160 120" className="w-full h-full">
+            {/* Water rings */}
+            <path d="M80,112 C128,112 148,85 143,58 C138,31 113,12 80,12 C47,12 22,31 17,58 C12,85 32,112 80,112" 
+                fill="#7DD3FC" />
+            <path d="M80,106 C122,106 140,82 136,58 C132,34 108,18 80,18 C52,18 28,34 24,58 C20,82 38,106 80,106" 
+                fill="#38BDF8" />
             
             {/* Beach */}
-            <ellipse cx="100" cy="138" rx="82" ry="16" fill="#FCD34D" />
+            <path d="M80,100 C116,100 132,78 128,58 C124,38 102,24 80,24 C58,24 36,38 32,58 C28,78 44,100 80,100" 
+                fill="#FDE68A" />
+            <path d="M80,94 C110,94 124,75 121,58 C118,41 98,30 80,30 C62,30 42,41 39,58 C36,75 50,94 80,94" 
+                fill="#FCD34D" />
             
             {/* Grass */}
-            <ellipse cx="100" cy="130" rx="75" ry="20" fill="#4ADE80" />
-            <ellipse cx="100" cy="125" rx="70" ry="18" fill="#22C55E" />
+            <ellipse cx="60" cy="55" rx="18" ry="12" fill="#4ADE80" />
+            <ellipse cx="95" cy="60" rx="14" ry="10" fill="#22C55E" />
             
-            {/* Rocky mountain */}
-            <path d="M70,125 L95,40 L130,125 Z" fill="#78716C" />
-            <path d="M80,125 L95,55 L115,125 Z" fill="#A8A29E" />
-            <path d="M85,110 L95,70 L105,110 Z" fill="#D6D3D1" opacity="0.5" />
-            
-            {/* Rock details */}
-            <path d="M75,120 L80,100 L90,120 Z" fill="#57534E" />
-            <path d="M105,118 L115,95 L125,118 Z" fill="#57534E" />
-            
-            {/* Bushes */}
-            <ellipse cx="50" cy="118" rx="15" ry="10" fill="#166534" />
-            <ellipse cx="45" cy="115" rx="10" ry="7" fill="#22C55E" />
-            <ellipse cx="55" cy="112" rx="8" ry="6" fill="#15803D" />
-            
-            <ellipse cx="150" cy="120" rx="12" ry="8" fill="#166534" />
-            <ellipse cx="155" cy="115" rx="8" ry="6" fill="#22C55E" />
-        </svg>
-    ),
-
-    // Island 5: Cave with forest
-    CaveForest: ({ color }) => (
-        <svg viewBox="0 0 200 160" className="w-full h-full">
-            {/* Water */}
-            <ellipse cx="100" cy="148" rx="90" ry="12" fill="#38BDF8" opacity="0.5" />
-            
-            {/* Beach */}
-            <ellipse cx="100" cy="138" rx="80" ry="15" fill="#FCD34D" />
-            
-            {/* Grass */}
-            <ellipse cx="100" cy="130" rx="75" ry="18" fill="#4ADE80" />
-            
-            {/* Cave mountain */}
-            <path d="M60,130 L100,45 L140,130 Z" fill="#78716C" />
-            <path d="M70,130 L100,60 L130,130 Z" fill="#A8A29E" />
-            
-            {/* Cave opening */}
-            <ellipse cx="100" cy="115" rx="18" ry="15" fill="#1F2937" />
-            <ellipse cx="100" cy="112" rx="12" ry="10" fill="#111827" />
-            
-            {/* Pine trees around cave */}
-            <path d="M45,130 L52,95 L59,130 Z" fill="#166534" />
-            <path d="M47,115 L52,85 L57,115 Z" fill="#15803D" />
-            
-            <path d="M145,128 L152,98 L159,128 Z" fill="#166534" />
-            <path d="M147,115 L152,90 L157,115 Z" fill="#15803D" />
-            
-            <path d="M155,130 L160,105 L165,130 Z" fill="#166534" />
-            
-            {/* Trees on top */}
-            <path d="M85,70 L90,50 L95,70 Z" fill="#166534" />
-            <path d="M105,72 L110,55 L115,72 Z" fill="#15803D" />
-        </svg>
-    ),
-
-    // Island 6: Desert/sand island
-    DesertIsland: ({ color }) => (
-        <svg viewBox="0 0 200 160" className="w-full h-full">
-            {/* Water */}
-            <ellipse cx="100" cy="145" rx="90" ry="15" fill="#38BDF8" opacity="0.6" />
-            <ellipse cx="100" cy="142" rx="85" ry="12" fill="#7DD3FC" opacity="0.4" />
-            
-            {/* Sand island - flat */}
-            <ellipse cx="100" cy="128" rx="75" ry="18" fill="#FDE68A" />
-            <ellipse cx="100" cy="125" rx="70" ry="15" fill="#FCD34D" />
-            <ellipse cx="100" cy="122" rx="65" ry="12" fill="#FBBF24" />
-            
-            {/* Sand dunes/ripples */}
-            <path d="M50,120 Q70,115 90,120" stroke="#F59E0B" strokeWidth="2" fill="none" opacity="0.5" />
-            <path d="M80,118 Q100,113 120,118" stroke="#F59E0B" strokeWidth="2" fill="none" opacity="0.5" />
-            <path d="M110,120 Q130,115 150,120" stroke="#F59E0B" strokeWidth="2" fill="none" opacity="0.5" />
-        </svg>
-    ),
-
-    // Island 7: Waterfall island
-    WaterfallIsland: ({ color }) => (
-        <svg viewBox="0 0 200 160" className="w-full h-full">
-            {/* Water pool */}
-            <ellipse cx="100" cy="145" rx="90" ry="15" fill="#38BDF8" opacity="0.7" />
-            <ellipse cx="85" cy="140" rx="30" ry="10" fill="#67E8F9" opacity="0.6" />
-            
-            {/* Beach */}
-            <ellipse cx="100" cy="132" rx="80" ry="18" fill="#FCD34D" />
-            
-            {/* Grass */}
-            <ellipse cx="100" cy="125" rx="72" ry="20" fill="#4ADE80" />
-            <ellipse cx="110" cy="120" rx="50" ry="15" fill="#22C55E" />
-            
-            {/* Rocks for waterfall */}
-            <path d="M55,125 L70,70 L90,125 Z" fill="#9CA3AF" />
-            <path d="M60,125 L72,80 L85,125 Z" fill="#D1D5DB" />
-            <circle cx="50" cy="118" r="10" fill="#78716C" />
-            <circle cx="92" cy="115" r="8" fill="#A1A1AA" />
-            
-            {/* Waterfall */}
-            <path d="M72,75 Q70,100 68,125" stroke="#7DD3FC" strokeWidth="8" fill="none" opacity="0.8" />
-            <path d="M72,75 Q74,100 76,125" stroke="#BAE6FD" strokeWidth="4" fill="none" opacity="0.6" />
-            
-            {/* Splash at bottom */}
-            <ellipse cx="72" cy="130" rx="15" ry="5" fill="#BAE6FD" opacity="0.5" />
+            {/* Hut (top view - red roof) */}
+            <rect x="72" y="50" width="16" height="16" fill="#7C2D12" rx="1" />
+            <rect x="74" y="52" width="12" height="12" fill="#DC2626" rx="1" />
             
             {/* Palm trees */}
-            <path d="M130,125 Q140,90 138,65" stroke="#92400E" strokeWidth="4" fill="none" />
-            <path d="M138,65 Q115,60 100,70" stroke="#22C55E" strokeWidth="3" fill="none" />
-            <path d="M138,65 Q155,55 170,60" stroke="#22C55E" strokeWidth="3" fill="none" />
-            <path d="M138,65 Q145,45 150,35" stroke="#4ADE80" strokeWidth="2" fill="none" />
+            <g transform="translate(50, 50)">
+                <circle cx="0" cy="0" r="2.5" fill="#92400E" />
+                <path d="M0,0 L-10,-4" stroke="#22C55E" strokeWidth="2.5" strokeLinecap="round" />
+                <path d="M0,0 L-8,6" stroke="#16A34A" strokeWidth="2.5" strokeLinecap="round" />
+                <path d="M0,0 L4,-10" stroke="#22C55E" strokeWidth="2.5" strokeLinecap="round" />
+                <path d="M0,0 L10,-2" stroke="#16A34A" strokeWidth="2.5" strokeLinecap="round" />
+                <path d="M0,0 L6,8" stroke="#22C55E" strokeWidth="2.5" strokeLinecap="round" />
+            </g>
             
-            <path d="M155,128 Q160,105 158,88" stroke="#78350F" strokeWidth="3" fill="none" />
-            <path d="M158,88 Q145,85 135,92" stroke="#22C55E" strokeWidth="2" fill="none" />
-            <path d="M158,88 Q170,82 178,85" stroke="#22C55E" strokeWidth="2" fill="none" />
+            <g transform="translate(110, 55)">
+                <circle cx="0" cy="0" r="2" fill="#78350F" />
+                <path d="M0,0 L-8,-3" stroke="#22C55E" strokeWidth="2" strokeLinecap="round" />
+                <path d="M0,0 L-6,5" stroke="#16A34A" strokeWidth="2" strokeLinecap="round" />
+                <path d="M0,0 L3,-8" stroke="#22C55E" strokeWidth="2" strokeLinecap="round" />
+                <path d="M0,0 L8,-1" stroke="#16A34A" strokeWidth="2" strokeLinecap="round" />
+            </g>
+            
+            {/* Bushes */}
+            <circle cx="65" cy="75" r="4" fill="#166534" />
+            <circle cx="100" cy="72" r="3" fill="#15803D" />
         </svg>
     ),
 
-    // Island 8: Small grassy mound
-    GrassyMound: ({ color }) => (
-        <svg viewBox="0 0 200 160" className="w-full h-full">
+    // Island 4: Volcano island
+    VolcanoIsland: ({ color }) => (
+        <svg viewBox="0 0 160 120" className="w-full h-full">
             {/* Water */}
-            <ellipse cx="100" cy="145" rx="85" ry="15" fill="#38BDF8" opacity="0.5" />
-            <ellipse cx="100" cy="142" rx="80" ry="12" fill="#7DD3FC" opacity="0.4" />
+            <path d="M80,112 C130,112 150,82 145,55 C140,28 115,8 80,8 C45,8 20,28 15,55 C10,82 30,112 80,112" 
+                fill="#7DD3FC" />
+            <path d="M80,105 C123,105 142,78 137,55 C132,32 108,15 80,15 C52,15 28,32 23,55 C18,78 37,105 80,105" 
+                fill="#38BDF8" />
             
             {/* Beach */}
-            <ellipse cx="100" cy="132" rx="70" ry="16" fill="#FCD34D" />
+            <path d="M80,98 C116,98 132,75 128,55 C124,35 103,20 80,20 C57,20 36,35 32,55 C28,75 44,98 80,98" 
+                fill="#FDE68A" />
             
-            {/* Grass base */}
-            <ellipse cx="100" cy="125" rx="60" ry="18" fill="#4ADE80" />
+            {/* Grass */}
+            <path d="M80,92 C110,92 124,72 121,55 C118,38 98,26 80,26 C62,26 42,38 39,55 C36,72 50,92 80,92" 
+                fill="#4ADE80" />
             
-            {/* Grass mounds */}
-            <ellipse cx="85" cy="110" rx="30" ry="20" fill="#22C55E" />
-            <ellipse cx="115" cy="115" rx="25" ry="15" fill="#16A34A" />
-            <ellipse cx="100" cy="105" rx="20" ry="18" fill="#15803D" />
+            {/* Volcano (top view) */}
+            <circle cx="80" cy="55" r="22" fill="#57534E" />
+            <circle cx="80" cy="55" r="16" fill="#78716C" />
+            <circle cx="80" cy="55" r="10" fill="#1F2937" />
+            <circle cx="80" cy="55" r="6" fill="#111827" />
             
-            {/* Small bushes */}
-            <circle cx="70" cy="115" r="6" fill="#166534" />
-            <circle cx="130" cy="118" r="5" fill="#166534" />
+            {/* Lava glow */}
+            <circle cx="80" cy="55" r="4" fill="#EF4444" opacity="0.6" />
             
-            {/* Grass tufts */}
-            <path d="M95,95 Q97,85 99,95" stroke="#15803D" strokeWidth="2" fill="none" />
-            <path d="M102,92 Q104,82 106,92" stroke="#166534" strokeWidth="2" fill="none" />
-            <path d="M80,105 Q82,98 84,105" stroke="#15803D" strokeWidth="2" fill="none" />
-            <path d="M115,100 Q117,93 119,100" stroke="#166534" strokeWidth="2" fill="none" />
+            {/* Trees around volcano */}
+            <circle cx="52" cy="70" r="5" fill="#166534" />
+            <circle cx="108" cy="68" r="4" fill="#166534" />
+            <circle cx="60" cy="82" r="4" fill="#15803D" />
+            <circle cx="100" cy="80" r="5" fill="#166534" />
+            <circle cx="80" cy="85" r="3" fill="#15803D" />
+        </svg>
+    ),
+
+    // Island 5: Jungle island with rocks
+    JungleRocks: ({ color }) => (
+        <svg viewBox="0 0 160 120" className="w-full h-full">
+            {/* Water */}
+            <path d="M80,110 C125,112 145,82 142,55 C139,28 115,10 80,10 C45,10 22,28 18,55 C14,82 35,108 80,110" 
+                fill="#7DD3FC" />
+            <path d="M80,104 C120,106 138,78 135,55 C132,32 110,16 80,16 C50,16 28,32 25,55 C22,78 40,102 80,104" 
+                fill="#38BDF8" />
+            
+            {/* Beach */}
+            <path d="M80,97 C113,99 128,75 125,55 C122,35 102,22 80,22 C58,22 38,35 35,55 C32,75 47,95 80,97" 
+                fill="#FDE68A" />
+            
+            {/* Dense jungle (grass) */}
+            <path d="M80,90 C106,92 118,72 116,55 C114,38 96,28 80,28 C64,28 46,38 44,55 C42,72 54,88 80,90" 
+                fill="#22C55E" />
+            
+            {/* Rock formations */}
+            <ellipse cx="55" cy="50" rx="10" ry="7" fill="#78716C" />
+            <ellipse cx="52" cy="48" rx="6" ry="4" fill="#A8A29E" />
+            <ellipse cx="100" cy="55" rx="8" ry="5" fill="#78716C" />
+            <ellipse cx="98" cy="53" rx="5" ry="3" fill="#A8A29E" />
+            
+            {/* Dense tree canopy */}
+            <circle cx="70" cy="55" r="8" fill="#166534" />
+            <circle cx="85" cy="50" r="7" fill="#15803D" />
+            <circle cx="78" cy="65" r="6" fill="#166534" />
+            <circle cx="60" cy="68" r="5" fill="#15803D" />
+            <circle cx="95" cy="70" r="6" fill="#166534" />
+            
+            {/* Palm top */}
+            <g transform="translate(45, 62)">
+                <circle cx="0" cy="0" r="2" fill="#78350F" />
+                <path d="M0,0 L-7,-3" stroke="#22C55E" strokeWidth="2" strokeLinecap="round" />
+                <path d="M0,0 L-5,5" stroke="#16A34A" strokeWidth="2" strokeLinecap="round" />
+                <path d="M0,0 L3,-7" stroke="#22C55E" strokeWidth="2" strokeLinecap="round" />
+                <path d="M0,0 L7,-1" stroke="#16A34A" strokeWidth="2" strokeLinecap="round" />
+            </g>
+        </svg>
+    ),
+
+    // Island 6: Simple sandy island
+    SandyIsland: ({ color }) => (
+        <svg viewBox="0 0 160 120" className="w-full h-full">
+            {/* Water */}
+            <path d="M80,108 C122,110 140,82 137,58 C134,34 112,15 80,15 C48,15 26,34 23,58 C20,82 38,106 80,108" 
+                fill="#7DD3FC" />
+            <path d="M80,102 C116,104 132,78 130,58 C128,38 108,22 80,22 C52,22 32,38 30,58 C28,78 44,100 80,102" 
+                fill="#38BDF8" />
+            
+            {/* Large sandy beach */}
+            <path d="M80,95 C110,97 123,75 121,58 C119,41 100,28 80,28 C60,28 41,41 39,58 C37,75 50,93 80,95" 
+                fill="#FDE68A" />
+            <path d="M80,88 C102,90 113,72 111,58 C109,44 94,34 80,34 C66,34 51,44 49,58 C47,72 58,86 80,88" 
+                fill="#FCD34D" />
+            
+            {/* Small grass patches */}
+            <ellipse cx="70" cy="55" rx="6" ry="4" fill="#4ADE80" />
+            <ellipse cx="90" cy="60" rx="5" ry="3" fill="#22C55E" />
+            
+            {/* Small stones */}
+            <circle cx="60" cy="65" r="2" fill="#9CA3AF" />
+            <circle cx="95" cy="58" r="2.5" fill="#9CA3AF" />
+            <circle cx="75" cy="72" r="1.5" fill="#D1D5DB" />
+        </svg>
+    ),
+
+    // Island 7: Beach resort island
+    ResortIsland: ({ color }) => (
+        <svg viewBox="0 0 160 120" className="w-full h-full">
+            {/* Water */}
+            <path d="M80,110 C128,110 148,82 143,55 C138,28 113,10 80,10 C47,10 22,28 17,55 C12,82 32,110 80,110" 
+                fill="#7DD3FC" />
+            <path d="M80,104 C122,104 140,78 136,55 C132,32 108,16 80,16 C52,16 28,32 24,55 C20,78 38,104 80,104" 
+                fill="#38BDF8" />
+            
+            {/* Beach */}
+            <path d="M80,97 C115,97 130,75 127,55 C124,35 104,22 80,22 C56,22 36,35 33,55 C30,75 45,97 80,97" 
+                fill="#FDE68A" />
+            <path d="M80,90 C107,90 120,72 118,55 C116,38 98,28 80,28 C62,28 44,38 42,55 C40,72 53,90 80,90" 
+                fill="#FCD34D" />
+            
+            {/* Beach umbrellas */}
+            <circle cx="55" cy="60" r="8" fill="#EF4444" />
+            <circle cx="55" cy="60" r="6" fill="#FCA5A5" />
+            <circle cx="100" cy="55" r="7" fill="#3B82F6" />
+            <circle cx="100" cy="55" r="5" fill="#93C5FD" />
+            <circle cx="75" cy="75" r="6" fill="#22C55E" />
+            <circle cx="75" cy="75" r="4" fill="#86EFAC" />
+            
+            {/* Dock */}
+            <rect x="115" y="65" width="20" height="4" fill="#92400E" rx="1" />
+            
+            {/* Palm tree */}
+            <g transform="translate(45, 48)">
+                <circle cx="0" cy="0" r="2" fill="#78350F" />
+                <path d="M0,0 L-8,-3" stroke="#22C55E" strokeWidth="2" strokeLinecap="round" />
+                <path d="M0,0 L-6,5" stroke="#16A34A" strokeWidth="2" strokeLinecap="round" />
+                <path d="M0,0 L3,-8" stroke="#22C55E" strokeWidth="2" strokeLinecap="round" />
+                <path d="M0,0 L8,-1" stroke="#16A34A" strokeWidth="2" strokeLinecap="round" />
+            </g>
+        </svg>
+    ),
+
+    // Island 8: Forest island
+    ForestIsland: ({ color }) => (
+        <svg viewBox="0 0 160 120" className="w-full h-full">
+            {/* Water */}
+            <path d="M80,110 C125,110 145,82 140,55 C135,28 112,10 80,10 C48,10 25,28 20,55 C15,82 35,110 80,110" 
+                fill="#7DD3FC" />
+            <path d="M80,104 C120,104 138,78 134,55 C130,32 108,16 80,16 C52,16 30,32 26,55 C22,78 40,104 80,104" 
+                fill="#38BDF8" />
+            
+            {/* Beach */}
+            <path d="M80,97 C113,97 128,75 125,55 C122,35 102,22 80,22 C58,22 38,35 35,55 C32,75 47,97 80,97" 
+                fill="#FDE68A" />
+            
+            {/* Grass */}
+            <path d="M80,90 C106,90 118,72 116,55 C114,38 96,28 80,28 C64,28 46,38 44,55 C42,72 54,90 80,90" 
+                fill="#4ADE80" />
+            <path d="M80,82 C98,82 108,68 106,55 C104,42 90,34 80,34 C70,34 56,42 54,55 C52,68 62,82 80,82" 
+                fill="#22C55E" />
+            
+            {/* Dense forest (tree canopy - top view) */}
+            <circle cx="65" cy="50" r="9" fill="#166534" />
+            <circle cx="90" cy="48" r="10" fill="#15803D" />
+            <circle cx="75" cy="60" r="8" fill="#166534" />
+            <circle cx="55" cy="62" r="6" fill="#15803D" />
+            <circle cx="100" cy="60" r="7" fill="#166534" />
+            <circle cx="80" cy="70" r="6" fill="#15803D" />
+            <circle cx="68" cy="75" r="5" fill="#166534" />
+            <circle cx="92" cy="72" r="5" fill="#15803D" />
         </svg>
     ),
 };
 
 const ISLAND_TYPES = [
-    'GrassyPond',
-    'MountainPines', 
-    'TropicalPalm',
-    'RockyMountain',
-    'CaveForest',
-    'DesertIsland',
-    'WaterfallIsland',
-    'GrassyMound',
+    'BeachPalms',
+    'RockyMountain', 
+    'TropicalHut',
+    'VolcanoIsland',
+    'JungleRocks',
+    'SandyIsland',
+    'ResortIsland',
+    'ForestIsland',
 ];
 
 export default function IslandSVG({ index, color, completed, progress = 0 }) {
@@ -283,27 +320,35 @@ export default function IslandSVG({ index, color, completed, progress = 0 }) {
             
             {/* Progress ring overlay */}
             {progress > 0 && progress < 100 && (
-                <svg className="absolute inset-0 w-full h-full" viewBox="0 0 200 160">
+                <svg className="absolute inset-0 w-full h-full pointer-events-none" viewBox="0 0 160 120">
                     <circle
-                        cx="100"
-                        cy="80"
-                        r="25"
+                        cx="80"
+                        cy="60"
+                        r="45"
                         fill="none"
-                        stroke={color}
-                        strokeWidth="4"
-                        strokeDasharray={`${progress * 1.57} 157`}
+                        stroke="#E9D5FF"
+                        strokeWidth="3"
+                        opacity="0.5"
+                    />
+                    <circle
+                        cx="80"
+                        cy="60"
+                        r="45"
+                        fill="none"
+                        stroke="#8B5CF6"
+                        strokeWidth="3"
+                        strokeDasharray={`${progress * 2.83} 283`}
                         strokeLinecap="round"
-                        transform="rotate(-90, 100, 80)"
-                        opacity="0.9"
+                        transform="rotate(-90, 80, 60)"
                     />
                 </svg>
             )}
             
             {/* Completed badge */}
             {completed && (
-                <svg className="absolute inset-0 w-full h-full" viewBox="0 0 200 160">
-                    <circle cx="155" cy="40" r="14" fill="#10B981" />
-                    <path d="M148,40 L153,46 L163,35" stroke="white" strokeWidth="3" fill="none" strokeLinecap="round" strokeLinejoin="round" />
+                <svg className="absolute inset-0 w-full h-full pointer-events-none" viewBox="0 0 160 120">
+                    <circle cx="130" cy="25" r="12" fill="#10B981" />
+                    <path d="M124,25 L128,29 L136,21" stroke="white" strokeWidth="2.5" fill="none" strokeLinecap="round" strokeLinejoin="round" />
                 </svg>
             )}
         </div>

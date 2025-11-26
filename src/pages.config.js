@@ -10,6 +10,7 @@ import ResumeBuilder from './pages/ResumeBuilder';
 import SearchResults from './pages/SearchResults';
 import Markets from './pages/Markets';
 import Learning from './pages/Learning';
+import Tasks from './pages/Tasks';
 
 
 export const PAGES = {
@@ -25,6 +26,7 @@ export const PAGES = {
     "SearchResults": SearchResults,
     "Markets": Markets,
     "Learning": Learning,
+    "Tasks": Tasks,
 }
 
 export const pagesConfig = {

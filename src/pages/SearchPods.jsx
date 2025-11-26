@@ -14,6 +14,7 @@ import { Slider } from "@/components/ui/slider";
 import { Progress } from "@/components/ui/progress";
 
 import { LOGO_URL, menuItems, footerLinks } from '../components/NavigationConfig';
+import GlobalSearchBar from '../components/GlobalSearchBar';
 
 const CATEGORIES = [
     { id: 'technology', name: 'Technology', color: '#6B4EE6', episodes: 16 },
@@ -415,31 +416,12 @@ export default function SearchPods() {
                         </Link>
                     </div>
 
-                    {/* Taller Search Bar */}
-                    <form onSubmit={handleSearch} className="flex-1 max-w-2xl mx-8 relative">
-                        <Search className="absolute left-5 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
-                        <Input
-                            value={searchQuery}
-                            onChange={(e) => setSearchQuery(e.target.value)}
-                            placeholder="Search any topic to create a podcast..."
-                            className="w-full pl-14 pr-24 py-4 h-14 bg-white border-2 border-purple-200 text-gray-900 placeholder:text-gray-400 rounded-full focus:border-purple-500 focus:ring-purple-500 text-base"
-                        />
-                        <div className="absolute right-3 top-1/2 -translate-y-1/2 flex items-center gap-2">
-                            <button
-                                type="button"
-                                onClick={handleVoiceSearch}
-                                className={`p-2 rounded-full ${isListening ? 'text-red-500 bg-red-50 animate-pulse' : 'text-gray-400 hover:text-purple-600 hover:bg-purple-50'}`}
-                            >
-                                <Mic className="w-5 h-5" />
-                            </button>
-                            <button
-                                type="submit"
-                                className="p-2 rounded-full bg-purple-600 text-white hover:bg-purple-700"
-                            >
-                                <Search className="w-5 h-5" />
-                            </button>
-                        </div>
-                    </form>
+                    {/* Global Search Bar */}
+                    <GlobalSearchBar 
+                        onSearch={(q) => { setSearchQuery(q); playEpisode({ title: q, category: 'Search' }); }}
+                        placeholder="Search any topic to create a podcast..."
+                        className="flex-1 max-w-2xl mx-8"
+                    />
 
                     <div className="w-20" />
                 </div>

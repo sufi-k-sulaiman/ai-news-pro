@@ -12,6 +12,7 @@ import MetricCard from '../components/dashboard/MetricCard';
 import PieChartCard from '../components/dashboard/PieChartCard';
 
 import { LOGO_URL, menuItems as navMenuItems, footerLinks } from '../components/NavigationConfig';
+import GlobalSearchBar from '../components/GlobalSearchBar';
 
 const AI_MODELS = [
     { id: 'qwirey', name: 'Qwirey', icon: null, isLogo: true, description: 'All-in-one AI assistant', color: '#6B4EE6' },

@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
 import { Menu, ChevronLeft } from 'lucide-react';
 import { Button } from "@/components/ui/button";
-import SmartSearchBar from './SmartSearchBar';
+import GlobalSearchBar from './GlobalSearchBar';
 import { LOGO_URL, menuItems, footerLinks } from './NavigationConfig';
 
 export default function PageLayout({ children, activePage, onSearch, searchPlaceholder = "Search anything..." }) {
@@ -34,7 +34,7 @@ export default function PageLayout({ children, activePage, onSearch, searchPlace
                         </Link>
                     </div>
 
-                    <SmartSearchBar 
+                    <GlobalSearchBar 
                         onSearch={onSearch || ((q) => console.log('Search:', q))}
                         placeholder={searchPlaceholder}
                         className="flex-1 max-w-xl mx-8"

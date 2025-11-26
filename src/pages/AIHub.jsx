@@ -46,6 +46,7 @@ export default function AIHub() {
     const handleVoiceInput = () => {
         if (isListening && recognitionRef.current) {
             recognitionRef.current.stop();
+            recognitionRef.current = null;
             setIsListening(false);
             return;
         }
@@ -60,14 +61,50 @@ export default function AIHub() {
         recognitionRef.current = recognition;
         recognition.continuous = true;
         recognition.interimResults = true;
+        recognition.lang = 'en-US';
 
-        recognition.onstart = () => setIsListening(true);
-        recognition.onresult = (e) => {
-            const transcript = Array.from(e.results).map(r => r[0].transcript).join('');
-            setQuery(transcript);
+        recognition.onstart = () => {
+            setIsListening(true);
         };
-        recognition.onerror = () => setIsListening(false);
-        recognition.onend = () => setIsListening(false);
+        
+        recognition.onresult = (e) => {
+            let finalTranscript = '';
+            let interimTranscript = '';
+            
+            for (let i = 0; i < e.results.length; i++) {
+                const transcript = e.results[i][0].transcript;
+                if (e.results[i].isFinal) {
+                    finalTranscript += transcript + ' ';
+                } else {
+                    interimTranscript += transcript;
+                }
+            }
+            
+            setQuery(prev => {
+                const base = prev.replace(/\[listening...\]$/, '').trim();
+                if (finalTranscript) {
+                    return (base ? base + ' ' : '') + finalTranscript.trim();
+                }
+                return (base ? base + ' ' : '') + interimTranscript + ' [listening...]';
+            });
+        };
+        
+        recognition.onerror = (e) => {
+            console.error('Speech recognition error:', e.error);
+            setIsListening(false);
+            recognitionRef.current = null;
+        };
+        
+        recognition.onend = () => {
+            setQuery(prev => prev.replace(/\s*\[listening...\]$/, '').trim());
+            if (isListening && recognitionRef.current) {
+                recognition.start();
+            } else {
+                setIsListening(false);
+                recognitionRef.current = null;
+            }
+        };
+        
         recognition.start();
     };
 
@@ -94,7 +131,20 @@ export default function AIHub() {
         for (const file of textFiles) {
             try {
                 const { file_url } = await base44.integrations.Core.UploadFile({ file });
-                setAttachedFiles(prev => [...prev, { name: file.name, url: file_url }]);
+                
+                // Extract content from the uploaded file
+                const extractedData = await base44.integrations.Core.ExtractDataFromUploadedFile({
+                    file_url: file_url,
+                    json_schema: {
+                        type: "object",
+                        properties: {
+                            content: { type: "string", description: "The full text content of the document" }
+                        }
+                    }
+                });
+                
+                const content = extractedData?.output?.content || '';
+                setAttachedFiles(prev => [...prev, { name: file.name, url: file_url, content }]);
             } catch (err) {
                 console.error('File upload error:', err);
             }
@@ -113,13 +163,19 @@ export default function AIHub() {
         setResults({ query, loading: true, text: '', images: [], documents: [], suggestions: [], chartData: null });
 
         try {
+            // Build context from attached files
+            const fileContext = attachedFiles.length > 0 
+                ? '\n\nAttached Documents:\n' + attachedFiles.map(f => `--- ${f.name} ---\n${f.content || 'Content not available'}`).join('\n\n')
+                : '';
+
             if (selectedModel === 'qwirey') {
                 // Qwirey: Full experience with images, docs, charts
                 const [textResponse, imagesResponse, webResponse] = await Promise.all([
                     base44.integrations.Core.InvokeLLM({
                         prompt: `You are Qwirey, an advanced AI assistant. Provide a comprehensive, well-structured response to: "${query}". 
-                        Include relevant insights, explanations, and actionable information. Use markdown formatting.`,
-                        add_context_from_internet: true
+                        Include relevant insights, explanations, and actionable information. Use markdown formatting.${fileContext}`,
+                        add_context_from_internet: true,
+                        file_urls: attachedFiles.length > 0 ? attachedFiles.map(f => f.url) : undefined
                     }),
                     
                     Promise.all([
@@ -187,8 +243,9 @@ export default function AIHub() {
             } else {
                 // GPT-4, Claude, Gemini: Simple text response only
                 const textResponse = await base44.integrations.Core.InvokeLLM({
-                    prompt: `You are ${selectedModel === 'gpt4' ? 'GPT-4o' : selectedModel === 'claude' ? 'Claude' : 'Gemini'}. Respond to: "${query}"`,
-                    add_context_from_internet: true
+                    prompt: `You are ${selectedModel === 'gpt4' ? 'GPT-4o' : selectedModel === 'claude' ? 'Claude' : 'Gemini'}. Respond to: "${query}"${fileContext}`,
+                    add_context_from_internet: true,
+                    file_urls: attachedFiles.length > 0 ? attachedFiles.map(f => f.url) : undefined
                 });
 
                 setResults({
@@ -248,8 +305,8 @@ export default function AIHub() {
                         <div className="flex items-center gap-3">
                             <img src={LOGO_URL} alt="1cPublishing" className="h-10 w-10 object-contain" />
                             <div>
-                                <span className="text-xl font-bold" style={{ color: '#6B4EE6' }}>AI Hub</span>
-                                <p className="text-xs text-gray-500">Powered by Qwirey</p>
+                                <span className="text-xl font-bold" style={{ color: '#6B4EE6' }}>1cPublishing</span>
+                                <p className="text-xs text-gray-500">AI Powered</p>
                             </div>
                         </div>
                     </div>

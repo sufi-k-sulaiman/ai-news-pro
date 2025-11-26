@@ -3,10 +3,10 @@ import { Link } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
 import { base44 } from '@/api/base44Client';
 import { 
-    Search, Play, Pause, SkipBack, SkipForward, Volume2, VolumeX,
-    Sparkles, Home, Radio, Menu, ChevronLeft, Loader2, X, 
+    Search, Play, Pause, SkipBack, SkipForward, Volume2,
+    Sparkles, Home, Radio, Menu, ChevronLeft, Loader2,
     ChevronRight, Plus, Cpu, BookOpen, Film, Trophy, Building2, Plane,
-    BarChart3, TestTube
+    BarChart3, Settings
 } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -44,9 +44,9 @@ const CATEGORIES = [
 const menuItems = [
     { icon: Home, label: "Home", href: createPageUrl('Home') },
     { icon: Sparkles, label: "AI Hub", href: createPageUrl('AIHub') },
-    { icon: Radio, label: "SearchPods", href: createPageUrl('SearchPods') },
+    { icon: Radio, label: "SearchPods", href: createPageUrl('SearchPods'), active: true },
     { icon: BarChart3, label: "Dashboard", href: createPageUrl('DashboardComponents') },
-    { icon: TestTube, label: "Test Functions", href: createPageUrl('TestFunctions') },
+    { icon: Settings, label: "Settings", href: createPageUrl('Settings') },
 ];
 
 export default function SearchPods() {
@@ -58,26 +58,42 @@ export default function SearchPods() {
     const [currentEpisode, setCurrentEpisode] = useState(null);
     const [isPlaying, setIsPlaying] = useState(false);
     const [currentTime, setCurrentTime] = useState(0);
-    const [duration, setDuration] = useState(86);
-    const [volume, setVolume] = useState(80);
+    const [duration, setDuration] = useState(300);
     const [selectedVoice, setSelectedVoice] = useState('nova');
     const [playbackSpeed, setPlaybackSpeed] = useState('1x');
     const [generatingCategory, setGeneratingCategory] = useState(null);
-    const [brailleDots, setBrailleDots] = useState(Array(8).fill(false));
+    const [currentCaption, setCurrentCaption] = useState('');
+    const [captions, setCaptions] = useState([]);
+    const [equalizerBars, setEqualizerBars] = useState(Array(12).fill(20));
+    const [hideIcons] = useState(() => localStorage.getItem('hideIcons') === 'true');
 
     useEffect(() => {
         loadCategories();
     }, []);
 
     useEffect(() => {
+        let interval;
         if (isPlaying) {
-            const interval = setInterval(() => {
-                setBrailleDots(prev => prev.map(() => Math.random() > 0.4));
-                setCurrentTime(prev => Math.min(prev + 1, duration));
-            }, 300);
-            return () => clearInterval(interval);
+            interval = setInterval(() => {
+                setEqualizerBars(prev => prev.map(() => Math.random() * 60 + 20));
+                setCurrentTime(prev => {
+                    const next = prev + 1;
+                    if (next >= duration) {
+                        setIsPlaying(false);
+                        return duration;
+                    }
+                    // Update caption
+                    const captionObj = captions.find((c, i) => {
+                        const nextC = captions[i + 1];
+                        return next >= c.time && (!nextC || next < nextC.time);
+                    });
+                    if (captionObj) setCurrentCaption(captionObj.text);
+                    return next;
+                });
+            }, 1000);
         }
-    }, [isPlaying, duration]);
+        return () => clearInterval(interval);
+    }, [isPlaying, duration, captions]);
 
     const loadCategories = async () => {
         setIsLoading(true);
@@ -85,9 +101,7 @@ export default function SearchPods() {
             const results = await Promise.all(
                 CATEGORIES.map(async (cat) => {
                     const response = await base44.integrations.Core.InvokeLLM({
-                        prompt: `Generate 4 podcast episode topics for the category "${cat.name}". 
-                        Also suggest 2-3 subtopic filters for this category.
-                        Make topics current and interesting.`,
+                        prompt: `Generate 4 podcast episode topics for "${cat.name}". Include subtopic filters.`,
                         add_context_from_internet: true,
                         response_json_schema: {
                             type: "object",
@@ -103,10 +117,7 @@ export default function SearchPods() {
                                         }
                                     }
                                 },
-                                subtopics: {
-                                    type: "array",
-                                    items: { type: "string" }
-                                }
+                                subtopics: { type: "array", items: { type: "string" } }
                             }
                         }
                     });
@@ -115,7 +126,7 @@ export default function SearchPods() {
                         (response?.episodes || []).slice(0, 4).map(async (ep) => {
                             try {
                                 const img = await base44.integrations.Core.GenerateImage({
-                                    prompt: `Podcast thumbnail for "${ep.title}" - ${cat.name} theme, professional, dark moody style`
+                                    prompt: `Podcast thumbnail for "${ep.title}" - ${cat.name} theme, professional light style`
                                 });
                                 return { ...ep, thumbnail: img?.url, category: cat.name };
                             } catch {
@@ -144,7 +155,7 @@ export default function SearchPods() {
         setGeneratingCategory(categoryName);
         try {
             const response = await base44.integrations.Core.InvokeLLM({
-                prompt: `Generate 3 new unique podcast episode topics for "${categoryName}". Make them different from typical topics.`,
+                prompt: `Generate 3 new podcast episode topics for "${categoryName}".`,
                 add_context_from_internet: true,
                 response_json_schema: {
                     type: "object",
@@ -168,7 +179,7 @@ export default function SearchPods() {
                 (response?.episodes || []).map(async (ep) => {
                     try {
                         const img = await base44.integrations.Core.GenerateImage({
-                            prompt: `Podcast thumbnail for "${ep.title}" - ${categoryName} theme, professional dark style`
+                            prompt: `Podcast thumbnail for "${ep.title}" - ${categoryName} theme, professional light style`
                         });
                         return { ...ep, thumbnail: img?.url, category: categoryName };
                     } catch {
@@ -189,42 +200,54 @@ export default function SearchPods() {
         }
     };
 
-    const generateSubtopics = async (categoryName) => {
-        setGeneratingCategory(categoryName);
+    const playEpisode = async (episode) => {
+        setCurrentEpisode(episode);
+        setShowPlayer(true);
+        setCurrentTime(0);
+        setCurrentCaption('Generating podcast content...');
+        setIsPlaying(false);
+
         try {
-            const response = await base44.integrations.Core.InvokeLLM({
-                prompt: `Generate 3 new subtopic filters for the podcast category "${categoryName}".`,
+            // Generate podcast script with captions
+            const scriptResponse = await base44.integrations.Core.InvokeLLM({
+                prompt: `Create a 5-minute podcast script about "${episode.title}". 
+                Include engaging content with facts and insights.
+                Break it into caption segments (sentences) with timestamps.`,
+                add_context_from_internet: true,
                 response_json_schema: {
                     type: "object",
                     properties: {
-                        subtopics: { type: "array", items: { type: "string" } }
+                        captions: {
+                            type: "array",
+                            items: {
+                                type: "object",
+                                properties: {
+                                    text: { type: "string" },
+                                    time: { type: "number" }
+                                }
+                            }
+                        },
+                        totalDuration: { type: "number" }
                     }
                 }
             });
 
-            setCategories(prev => prev.map(cat => 
-                cat.name === categoryName 
-                    ? { ...cat, subtopics: [...cat.subtopics, ...(response?.subtopics || [])] }
-                    : cat
-            ));
+            const generatedCaptions = scriptResponse?.captions || [
+                { text: "Welcome to this episode about " + episode.title, time: 0 },
+                { text: "Let's dive into the topic.", time: 5 }
+            ];
+            
+            setCaptions(generatedCaptions);
+            setDuration(scriptResponse?.totalDuration || 300);
+            setCurrentCaption(generatedCaptions[0]?.text || '');
+            setIsPlaying(true);
         } catch (error) {
-            console.error('Error generating subtopics:', error);
-        } finally {
-            setGeneratingCategory(null);
+            console.error('Error generating script:', error);
+            setCaptions([{ text: "Welcome to " + episode.title, time: 0 }]);
+            setCurrentCaption("Welcome to " + episode.title);
+            setDuration(300);
+            setIsPlaying(true);
         }
-    };
-
-    const playEpisode = (episode) => {
-        setCurrentEpisode(episode);
-        setShowPlayer(true);
-        setIsPlaying(true);
-        setCurrentTime(0);
-    };
-
-    const formatTime = (seconds) => {
-        const mins = Math.floor(seconds / 60);
-        const secs = Math.floor(seconds % 60);
-        return `${mins}:${secs.toString().padStart(2, '0')}`;
     };
 
     const handleSearch = async (e) => {
@@ -240,7 +263,7 @@ export default function SearchPods() {
         
         try {
             const img = await base44.integrations.Core.GenerateImage({
-                prompt: `Podcast thumbnail for "${searchQuery}" - professional, dark moody style with microphone`
+                prompt: `Podcast thumbnail for "${searchQuery}" - professional light style`
             });
             episode.thumbnail = img?.url;
         } catch {}
@@ -248,37 +271,43 @@ export default function SearchPods() {
         playEpisode(episode);
     };
 
+    const formatTime = (seconds) => {
+        const mins = Math.floor(seconds / 60);
+        const secs = Math.floor(seconds % 60);
+        return `${mins}:${secs.toString().padStart(2, '0')}`;
+    };
+
     return (
-        <div className="min-h-screen flex flex-col bg-[#0D1321]">
+        <div className="min-h-screen flex flex-col bg-gray-50">
             {/* Header */}
-            <header className="bg-[#1A1F2E] sticky top-0 z-50 border-b border-gray-800">
+            <header className="bg-white sticky top-0 z-50 border-b border-gray-200 shadow-sm">
                 <div className="flex items-center justify-between px-4 py-3">
                     <div className="flex items-center gap-4">
                         <Button
                             variant="ghost"
                             size="icon"
                             onClick={() => setSidebarOpen(!sidebarOpen)}
-                            className="text-gray-400 hover:text-white hover:bg-gray-800"
+                            className="hover:bg-gray-100"
                         >
-                            {sidebarOpen ? <ChevronLeft className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+                            {sidebarOpen ? <ChevronLeft className="w-5 h-5 text-purple-600" /> : <Menu className="w-5 h-5 text-purple-600" />}
                         </Button>
                         <div className="flex items-center gap-3">
                             <img src={LOGO_URL} alt="1cPublishing" className="h-10 w-10 object-contain" />
                             <div>
-                                <span className="text-xl font-bold text-white">1cPublishing</span>
-                                <p className="text-xs font-medium text-purple-400">AI Powered</p>
+                                <span className="text-xl font-bold text-black">1cPublishing</span>
+                                <p className="text-xs font-medium text-purple-600">AI Powered</p>
                             </div>
                         </div>
                     </div>
 
                     <form onSubmit={handleSearch} className="flex-1 max-w-xl mx-8">
                         <div className="relative">
-                            <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-500" />
+                            <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
                             <Input
                                 value={searchQuery}
                                 onChange={(e) => setSearchQuery(e.target.value)}
                                 placeholder="Search for any topic..."
-                                className="pl-12 pr-4 py-3 rounded-full bg-[#252B3B] border-gray-700 text-white placeholder:text-gray-500 focus:border-purple-500"
+                                className="pl-12 pr-4 py-3 rounded-full border-gray-200 focus:border-purple-500"
                             />
                         </div>
                     </form>
@@ -289,19 +318,19 @@ export default function SearchPods() {
 
             <div className="flex flex-1">
                 {/* Sidebar */}
-                <aside className={`${sidebarOpen ? 'w-64' : 'w-0'} transition-all duration-300 overflow-hidden bg-[#1A1F2E] border-r border-gray-800 flex-shrink-0`}>
+                <aside className={`${sidebarOpen ? 'w-64' : 'w-0'} transition-all duration-300 overflow-hidden bg-white border-r border-gray-200 flex-shrink-0`}>
                     <nav className="p-4 space-y-2">
                         {menuItems.map((item, index) => (
                             <Link
                                 key={index}
                                 to={item.href}
                                 className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-colors ${
-                                    item.label === 'SearchPods'
-                                        ? 'bg-purple-600/20 text-purple-400' 
-                                        : 'text-gray-400 hover:bg-gray-800 hover:text-white'
+                                    item.active
+                                        ? 'bg-purple-100 text-purple-700'
+                                        : 'text-gray-700 hover:bg-purple-50 hover:text-purple-600'
                                 }`}
                             >
-                                <item.icon className="w-5 h-5" />
+                                {!hideIcons && <item.icon className="w-5 h-5" style={{ color: '#6B4EE6' }} />}
                                 <span className="font-medium">{item.label}</span>
                             </Link>
                         ))}
@@ -312,26 +341,26 @@ export default function SearchPods() {
                 <main className="flex-1 p-6 overflow-auto">
                     {isLoading ? (
                         <div className="flex items-center justify-center h-64">
-                            <Loader2 className="w-8 h-8 animate-spin text-purple-500" />
+                            <Loader2 className="w-8 h-8 animate-spin text-purple-600" />
                         </div>
                     ) : (
                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                             {categories.map((category) => {
                                 const IconComponent = CATEGORY_ICONS[category.name] || Radio;
                                 return (
-                                    <div key={category.name} className="bg-[#1A1F2E] rounded-2xl p-5 border border-gray-800">
+                                    <div key={category.name} className="bg-white rounded-2xl p-5 border border-gray-200 shadow-sm">
                                         {/* Category Header */}
                                         <div className="flex items-center justify-between mb-4">
                                             <div className="flex items-center gap-3">
-                                                <div className="w-10 h-10 rounded-lg flex items-center justify-center" style={{ backgroundColor: `${category.color}20` }}>
+                                                <div className="w-10 h-10 rounded-lg flex items-center justify-center" style={{ backgroundColor: `${category.color}15` }}>
                                                     <IconComponent className="w-5 h-5" style={{ color: category.color }} />
                                                 </div>
                                                 <div>
-                                                    <h3 className="font-semibold text-white">{category.name}</h3>
+                                                    <h3 className="font-semibold text-gray-800">{category.name}</h3>
                                                     <p className="text-xs text-gray-500">{category.episodeCount} episodes</p>
                                                 </div>
                                             </div>
-                                            <button className="flex items-center gap-1 text-sm text-purple-400 hover:text-purple-300">
+                                            <button className="flex items-center gap-1 text-sm text-purple-600 hover:text-purple-700">
                                                 More <ChevronRight className="w-4 h-4" />
                                             </button>
                                         </div>
@@ -340,15 +369,12 @@ export default function SearchPods() {
                                         <div className="flex flex-wrap gap-2 mb-4">
                                             <span className="px-3 py-1 rounded-full text-xs font-medium bg-purple-600 text-white">All</span>
                                             {category.subtopics?.slice(0, 2).map((sub, i) => (
-                                                <span key={i} className="px-3 py-1 rounded-full text-xs font-medium bg-gray-700 text-gray-300 hover:bg-gray-600 cursor-pointer">
+                                                <span key={i} className="px-3 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-600 hover:bg-gray-200 cursor-pointer">
                                                     {sub}
                                                 </span>
                                             ))}
-                                            <button 
-                                                onClick={() => generateSubtopics(category.name)}
-                                                className="px-3 py-1 rounded-full text-xs font-medium border border-dashed border-gray-600 text-gray-400 hover:border-purple-500 hover:text-purple-400 flex items-center gap-1"
-                                            >
-                                                <Plus className="w-3 h-3" /> Generate Subtopics
+                                            <button className="px-3 py-1 rounded-full text-xs font-medium border border-dashed border-gray-300 text-gray-400 hover:border-purple-500 hover:text-purple-600 flex items-center gap-1">
+                                                <Plus className="w-3 h-3" /> More
                                             </button>
                                         </div>
 
@@ -358,25 +384,25 @@ export default function SearchPods() {
                                                 <div 
                                                     key={i} 
                                                     onClick={() => playEpisode(episode)}
-                                                    className="flex items-center gap-3 p-2 rounded-lg hover:bg-gray-800/50 cursor-pointer group"
+                                                    className="flex items-center gap-3 p-2 rounded-lg hover:bg-gray-50 cursor-pointer group"
                                                 >
-                                                    <div className="w-12 h-12 rounded-lg bg-gray-700 overflow-hidden flex-shrink-0 relative">
+                                                    <div className="w-12 h-12 rounded-lg bg-gray-100 overflow-hidden flex-shrink-0 relative">
                                                         {episode.thumbnail ? (
                                                             <img src={episode.thumbnail} alt={episode.title} className="w-full h-full object-cover" />
                                                         ) : (
                                                             <div className="w-full h-full flex items-center justify-center">
-                                                                <Radio className="w-5 h-5 text-gray-500" />
+                                                                <Radio className="w-5 h-5 text-gray-400" />
                                                             </div>
                                                         )}
-                                                        <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                                                        <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
                                                             <Play className="w-5 h-5 text-white" fill="white" />
                                                         </div>
                                                     </div>
                                                     <div className="flex-1 min-w-0">
-                                                        <h4 className="text-sm font-medium text-white truncate">{episode.title}</h4>
-                                                        <p className="text-xs text-gray-500">{episode.duration || '2:00'} • {episode.plays || 0} plays</p>
+                                                        <h4 className="text-sm font-medium text-gray-800 truncate">{episode.title}</h4>
+                                                        <p className="text-xs text-gray-500">{episode.duration || '5:00'} • {episode.plays || 0} plays</p>
                                                     </div>
-                                                    <Play className="w-5 h-5 text-gray-500 group-hover:text-purple-400 flex-shrink-0" />
+                                                    <Play className="w-5 h-5 text-gray-400 group-hover:text-purple-600 flex-shrink-0" />
                                                 </div>
                                             ))}
                                         </div>
@@ -385,7 +411,7 @@ export default function SearchPods() {
                                         <button 
                                             onClick={() => generateMoreEpisodes(category.name)}
                                             disabled={generatingCategory === category.name}
-                                            className="w-full mt-4 py-3 rounded-xl border border-dashed border-gray-700 text-gray-400 hover:border-purple-500 hover:text-purple-400 flex flex-col items-center gap-1 transition-colors"
+                                            className="w-full mt-4 py-3 rounded-xl border border-dashed border-gray-300 text-gray-500 hover:border-purple-500 hover:text-purple-600 flex flex-col items-center gap-1 transition-colors"
                                         >
                                             {generatingCategory === category.name ? (
                                                 <Loader2 className="w-5 h-5 animate-spin" />
@@ -393,7 +419,6 @@ export default function SearchPods() {
                                                 <Sparkles className="w-5 h-5" />
                                             )}
                                             <span className="text-sm font-medium">Generate More</span>
-                                            <span className="text-xs">AI-powered</span>
                                         </button>
                                     </div>
                                 );
@@ -405,57 +430,56 @@ export default function SearchPods() {
 
             {/* Player Modal */}
             <Dialog open={showPlayer} onOpenChange={setShowPlayer}>
-                <DialogContent className="max-w-2xl p-0 bg-[#0D1321] border-gray-800 overflow-hidden">
+                <DialogContent className="max-w-2xl p-0 bg-white border-gray-200 overflow-hidden">
                     <div className="p-6">
                         {/* Header */}
-                        <div className="flex items-center justify-between mb-8">
-                            <button onClick={() => setShowPlayer(false)} className="text-gray-400 hover:text-white">
+                        <div className="flex items-center justify-between mb-6">
+                            <button onClick={() => setShowPlayer(false)} className="text-gray-400 hover:text-gray-600">
                                 <ChevronLeft className="w-6 h-6" />
                             </button>
-                            <span className="text-sm text-gray-400 uppercase tracking-wider">Now Playing</span>
+                            <span className="text-sm text-gray-500 uppercase tracking-wider">Now Playing</span>
                             <div className="w-6" />
                         </div>
 
                         {/* Album Art */}
                         <div className="flex justify-center mb-6">
-                            <div className="w-64 h-64 rounded-2xl bg-gray-800 overflow-hidden relative">
+                            <div className="w-56 h-56 rounded-2xl bg-gray-100 overflow-hidden relative shadow-lg">
                                 {currentEpisode?.thumbnail ? (
                                     <img src={currentEpisode.thumbnail} alt={currentEpisode?.title} className="w-full h-full object-cover" />
                                 ) : (
-                                    <div className="w-full h-full flex items-center justify-center">
-                                        <Radio className="w-16 h-16 text-gray-600" />
-                                    </div>
-                                )}
-                                {/* Equalizer Overlay */}
-                                {isPlaying && (
-                                    <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex items-end gap-1">
-                                        {[...Array(5)].map((_, i) => (
-                                            <div 
-                                                key={i}
-                                                className="w-1 bg-purple-500 rounded-full transition-all duration-150"
-                                                style={{ height: `${Math.random() * 20 + 10}px` }}
-                                            />
-                                        ))}
+                                    <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-purple-500 to-blue-500">
+                                        <Radio className="w-16 h-16 text-white" />
                                     </div>
                                 )}
                             </div>
                         </div>
 
                         {/* Title */}
-                        <div className="text-center mb-6">
-                            <h2 className="text-xl font-semibold text-white mb-1">{currentEpisode?.title}</h2>
-                            <p className="text-sm text-purple-400">{currentEpisode?.category}</p>
+                        <div className="text-center mb-4">
+                            <h2 className="text-xl font-semibold text-gray-800 mb-1">{currentEpisode?.title}</h2>
+                            <p className="text-sm text-purple-600">{currentEpisode?.category}</p>
+                        </div>
+
+                        {/* Equalizer */}
+                        <div className="flex items-end justify-center gap-1 h-12 mb-4">
+                            {equalizerBars.map((height, i) => (
+                                <div
+                                    key={i}
+                                    className="w-2 bg-purple-500 rounded-t transition-all duration-150"
+                                    style={{ height: isPlaying ? `${height}%` : '20%' }}
+                                />
+                            ))}
                         </div>
 
                         {/* Braille Animation */}
-                        <div className="flex justify-center gap-4 mb-6">
-                            {[...Array(8)].map((_, groupIndex) => (
+                        <div className="flex justify-center gap-3 mb-4">
+                            {[...Array(6)].map((_, groupIndex) => (
                                 <div key={groupIndex} className="grid grid-cols-2 gap-0.5">
                                     {[...Array(6)].map((_, dotIndex) => (
                                         <div 
                                             key={dotIndex}
-                                            className={`w-1.5 h-1.5 rounded-full transition-all duration-150 ${
-                                                isPlaying && Math.random() > 0.5 ? 'bg-green-400' : 'bg-gray-600'
+                                            className={`w-1.5 h-1.5 rounded-full transition-all duration-200 ${
+                                                isPlaying && Math.random() > 0.5 ? 'bg-purple-500' : 'bg-gray-300'
                                             }`}
                                         />
                                     ))}
@@ -463,21 +487,15 @@ export default function SearchPods() {
                             ))}
                         </div>
 
-                        {/* Voice Selectors */}
+                        {/* Live Caption */}
+                        <div className="bg-gray-100 rounded-xl p-4 mb-6 min-h-[80px] flex items-center justify-center">
+                            <p className="text-center text-gray-700 leading-relaxed">{currentCaption}</p>
+                        </div>
+
+                        {/* Voice Selector */}
                         <div className="flex justify-center gap-4 mb-6">
-                            <Select defaultValue="english">
-                                <SelectTrigger className="w-32 bg-gray-800 border-gray-700 text-white">
-                                    <SelectValue placeholder="Language" />
-                                </SelectTrigger>
-                                <SelectContent>
-                                    <SelectItem value="english">English</SelectItem>
-                                    <SelectItem value="spanish">Spanish</SelectItem>
-                                    <SelectItem value="french">French</SelectItem>
-                                </SelectContent>
-                            </Select>
-                            
                             <Select value={selectedVoice} onValueChange={setSelectedVoice}>
-                                <SelectTrigger className="w-40 bg-gray-800 border-gray-700 text-white">
+                                <SelectTrigger className="w-40 bg-gray-50 border-gray-200">
                                     <SelectValue />
                                 </SelectTrigger>
                                 <SelectContent>
@@ -510,17 +528,17 @@ export default function SearchPods() {
 
                         {/* Controls */}
                         <div className="flex items-center justify-center gap-6 mb-6">
-                            <Button variant="ghost" size="icon" className="text-gray-400 hover:text-white">
+                            <Button variant="ghost" size="icon" className="text-gray-500 hover:text-gray-700">
                                 <SkipBack className="w-6 h-6" />
                             </Button>
                             <Button
                                 size="icon"
-                                className="w-16 h-16 rounded-full bg-white text-black hover:bg-gray-200"
+                                className="w-16 h-16 rounded-full bg-purple-600 text-white hover:bg-purple-700"
                                 onClick={() => setIsPlaying(!isPlaying)}
                             >
                                 {isPlaying ? <Pause className="w-7 h-7" /> : <Play className="w-7 h-7 ml-1" />}
                             </Button>
-                            <Button variant="ghost" size="icon" className="text-gray-400 hover:text-white">
+                            <Button variant="ghost" size="icon" className="text-gray-500 hover:text-gray-700">
                                 <SkipForward className="w-6 h-6" />
                             </Button>
                         </div>
@@ -531,10 +549,10 @@ export default function SearchPods() {
                                 <button
                                     key={speed}
                                     onClick={() => setPlaybackSpeed(speed)}
-                                    className={`px-3 py-1 rounded-lg text-sm ${
+                                    className={`px-3 py-1 rounded-lg text-sm transition-colors ${
                                         playbackSpeed === speed 
                                             ? 'bg-purple-600 text-white' 
-                                            : 'text-gray-400 hover:text-white'
+                                            : 'text-gray-500 hover:bg-gray-100'
                                     }`}
                                 >
                                     {speed}
@@ -546,18 +564,18 @@ export default function SearchPods() {
             </Dialog>
 
             {/* Footer */}
-            <footer className="py-6 bg-[#1A1F2E] border-t border-gray-800">
+            <footer className="py-6 bg-white border-t border-gray-200">
                 <div className="max-w-6xl mx-auto px-4">
                     <div className="flex flex-col md:flex-row justify-between items-center gap-4">
                         <img src={LOGO_URL} alt="1cPublishing" className="h-8 w-8 object-contain grayscale" />
                         <nav className="flex flex-wrap justify-center gap-6 text-sm">
-                            <a href="#" className="text-gray-500 hover:text-purple-400 transition-colors">Contact Us</a>
-                            <a href="#" className="text-gray-500 hover:text-purple-400 transition-colors">Governance</a>
-                            <a href="#" className="text-gray-500 hover:text-purple-400 transition-colors">Cookie Policy</a>
-                            <a href="#" className="text-gray-500 hover:text-purple-400 transition-colors">Terms of Use</a>
+                            <a href="#" className="text-gray-600 hover:text-purple-600 transition-colors">Contact Us</a>
+                            <a href="#" className="text-gray-600 hover:text-purple-600 transition-colors">Governance</a>
+                            <a href="#" className="text-gray-600 hover:text-purple-600 transition-colors">Cookie Policy</a>
+                            <a href="#" className="text-gray-600 hover:text-purple-600 transition-colors">Terms of Use</a>
                         </nav>
                     </div>
-                    <div className="mt-4 pt-4 border-t border-gray-800 text-center text-sm text-gray-600">
+                    <div className="mt-4 pt-4 border-t border-gray-200 text-center text-sm text-gray-500">
                         © 2025 1cPublishing.com
                     </div>
                 </div>

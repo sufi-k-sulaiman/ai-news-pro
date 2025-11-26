@@ -4,6 +4,7 @@ import DashboardComponents from './pages/DashboardComponents';
 import AIHub from './pages/AIHub';
 import Home from './pages/Home';
 import SearchPods from './pages/SearchPods';
+import Settings from './pages/Settings';
 
 
 export const PAGES = {
@@ -13,6 +14,7 @@ export const PAGES = {
     "AIHub": AIHub,
     "Home": Home,
     "SearchPods": SearchPods,
+    "Settings": Settings,
 }
 
 export const pagesConfig = {

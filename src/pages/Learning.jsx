@@ -198,7 +198,7 @@ export default function Learning() {
                     <div className="flex items-center gap-4">
                         <div>
                             <h1 className="text-xl font-bold text-white">Learning Archipelago</h1>
-                            <p className="text-purple-200 text-sm">Learning Archipelago</p>
+                            <p className="text-purple-200 text-sm">Ai-Powered Learning Journey</p>
                         </div>
                     </div>
 

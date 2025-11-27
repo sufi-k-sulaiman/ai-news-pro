@@ -270,7 +270,7 @@ Provide:
                         <div className="flex items-center gap-4">
                             <div>
                                 <h1 className="text-2xl font-bold">Generative Intelligence</h1>
-                                <p className="text-white/80 text-sm">Generative Intelligence</p>
+                                <p className="text-white/80 text-sm">Ai-Powered Analytics</p>
                             </div>
                         </div>
                         <div className="flex gap-6">
@@ -692,7 +692,7 @@ Provide:
                                     </div>
                                     <div className="flex items-center gap-2 p-2 bg-gray-50 rounded-lg">
                                         <FileText className="w-4 h-4 text-pink-600" />
-                                        <span>AI narrative generation</span>
+                                        <span>Ai narrative generation</span>
                                     </div>
                                     <div className="flex items-center gap-2 p-2 bg-gray-50 rounded-lg">
                                         <Users className="w-4 h-4 text-indigo-600" />

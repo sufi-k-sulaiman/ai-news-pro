@@ -551,20 +551,20 @@ Use short sentences for better pacing. Do NOT use any markdown formatting.`,
                     <div className="p-6">
                         {/* Header */}
                         <div className="flex justify-between items-center mb-6">
-                            <button onClick={closePlayer} className="text-white/40 hover:text-white">
+                            <button onClick={closePlayer} className="text-gray-400 hover:text-gray-600">
                                 <X className="w-6 h-6" />
                             </button>
-                            <span className="text-white/50 text-sm uppercase tracking-wider">Now Playing</span>
+                            <span className="text-gray-500 text-sm uppercase tracking-wider">Now Playing</span>
                             <div className="w-6" />
                         </div>
 
                         {/* Album Art */}
                         <div className="flex justify-center mb-6">
-                            <div className="relative w-56 h-56 rounded-2xl bg-gradient-to-br from-emerald-500 to-cyan-500 flex items-center justify-center shadow-2xl shadow-emerald-500/30 overflow-hidden">
+                            <div className="relative w-56 h-56 rounded-2xl bg-gradient-to-br from-purple-500 to-indigo-600 flex items-center justify-center shadow-2xl shadow-purple-500/30 overflow-hidden">
                                 {isGenerating ? (
                                     <div className="flex flex-col items-center gap-3">
                                         <Loader2 className="w-12 h-12 text-white/80 animate-spin" />
-                                        <span className="text-white/60 text-sm">{generationStep}</span>
+                                        <span className="text-white/80 text-sm">{generationStep}</span>
                                     </div>
                                 ) : (
                                     <>
@@ -582,14 +582,14 @@ Use short sentences for better pacing. Do NOT use any markdown formatting.`,
 
                         {/* Title */}
                         <div className="text-center mb-4">
-                            <h2 className="text-white text-xl font-bold mb-1 line-clamp-2">{currentEpisode?.title}</h2>
-                            <p className="text-emerald-400 text-sm">{currentEpisode?.category}</p>
+                            <h2 className="text-gray-900 text-xl font-bold mb-1 line-clamp-2">{currentEpisode?.title}</h2>
+                            <p className="text-purple-600 text-sm">{currentEpisode?.category}</p>
                         </div>
 
                         {/* Captions */}
                         {!isGenerating && (
-                            <div className="bg-white/5 rounded-xl p-4 mb-6 min-h-[60px] border border-white/10">
-                                <p className="text-center text-white/80 leading-relaxed text-sm">
+                            <div className="bg-gray-50 rounded-xl p-4 mb-6 min-h-[60px] border border-gray-200">
+                                <p className="text-center text-gray-700 leading-relaxed text-sm">
                                     {currentCaption}
                                 </p>
                             </div>
@@ -597,8 +597,8 @@ Use short sentences for better pacing. Do NOT use any markdown formatting.`,
 
                         {/* Progress */}
                         <div className="mb-6">
-                            <Progress value={(currentTime / (duration || 1)) * 100} className="h-1 bg-white/10" />
-                            <div className="flex justify-between text-xs text-white/40 mt-2">
+                            <Progress value={(currentTime / (duration || 1)) * 100} className="h-1 bg-gray-200" />
+                            <div className="flex justify-between text-xs text-gray-400 mt-2">
                                 <span>{formatTime(currentTime)}</span>
                                 <span>{formatTime(duration)}</span>
                             </div>
@@ -606,13 +606,13 @@ Use short sentences for better pacing. Do NOT use any markdown formatting.`,
 
                         {/* Controls */}
                         <div className="flex items-center justify-center gap-6">
-                            <button className="text-white/40 hover:text-white p-2">
+                            <button className="text-gray-400 hover:text-gray-600 p-2">
                                 <SkipBack className="w-6 h-6" />
                             </button>
                             <button
                                 onClick={togglePlay}
                                 disabled={isGenerating}
-                                className="w-16 h-16 rounded-full bg-emerald-500 hover:bg-emerald-600 flex items-center justify-center text-white disabled:opacity-50 transition-all shadow-lg shadow-emerald-500/30"
+                                className="w-16 h-16 rounded-full bg-purple-600 hover:bg-purple-700 flex items-center justify-center text-white disabled:opacity-50 transition-all shadow-lg shadow-purple-500/30"
                             >
                                 {isPlaying ? (
                                     <Pause className="w-7 h-7" />
@@ -620,7 +620,7 @@ Use short sentences for better pacing. Do NOT use any markdown formatting.`,
                                     <Play className="w-7 h-7 ml-1" fill="currentColor" />
                                 )}
                             </button>
-                            <button className="text-white/40 hover:text-white p-2">
+                            <button className="text-gray-400 hover:text-gray-600 p-2">
                                 <SkipForward className="w-6 h-6" />
                             </button>
                         </div>
@@ -628,7 +628,7 @@ Use short sentences for better pacing. Do NOT use any markdown formatting.`,
                         {/* Speed & Volume */}
                         <div className="flex items-center justify-between mt-6 gap-4">
                             <div className="flex items-center gap-2">
-                                <button onClick={() => setIsMuted(!isMuted)} className="text-white/50 hover:text-white">
+                                <button onClick={() => setIsMuted(!isMuted)} className="text-gray-500 hover:text-gray-700">
                                     {isMuted ? <VolumeX className="w-4 h-4" /> : <Volume2 className="w-4 h-4" />}
                                 </button>
                                 <Slider
@@ -645,8 +645,8 @@ Use short sentences for better pacing. Do NOT use any markdown formatting.`,
                                         onClick={() => setPlaybackSpeed(speed)}
                                         className={`px-2 py-1 rounded text-xs transition-all ${
                                             playbackSpeed === speed
-                                                ? 'bg-emerald-500 text-white'
-                                                : 'text-white/50 hover:bg-white/10'
+                                                ? 'bg-purple-600 text-white'
+                                                : 'text-gray-500 hover:bg-gray-100'
                                         }`}
                                     >
                                         {speed}x
@@ -664,7 +664,7 @@ Use short sentences for better pacing. Do NOT use any markdown formatting.`,
                                         const voice = voices.find(v => v.name === e.target.value);
                                         setSelectedVoice(voice);
                                     }}
-                                    className="bg-white/10 border border-white/20 rounded-lg px-3 py-1 text-sm text-white/70"
+                                    className="bg-gray-50 border border-gray-200 rounded-lg px-3 py-1 text-sm text-gray-700"
                                 >
                                     {voices.map((voice) => (
                                         <option key={voice.name} value={voice.name}>

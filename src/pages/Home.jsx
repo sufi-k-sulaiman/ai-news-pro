@@ -28,7 +28,7 @@ export default function Home() {
                 
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
                     {pages.map((page) => (
-                        <Link key={page.name} to={page.href} className="group">
+                        <Link key={page.name} to={createPageUrl(page.page)} className="group">
                             <div className={`bg-gradient-to-br ${page.color} rounded-2xl shadow-lg p-6 hover:shadow-xl transition-all hover:-translate-y-1 text-white h-full`}>
                                 <div className="w-14 h-14 rounded-xl bg-white/20 flex items-center justify-center mb-4">
                                     <page.icon className="w-7 h-7 text-white" />

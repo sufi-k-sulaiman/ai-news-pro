@@ -32,7 +32,7 @@ export default function LearnMoreModal({ keyword, isOpen, onClose }) {
         setGeneratedImage(null);
         try {
             const result = await base44.integrations.Core.GenerateImage({
-                prompt: `Professional, detailed illustration representing "${keyword.name}". Modern, clean design with vibrant colors, suitable for an educational knowledge platform. High quality, conceptual artwork.`
+                prompt: `Beautiful lifestyle and nature photography representing "${keyword.name}". Earth elements, natural landscapes, serene outdoor scenes, organic textures, sustainable living aesthetic. High quality, editorial style photography.`
             });
             setGeneratedImage(result?.url);
         } catch (error) {
@@ -132,7 +132,7 @@ export default function LearnMoreModal({ keyword, isOpen, onClose }) {
 
     return (
         <Dialog open={isOpen} onOpenChange={onClose}>
-            <DialogContent className="max-w-5xl h-[90vh] p-0 overflow-hidden">
+            <DialogContent className="max-w-5xl max-h-[90vh] p-0 overflow-hidden">
                 <div className="flex flex-col h-full">
                     {/* Header */}
                     <div className="bg-gradient-to-r from-purple-600 to-indigo-600 p-6 text-white">
@@ -440,6 +440,12 @@ export default function LearnMoreModal({ keyword, isOpen, onClose }) {
                                     {/* Documents Tab */}
                                     <TabsContent value="documents" className="m-0">
                                         <div className="space-y-4">
+                                            {(!data.documents || data.documents.length === 0) && (
+                                                <div className="text-center py-12 text-gray-500">
+                                                    <FileText className="w-12 h-12 mx-auto mb-3 text-gray-300" />
+                                                    <p>No documents available for this topic.</p>
+                                                </div>
+                                            )}
                                             {data.documents?.map((doc, i) => (
                                                 <div key={i} className="bg-white rounded-xl border p-5 hover:shadow-md transition-shadow">
                                                     <div className="flex items-start gap-4">

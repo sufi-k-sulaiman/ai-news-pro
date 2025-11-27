@@ -28,7 +28,7 @@ export default function Settings() {
     const [uiStyle, setUiStyle] = useState(() => localStorage.getItem('uiStyle') || 'rounded');
     const [blackWhiteMode, setBlackWhiteMode] = useState(() => localStorage.getItem('blackWhiteMode') === 'true');
     const [hideIcons, setHideIcons] = useState(() => localStorage.getItem('hideIcons') === 'true');
-    const [voicePrompts, setVoicePrompts] = useState(() => localStorage.getItem('voicePrompts') === 'true');
+
     const [fontSizeSlider, setFontSizeSlider] = useState(() => parseInt(localStorage.getItem('fontSizeSlider')) || 16);
 
     useEffect(() => {
@@ -38,18 +38,14 @@ export default function Settings() {
         localStorage.setItem('uiStyle', uiStyle);
         localStorage.setItem('blackWhiteMode', blackWhiteMode);
         localStorage.setItem('hideIcons', hideIcons);
-        localStorage.setItem('voicePrompts', voicePrompts);
+
         localStorage.setItem('fontSizeSlider', fontSizeSlider);
 
         const sizes = { small: '12px', medium: '16px', large: '20px' };
         document.documentElement.style.fontSize = sizes[fontSize] || '16px';
 
         document.documentElement.classList.remove('dark', 'hybrid');
-        if (theme === 'dark') {
-            document.documentElement.classList.add('dark');
-            document.body.style.backgroundColor = '#1a1a2e';
-            document.body.style.color = '#ffffff';
-        } else if (theme === 'hybrid') {
+        if (theme === 'hybrid') {
             document.documentElement.classList.add('hybrid');
             document.body.style.backgroundColor = '#d1d5db';
             document.body.style.color = '#1f2937';
@@ -57,6 +53,9 @@ export default function Settings() {
             document.body.style.backgroundColor = '#ffffff';
             document.body.style.color = '#000000';
         }
+        
+        // Force re-render by triggering a small DOM change
+        document.body.offsetHeight;
 
         document.documentElement.style.filter = blackWhiteMode ? 'grayscale(100%)' : 'none';
 
@@ -97,11 +96,11 @@ export default function Settings() {
             document.body.style.fontFamily = '';
             document.body.style.lineHeight = '';
         }
-    }, [fontSize, cognitiveMode, theme, uiStyle, blackWhiteMode, hideIcons, voicePrompts, fontSizeSlider]);
+    }, [fontSize, cognitiveMode, theme, uiStyle, blackWhiteMode, hideIcons, fontSizeSlider]);
 
-    // Audible mode OR Voice Prompts - read on hover
+    // Audible mode - read on hover
     useEffect(() => {
-        if (cognitiveMode !== 'audible' && !voicePrompts) return;
+        if (cognitiveMode !== 'audible') return;
         
         const handleMouseOver = (e) => {
             const target = e.target;
@@ -113,16 +112,10 @@ export default function Settings() {
 
         document.addEventListener('mouseover', handleMouseOver);
         return () => document.removeEventListener('mouseover', handleMouseOver);
-    }, [cognitiveMode, voicePrompts]);
-
-    useEffect(() => {
-        if (cognitiveMode === 'audible' && voicePrompts) {
-            speakText('Audible mode enabled. Voice prompts will read content aloud.');
-        }
     }, [cognitiveMode]);
 
     const OptionCard = ({ selected, onClick, children, label = '' }) => (
-        <button onClick={() => { onClick(); if (voicePrompts && label) speakText(`Selected ${label}`); }}
+        <button onClick={() => { onClick(); if (cognitiveMode === 'audible' && label) speakText(`Selected ${label}`); }}
             className={`p-4 rounded-xl border-2 transition-all flex flex-col items-center gap-2 min-w-[100px] ${
                 selected ? 'border-purple-500 bg-purple-50 text-purple-700' : 'border-gray-200 bg-white hover:border-purple-300 text-gray-600'
             }`}>
@@ -244,19 +237,18 @@ export default function Settings() {
                 <h2 className="text-lg font-semibold text-gray-800 mb-1">Accessibility</h2>
                 <p className="text-sm text-gray-500 mb-4">Additional accessibility options</p>
                 <div className="space-y-3">
-                    <ToggleCard enabled={blackWhiteMode} onToggle={(v) => { setBlackWhiteMode(v); if (voicePrompts) speakText(v ? 'Grayscale enabled' : 'Grayscale disabled'); }}
+                    <ToggleCard enabled={blackWhiteMode} onToggle={(v) => { setBlackWhiteMode(v); if (cognitiveMode === 'audible') speakText(v ? 'Grayscale enabled' : 'Grayscale disabled'); }}
                         icon={Eye} title="Grayscale Mode" description="High contrast black & white display" />
-                    <ToggleCard enabled={hideIcons} onToggle={(v) => { setHideIcons(v); if (voicePrompts) speakText(v ? 'Icons hidden' : 'Icons visible'); }}
+                    <ToggleCard enabled={hideIcons} onToggle={(v) => { setHideIcons(v); if (cognitiveMode === 'audible') speakText(v ? 'Icons hidden' : 'Icons visible'); }}
                         icon={EyeOff} title="Hide Icons" description="Text-only navigation" />
-                    <ToggleCard enabled={voicePrompts} onToggle={(v) => { setVoicePrompts(v); if (v) speakText('Voice prompts enabled'); }}
-                        icon={Volume2} title="Voice Prompts" description="Read settings aloud" />
+
                 </div>
             </div>
 
             {/* Reset */}
             <button onClick={() => {
                 setFontSize('medium'); setCognitiveMode('none'); setTheme('light'); setUiStyle('rounded');
-                setBlackWhiteMode(false); setHideIcons(false); setVoicePrompts(false); setFontSizeSlider(16);
+                setBlackWhiteMode(false); setHideIcons(false); setFontSizeSlider(16);
             }} className={uiStyle === 'classic' 
                 ? "text-purple-600 underline font-medium" 
                 : "flex items-center gap-2 px-5 py-2.5 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-xl font-medium transition-colors"}>

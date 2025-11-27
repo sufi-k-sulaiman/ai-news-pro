@@ -46,11 +46,7 @@ export default function Layout({ children, currentPageName }) {
 
     // Apply theme
     document.documentElement.classList.remove('dark', 'hybrid');
-    if (savedTheme === 'dark') {
-      document.documentElement.classList.add('dark');
-      document.body.style.backgroundColor = '#1a1a2e';
-      document.body.style.color = '#ffffff';
-    } else if (savedTheme === 'hybrid') {
+    if (savedTheme === 'hybrid') {
       document.documentElement.classList.add('hybrid');
       document.body.style.backgroundColor = '#d1d5db';
       document.body.style.color = '#1f2937';

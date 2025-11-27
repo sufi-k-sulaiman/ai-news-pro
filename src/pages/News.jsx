@@ -3,6 +3,7 @@ import { base44 } from '@/api/base44Client';
 import { Newspaper, Search, Loader2, ExternalLink, RefreshCw, TrendingUp, Clock, Globe, Image as ImageIcon } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import ErrorDisplay, { LoadingState, getErrorCode } from '@/components/ErrorDisplay';
 
 const NewsCard = ({ article, index }) => {
     const [imageUrl, setImageUrl] = useState(null);
@@ -100,10 +101,12 @@ export default function News() {
     const [expandedCategory, setExpandedCategory] = useState(null);
     const [news, setNews] = useState([]);
     const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
     const [lastUpdated, setLastUpdated] = useState(null);
 
     const fetchNews = async (keyword) => {
         setLoading(true);
+        setError(null);
         try {
             const response = await base44.integrations.Core.InvokeLLM({
                 prompt: `Search for the latest news about "${keyword}" from multiple sources. 
@@ -143,8 +146,9 @@ The URL must be a direct link to the article page, not a search results page.`,
 
             setNews(response?.articles || []);
             setLastUpdated(new Date());
-        } catch (error) {
-            console.error('Error fetching news:', error);
+        } catch (err) {
+            console.error('Error fetching news:', err);
+            setError(getErrorCode(err));
             setNews([]);
         } finally {
             setLoading(false);
@@ -272,9 +276,13 @@ The URL must be a direct link to the article page, not a search results page.`,
 
                 {/* News Grid */}
                 {loading ? (
-                    <div className="flex flex-col items-center justify-center py-20">
-                        <Loader2 className="w-12 h-12 text-red-600 animate-spin mb-4" />
-                        <p className="text-gray-600">Fetching latest news...</p>
+                    <LoadingState message="Fetching latest news..." size="large" />
+                ) : error ? (
+                    <div className="bg-white rounded-2xl border border-gray-200">
+                        <ErrorDisplay 
+                            errorCode={error} 
+                            onRetry={() => fetchNews(searchQuery || activeCategory)}
+                        />
                     </div>
                 ) : news.length === 0 ? (
                     <div className="text-center py-20 bg-white rounded-2xl border border-gray-200">

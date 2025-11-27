@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { base44 } from '@/api/base44Client';
-import { Globe, Paperclip, Mic, MicOff, X, Loader2, Copy, Check, FileText, Image as ImageIcon, ExternalLink, ChevronRight } from 'lucide-react';
+import { Globe, Paperclip, Mic, MicOff, X, Loader2, Copy, Check, FileText, Image as ImageIcon, ExternalLink, ChevronRight, AlertTriangle } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
@@ -8,6 +8,7 @@ import { LOGO_URL } from '@/components/NavigationConfig';
 import ReactMarkdown from 'react-markdown';
 import { BarChart, Bar, PieChart, Pie, Cell, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import { toast } from 'sonner';
+import { ERROR_CODES, getErrorCode } from '@/components/ErrorDisplay';
 
 // AI Model Icons - Real brand colors and designs
 const GPT4Icon = () => (
@@ -276,9 +277,13 @@ export default function Qwirey() {
             }
         } catch (error) {
             console.error('AI Error:', error);
+            const errorCode = getErrorCode(error);
+            const errorInfo = ERROR_CODES[errorCode] || ERROR_CODES.E500;
             setResult({
                 type: 'error',
-                text: 'Sorry, there was an error processing your request. Please try again.'
+                errorCode,
+                title: errorInfo.title,
+                text: errorInfo.message
             });
         } finally {
             setLoading(false);
@@ -411,6 +416,23 @@ export default function Qwirey() {
                 {/* Results */}
                 {result && (
                     <div className="space-y-6">
+                        {result.type === 'error' ? (
+                            <div className="bg-white rounded-2xl border border-red-200 p-6 shadow-sm">
+                                <div className="flex items-center gap-3 mb-4">
+                                    <div className="w-10 h-10 rounded-lg bg-red-100 flex items-center justify-center">
+                                        <AlertTriangle className="w-5 h-5 text-red-600" />
+                                    </div>
+                                    <div>
+                                        <span className="font-bold text-gray-900">{result.title}</span>
+                                        <p className="text-xs text-gray-500">Error Code: {result.errorCode}</p>
+                                    </div>
+                                </div>
+                                <p className="text-gray-600 mb-4">{result.text}</p>
+                                <Button onClick={() => handleSubmit()} variant="outline" className="gap-2">
+                                    Try Again
+                                </Button>
+                            </div>
+                        ) : (
                         <div className="bg-white rounded-2xl border border-gray-200 p-6 shadow-sm">
                             <div className="flex items-center justify-between mb-4">
                                 <div className="flex items-center gap-3">
@@ -541,6 +563,7 @@ export default function Qwirey() {
                                     </div>
                                 )}
                             </>
+                        )}
                         )}
                     </div>
                 )}

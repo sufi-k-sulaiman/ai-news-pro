@@ -1053,7 +1053,7 @@ export default function SpaceBattleGame({ onExit }) {
             <div className="max-w-4xl mx-auto">
                 {/* Header */}
                 <div className="text-center mb-8">
-                    <div className="text-5xl mb-3">🎯</div>
+                    <img src={LOGO_URL} alt="1cPublishing" className="w-16 h-16 mx-auto mb-3 rounded-xl" />
                     <h1 className="text-4xl font-black text-gray-900 mb-2">SPACE BATTLE</h1>
                     <p className="text-gray-500">FPS Combat Learning Game</p>
                 </div>
@@ -1078,10 +1078,10 @@ export default function SpaceBattleGame({ onExit }) {
                 {/* Categories and Topics */}
                 <div className="bg-white rounded-2xl border border-gray-200 p-6 mb-6 shadow-sm">
                     {/* Category tabs */}
-                    <div className="flex gap-2 mb-6">
+                    <div className="flex flex-wrap gap-2 mb-6">
                         {TABS.map(tab => (
                             <Button key={tab.id} onClick={() => setActiveCategory(tab.id)}
-                                className={`px-4 py-2 rounded-full text-sm font-medium transition-all ${
+                                className={`px-3 py-1.5 rounded-full text-xs font-medium transition-all ${
                                     activeCategory === tab.id 
                                         ? 'bg-emerald-500 text-white' 
                                         : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
@@ -1104,10 +1104,10 @@ export default function SpaceBattleGame({ onExit }) {
                                 const TopicIcon = icons[i % icons.length];
                                 return (
                                     <button key={topic.id || i} onClick={() => startGame(topic)}
-                                        className="h-auto py-6 px-5 bg-gradient-to-br from-purple-600 to-violet-700 hover:from-purple-700 hover:to-violet-800 text-left rounded-2xl transition-all hover:scale-[1.02] hover:shadow-lg">
-                                        <TopicIcon className="w-6 h-6 text-white/70 mb-3" />
-                                        <p className="font-semibold text-white text-base leading-tight">{topic.label}</p>
-                                        <p className="text-sm text-white/70 line-clamp-2 mt-2">{topic.description}</p>
+                                        className="h-32 py-4 px-4 bg-gradient-to-br from-purple-600 to-violet-700 hover:from-purple-700 hover:to-violet-800 text-left rounded-xl transition-all hover:scale-[1.02] hover:shadow-lg">
+                                        <TopicIcon className="w-5 h-5 text-white/70 mb-2" />
+                                        <p className="font-semibold text-white text-sm leading-tight line-clamp-2">{topic.label}</p>
+                                        <p className="text-xs text-white/70 line-clamp-2 mt-1">{topic.description}</p>
                                     </button>
                                 );
                             })}

@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
 import { Maximize2, Minimize2, Loader2, Zap, Book, Layers, Play, Search, X, Sparkles, Globe, Cpu, Atom, Leaf, Brain, Lightbulb, TrendingUp } from "lucide-react";
+import { LOGO_URL } from '@/components/NavigationConfig';
 import { base44 } from "@/api/base44Client";
 
 export default function WordShooter({ onExit }) {
@@ -556,10 +557,10 @@ export default function WordShooter({ onExit }) {
       </Button>
       
       <div className="max-w-5xl mx-auto">
-        <div className="text-center mb-10">
-          <div className="text-6xl mb-6">🚀</div>
-          <h1 className="text-5xl font-black text-gray-900 mb-4">WORD SHOOTER</h1>
-          <p className="text-xl text-gray-500">Gamified Vocabulary Learning</p>
+        <div className="text-center mb-8">
+          <img src={LOGO_URL} alt="1cPublishing" className="w-16 h-16 mx-auto mb-3 rounded-xl" />
+          <h1 className="text-4xl font-black text-gray-900 mb-2">WORD SHOOTER</h1>
+          <p className="text-gray-500">Gamified Vocabulary Learning</p>
         </div>
 
         <Card className="p-6 mb-8 bg-white border-purple-200 border-2 shadow-sm">
@@ -578,10 +579,10 @@ export default function WordShooter({ onExit }) {
         </Card>
 
         <Card className="p-6 mb-8 bg-white border-gray-200 shadow-sm">
-          <div className="flex gap-2 mb-6 flex-wrap">
+          <div className="flex flex-wrap gap-2 mb-6">
             {TABS.map(tab => (
               <Button key={tab.id} onClick={() => setActiveTab(tab.id)}
-                className={`px-5 py-2 ${activeTab === tab.id ? `bg-gradient-to-r ${tab.color}` : 'bg-gray-200 hover:bg-gray-300 text-gray-700'} ${activeTab === tab.id ? 'text-white' : ''}`}>
+                className={`px-3 py-1.5 rounded-full text-xs font-medium ${activeTab === tab.id ? `bg-gradient-to-r ${tab.color} text-white` : 'bg-gray-200 hover:bg-gray-300 text-gray-700'}`}>
                 {tab.label}
               </Button>
             ))}
@@ -593,17 +594,17 @@ export default function WordShooter({ onExit }) {
               <p className="text-gray-500">Generating topics with AI...</p>
             </div>
           ) : (
-            <div className="grid grid-cols-3 gap-4">
+            <div className="grid grid-cols-3 gap-3">
               {filteredTopics(generatedTopics[activeTab] || []).slice(0, 9).map((topic, i) => {
                 const tabInfo = TABS.find(t => t.id === activeTab);
                 const icons = [Sparkles, Globe, Cpu, Atom, Leaf, Brain, Lightbulb, TrendingUp];
                 const TopicIcon = icons[i % icons.length];
                 return (
                   <button key={topic.id || i} onClick={() => handleStartGame(topic)} 
-                    className={`h-36 text-left p-5 rounded-2xl bg-gradient-to-br ${tabInfo?.color || 'from-purple-600 to-purple-700'} hover:opacity-90 text-white transition-all hover:scale-[1.02] hover:shadow-lg`}>
-                    <TopicIcon className="w-6 h-6 text-white/70 mb-3" />
-                    <div className="text-base font-bold mb-1 line-clamp-1">{topic.label}</div>
-                    <div className="text-xs text-white/70 line-clamp-2">{topic.description}</div>
+                    className={`h-32 text-left py-4 px-4 rounded-xl bg-gradient-to-br ${tabInfo?.color || 'from-purple-600 to-purple-700'} hover:opacity-90 text-white transition-all hover:scale-[1.02] hover:shadow-lg`}>
+                    <TopicIcon className="w-5 h-5 text-white/70 mb-2" />
+                    <div className="text-sm font-bold line-clamp-2 leading-tight">{topic.label}</div>
+                    <div className="text-xs text-white/70 line-clamp-2 mt-1">{topic.description}</div>
                   </button>
                 );
               })}

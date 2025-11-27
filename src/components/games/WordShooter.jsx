@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
-import { Maximize2, Minimize2, Loader2, Zap, Book, Layers, Play, Search, X } from "lucide-react";
+import { Maximize2, Minimize2, Loader2, Zap, Book, Layers, Play, Search, X, Sparkles, Globe, Cpu, Atom, Leaf, Brain, Lightbulb, TrendingUp } from "lucide-react";
 import { base44 } from "@/api/base44Client";
 
 export default function WordShooter({ onExit }) {
@@ -584,14 +584,15 @@ export default function WordShooter({ onExit }) {
             <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
               {filteredTopics(generatedTopics[activeTab] || []).map((topic, i) => {
                 const tabInfo = TABS.find(t => t.id === activeTab);
+                const icons = [Sparkles, Globe, Cpu, Atom, Leaf, Brain, Lightbulb, TrendingUp];
+                const TopicIcon = icons[i % icons.length];
                 return (
-                  <Button key={topic.id || i} onClick={() => handleStartGame(topic)} 
-                    className={`h-28 text-left justify-start p-5 bg-gradient-to-r ${tabInfo?.color || 'from-purple-600 to-purple-700'} hover:opacity-90 text-white`}>
-                    <div className="w-full">
-                      <div className="text-lg font-bold mb-1 line-clamp-1">{topic.label}</div>
-                      <div className="text-xs opacity-80 line-clamp-2">{topic.description}</div>
-                    </div>
-                  </Button>
+                  <button key={topic.id || i} onClick={() => handleStartGame(topic)} 
+                    className={`h-36 text-left p-5 rounded-2xl bg-gradient-to-br ${tabInfo?.color || 'from-purple-600 to-purple-700'} hover:opacity-90 text-white transition-all hover:scale-[1.02] hover:shadow-lg`}>
+                    <TopicIcon className="w-6 h-6 text-white/70 mb-3" />
+                    <div className="text-base font-bold mb-1 line-clamp-1">{topic.label}</div>
+                    <div className="text-xs text-white/70 line-clamp-2">{topic.description}</div>
+                  </button>
                 );
               })}
             </div>

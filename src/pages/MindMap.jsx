@@ -739,12 +739,12 @@ export default function MindMapPage() {
                         />
                     ) : (
                         <div 
-                            className={`relative flex justify-center overflow-auto pt-4 ${spacePressed ? 'select-none cursor-grab' : ''} ${isDragging ? 'cursor-grabbing' : ''}`}
+                            className={`relative flex justify-center overflow-auto pt-4 ${spacePressed ? 'select-none cursor-grab' : ''} ${isDragging ? 'cursor-grabbing' : ''} ${annotationMode === 'draw' || annotationMode === 'rectangle' || annotationMode === 'circle' ? 'cursor-crosshair' : ''} ${annotationMode === 'text' ? 'cursor-text' : ''} ${annotationMode === 'eraser' ? 'cursor-cell' : ''}`}
                             ref={canvasOverlayRef}
-                            onMouseDown={spacePressed ? handleCanvasMouseDown : undefined}
-                            onMouseMove={(spacePressed || isDragging) ? handleCanvasMouseMove : undefined}
-                            onMouseUp={(spacePressed || isDragging) ? handleCanvasMouseUp : undefined}
-                            onMouseLeave={(spacePressed || isDragging) ? handleCanvasMouseUp : undefined}
+                            onMouseDown={(annotationMode || spacePressed) ? handleCanvasMouseDown : undefined}
+                            onMouseMove={(annotationMode || spacePressed || isDragging || isDrawing) ? handleCanvasMouseMove : undefined}
+                            onMouseUp={(annotationMode || spacePressed || isDragging || isDrawing) ? handleCanvasMouseUp : undefined}
+                            onMouseLeave={(annotationMode || spacePressed || isDragging || isDrawing) ? handleCanvasMouseUp : undefined}
                             style={{ height: '100%', width: '100%' }}
                         >
                             {renderAnnotations()}
@@ -782,6 +782,7 @@ export default function MindMapPage() {
                     keyword={selectedKeyword}
                     isOpen={showModal}
                     onClose={() => setShowModal(false)}
+                    containerRef={containerRef}
                 />
             )}
         </div>

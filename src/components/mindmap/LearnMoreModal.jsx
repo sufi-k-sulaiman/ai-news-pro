@@ -13,7 +13,7 @@ import RadialProgressCard from '@/components/dashboard/RadialProgressCard';
 
 const CHART_COLORS = ['#8b5cf6', '#6366f1', '#3b82f6', '#06b6d4', '#10b981', '#f59e0b'];
 
-export default function LearnMoreModal({ keyword, isOpen, onClose }) {
+export default function LearnMoreModal({ keyword, isOpen, onClose, containerRef }) {
     const [activeTab, setActiveTab] = useState('overview');
     const [data, setData] = useState(null);
     const [loading, setLoading] = useState(false);
@@ -185,9 +185,12 @@ For each document, provide the actual URL where it can be found.`,
 
     if (!keyword) return null;
 
+    // Use fullscreen element if available, otherwise document.body
+    const portalContainer = document.fullscreenElement || containerRef?.current || document.body;
+
     return (
         <Dialog open={isOpen} onOpenChange={onClose}>
-            <DialogPortal container={document.body}>
+            <DialogPortal container={portalContainer}>
                 <DialogOverlay className="fixed inset-0 bg-black/50" style={{ zIndex: 99998 }} />
                 <DialogContent className="fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 max-w-5xl w-[95vw] max-h-[90vh] p-0 overflow-y-auto bg-white rounded-xl shadow-xl" style={{ zIndex: 99999 }}>
                 <div className="flex flex-col h-full">

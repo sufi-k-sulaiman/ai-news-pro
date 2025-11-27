@@ -1,11 +1,10 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { X, Paperclip, Upload, Trash2 } from 'lucide-react';
-import { useDropzone } from 'react-dropzone';
 import { base44 } from '@/api/base44Client';
 import { toast } from 'sonner';
 
@@ -29,16 +28,18 @@ const STATUS_CONFIG = {
 export default function TaskModal({ task, isOpen, onClose, onSave, onDelete, categories }) {
   const [editedTask, setEditedTask] = useState(task);
   const [isUploading, setIsUploading] = useState(false);
+  const [isDragActive, setIsDragActive] = useState(false);
+  const fileInputRef = useRef(null);
 
   useEffect(() => {
     setEditedTask(task);
   }, [task]);
 
-  const onDrop = useCallback(async (acceptedFiles) => {
-    if (!editedTask) return;
+  const handleFiles = async (files) => {
+    if (!editedTask || files.length === 0) return;
     setIsUploading(true);
     try {
-      const uploadPromises = acceptedFiles.map(file => base44.integrations.Core.UploadFile({ file }));
+      const uploadPromises = Array.from(files).map(file => base44.integrations.Core.UploadFile({ file }));
       const uploadedFiles = await Promise.all(uploadPromises);
       const newAttachments = uploadedFiles.map(f => f.file_url);
       
@@ -46,23 +47,41 @@ export default function TaskModal({ task, isOpen, onClose, onSave, onDelete, cat
         ...prev,
         attachments: [...(prev.attachments || []), ...newAttachments]
       }));
-      toast.success(`${acceptedFiles.length} file(s) uploaded successfully.`);
+      toast.success(`${files.length} file(s) uploaded successfully.`);
     } catch (error) {
       console.error("Upload error:", error);
       toast.error('File upload failed. Please try again.');
     } finally {
       setIsUploading(false);
     }
-  }, [editedTask]);
+  };
 
-  const { getRootProps, getInputProps, isDragActive } = useDropzone({ onDrop, noClick: true });
+  const handleDragOver = (e) => {
+    e.preventDefault();
+    setIsDragActive(true);
+  };
+
+  const handleDragLeave = (e) => {
+    e.preventDefault();
+    setIsDragActive(false);
+  };
+
+  const handleDrop = (e) => {
+    e.preventDefault();
+    setIsDragActive(false);
+    if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
+      handleFiles(e.dataTransfer.files);
+    }
+  };
 
   const handlePaste = async (event) => {
-    const items = (event.clipboardData || event.originalEvent.clipboardData).items;
+    const items = (event.clipboardData || event.originalEvent?.clipboardData)?.items;
+    if (!items) return;
+    
     for (const item of items) {
       if (item.type.indexOf('image') === 0) {
         const file = item.getAsFile();
-        onDrop([file]);
+        if (file) handleFiles([file]);
       }
     }
   };
@@ -82,14 +101,19 @@ export default function TaskModal({ task, isOpen, onClose, onSave, onDelete, cat
   const handleDelete = () => {
     onDelete(editedTask.id);
     onClose();
-  }
+  };
 
   if (!isOpen || !editedTask) return null;
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-2xl" {...getRootProps()} onPaste={handlePaste}>
-        <input {...getInputProps()} />
+      <DialogContent 
+        className="max-w-2xl" 
+        onPaste={handlePaste}
+        onDragOver={handleDragOver}
+        onDragLeave={handleDragLeave}
+        onDrop={handleDrop}
+      >
         <DialogHeader>
           <DialogTitle>
             <Input 
@@ -113,16 +137,24 @@ export default function TaskModal({ task, isOpen, onClose, onSave, onDelete, cat
             <div>
               <h4 className="font-semibold text-sm mb-2">Attachments</h4>
               <div 
-                className={`border-2 border-dashed rounded-lg p-6 text-center transition-colors ${
-                  isDragActive ? 'border-purple-500 bg-purple-50' : 'border-gray-300'
+                onClick={() => fileInputRef.current?.click()}
+                className={`border-2 border-dashed rounded-lg p-6 text-center transition-colors cursor-pointer ${
+                  isDragActive ? 'border-purple-500 bg-purple-50' : 'border-gray-300 hover:border-gray-400'
                 }`}
               >
+                <input 
+                  ref={fileInputRef}
+                  type="file"
+                  multiple
+                  className="hidden"
+                  onChange={(e) => e.target.files && handleFiles(e.target.files)}
+                />
                 {isUploading ? (
                    <p className="text-sm text-gray-500">Uploading...</p>
                 ) : (
                   <div className="flex flex-col items-center justify-center">
                     <Upload className="w-8 h-8 text-gray-400 mb-2" />
-                    <p className="text-sm text-gray-500">Drag & drop files or paste screenshots here.</p>
+                    <p className="text-sm text-gray-500">Drag & drop files, click to browse, or paste screenshots.</p>
                   </div>
                 )}
               </div>

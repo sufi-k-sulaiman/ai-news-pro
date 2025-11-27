@@ -4,7 +4,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
 import { ListTodo, Plus, Loader2 } from 'lucide-react';
 import { Button } from "@/components/ui/button";
-const PAGE_LABELS = ['Home', 'Qwirey', 'MindMap', 'SearchPods', 'Markets', 'Learning', 'Geospatial', 'Intelligence', 'Resume Builder', 'Tasks', 'Notes', 'Games', 'Terms of Use', 'Settings'];
+import { menuItems } from '@/components/NavigationConfig';
 import { PieChart, Pie, Cell, BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid } from 'recharts';
 import { toast } from 'sonner';
 
@@ -13,7 +13,7 @@ import TaskModal from '../components/tasks/TaskModal';
 
 const STATUSES = ['todo', 'in_progress', 'review', 'done'];
 const TASK_CATEGORIES = [
-  ...PAGE_LABELS,
+  ...menuItems.map(item => item.label),
   'Feedback',
   'Bugs',
   'Features'
@@ -73,7 +73,7 @@ const TasksPage = () => {
     if (task) {
         setSelectedTask(task);
     } else {
-        const defaultCategory = 'Tasks';
+        const defaultCategory = menuItems.find(item => item.page === 'Tasks')?.label || 'Tasks';
         setSelectedTask({ title: '', description: '', category: defaultCategory, priority: 'medium', status: 'todo', attachments: [] });
     }
     setIsModalOpen(true);

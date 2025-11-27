@@ -140,7 +140,10 @@ export default function TermsOfUse() {
                     </Section>
                 </div>
 
-
+                {/* Footer */}
+                <div className="text-center mt-8 text-gray-500 text-sm">
+                    <p>© 2025 1cPublishing Inc. All rights reserved.</p>
+                </div>
             </div>
         </div>
     );

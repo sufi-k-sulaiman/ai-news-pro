@@ -1,15 +1,5 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
-import { createPageUrl } from '@/utils';
-
-const LOGO_URL = 'https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/692729a5f5180fbd43f297e9/a1a505225_1cPublishing-logo.png';
-
-const footerLinks = [
-    { label: 'Terms of Use', href: createPageUrl('TermsOfUse') },
-    { label: 'Privacy Policy', href: createPageUrl('PrivacyPolicy') },
-    { label: 'Cookie Policy', href: createPageUrl('CookiePolicyPage') },
-    { label: 'Contact Us', href: createPageUrl('ContactUs') },
-];
+import { LOGO_URL, footerLinks } from '../NavigationConfig';
 
 export default function Footer() {
     return (
@@ -19,7 +9,7 @@ export default function Footer() {
                     <img src={LOGO_URL} alt="1cPublishing" className="h-8 w-8 object-contain grayscale" />
                     <nav className="flex flex-wrap justify-center gap-6 text-sm">
                         {footerLinks.map((link, i) => (
-                            <Link key={i} to={link.href} className="text-gray-600 hover:text-purple-600 transition-colors">{link.label}</Link>
+                            <a key={i} href={link.href} className="text-gray-600 hover:text-purple-600 transition-colors">{link.label}</a>
                         ))}
                     </nav>
                 </div>

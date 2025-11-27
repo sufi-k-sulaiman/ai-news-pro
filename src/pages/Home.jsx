@@ -1,84 +1,43 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
-import { Globe, Sparkles, BarChart3, Gamepad2, Settings, Radio, Brain, FileText, GraduationCap, ListTodo, StickyNote, Lightbulb, ScrollText, ArrowRight } from 'lucide-react';
+import { Sparkles, Radio, Settings, Brain, FileText, BarChart3, GraduationCap, ListTodo, Lightbulb, StickyNote, MessageCircle, Gamepad2, Globe } from "lucide-react";
 
-const LOGO_URL = 'https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/692729a5f5180fbd43f297e9/a1a505225_1cPublishing-logo.png';
-
-const features = [
-    { label: 'Qwirey', icon: Sparkles, href: createPageUrl('Qwirey'), description: 'Advanced AI assistant', color: 'bg-purple-100 text-purple-600' },
-    { label: 'MindMap', icon: Brain, href: createPageUrl('MindMap'), description: 'Visual knowledge exploration', color: 'bg-blue-100 text-blue-600' },
-    { label: 'SearchPods', icon: Radio, href: createPageUrl('SearchPods'), description: 'AI-powered podcasts', color: 'bg-orange-100 text-orange-600' },
-    { label: 'Markets', icon: BarChart3, href: createPageUrl('Markets'), description: 'Stock market analysis', color: 'bg-green-100 text-green-600' },
-    { label: 'Learning', icon: GraduationCap, href: createPageUrl('Learning'), description: 'Interactive learning platform', color: 'bg-indigo-100 text-indigo-600' },
-    { label: 'Geospatial', icon: Globe, href: createPageUrl('Geospatial'), description: 'Geographic intelligence', color: 'bg-cyan-100 text-cyan-600' },
-    { label: 'Intelligence', icon: Lightbulb, href: createPageUrl('Intelligence'), description: 'Data-driven insights', color: 'bg-amber-100 text-amber-600' },
-    { label: 'Resume Builder', icon: FileText, href: createPageUrl('ResumeBuilder'), description: 'Professional resume creator', color: 'bg-rose-100 text-rose-600' },
-    { label: 'Tasks', icon: ListTodo, href: createPageUrl('Tasks'), description: 'Task management', color: 'bg-emerald-100 text-emerald-600' },
-    { label: 'Notes', icon: StickyNote, href: createPageUrl('Notes'), description: 'Smart note-taking', color: 'bg-yellow-100 text-yellow-600' },
-    { label: 'Games', icon: Gamepad2, href: createPageUrl('Games'), description: 'Fun arcade games', color: 'bg-pink-100 text-pink-600' },
+const pages = [
+    { name: 'Geospatial', page: 'Geospatial', icon: Globe, description: 'Global data intelligence across 18 domains', color: 'from-indigo-600 to-purple-600' },
+    { name: 'Qwirey', page: 'Qwirey', icon: Sparkles, description: 'Your all-in-one AI assistant, powered by Qwirey', color: 'from-purple-600 to-indigo-600' },
+    { name: 'SearchPods', page: 'SearchPods', icon: Radio, description: 'AI-generated podcasts on any topic with voice playback', color: 'from-blue-600 to-cyan-600' },
+    { name: 'MindMap', page: 'MindMap', icon: Brain, description: 'AI-powered knowledge visualization and exploration', color: 'from-pink-600 to-rose-600' },
+    { name: 'Intelligence', page: 'Intelligence', icon: Lightbulb, description: 'AI predictive analytics and scenario modeling', color: 'from-indigo-600 to-purple-600' },
+    { name: 'Resume Builder', page: 'ResumeBuilder', icon: FileText, description: 'AI-powered professional resume generator', color: 'from-green-600 to-emerald-600' },
+    { name: 'Markets', page: 'Markets', icon: BarChart3, description: 'AI-powered stock market analysis and screening', color: 'from-orange-600 to-amber-600' },
+    { name: 'Learning', page: 'Learning', icon: GraduationCap, description: 'Navigate knowledge islands with progress tracking', color: 'from-emerald-600 to-teal-600' },
+    { name: 'Tasks', page: 'Tasks', icon: ListTodo, description: 'Track initiatives across all departments', color: 'from-violet-600 to-purple-600' },
+    { name: 'Notes', page: 'Notes', icon: StickyNote, description: 'Rich text notes with AI assistance', color: 'from-pink-600 to-rose-600' },
+    { name: 'Comms', page: 'Comms', icon: MessageCircle, description: 'Calls, SMS, email & team collaboration', color: 'from-cyan-600 to-blue-600' },
+    { name: 'Games', page: 'Games', icon: Gamepad2, description: 'Learn while you play with Word Shooter', color: 'from-purple-600 to-pink-600' },
+    { name: 'Settings', page: 'Settings', icon: Settings, description: 'Customize your experience with accessibility options', color: 'from-gray-600 to-slate-600' },
 ];
 
-export default function Home() {
+export default function HomePage() {
     return (
-        <div className="min-h-screen bg-gray-50 p-4 md:p-8">
-            <div className="max-w-6xl mx-auto">
-                {/* Hero Section */}
-                <div className="bg-gradient-to-br from-purple-600 to-indigo-700 rounded-3xl p-8 md:p-12 mb-8 text-white">
-                    <div className="flex items-center gap-4 mb-6">
-                        <img src={LOGO_URL} alt="1cPublishing" className="w-16 h-16 rounded-xl" />
-                        <div>
-                            <h1 className="text-3xl md:text-4xl font-bold">Welcome to 1cPublishing</h1>
-                            <p className="text-purple-200">Your intelligent productivity platform</p>
-                        </div>
-                    </div>
-                    <p className="text-lg text-purple-100 max-w-2xl">
-                        Explore AI-powered tools for research, learning, productivity, and more. 
-                        Everything you need to work smarter, all in one place.
-                    </p>
-                </div>
-
-                {/* Features Grid */}
-                <h2 className="text-2xl font-bold text-gray-900 mb-6">Explore Features</h2>
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                    {features.map((feature) => (
-                        <Link
-                            key={feature.label}
-                            to={feature.href}
-                            className="bg-white rounded-2xl p-6 border border-gray-200 hover:border-purple-300 hover:shadow-lg transition-all group"
-                        >
-                            <div className="flex items-start gap-4">
-                                <div className={`w-12 h-12 rounded-xl ${feature.color} flex items-center justify-center flex-shrink-0`}>
-                                    <feature.icon className="w-6 h-6" />
+        <div className="p-4 md:p-8">
+            <div className="max-w-5xl mx-auto">
+                <h1 className="text-2xl md:text-3xl font-bold mb-2 text-gray-800">Welcome to 1cPublishing</h1>
+                <p className="mb-6 md:mb-8 text-gray-600">AI Powered Platform. Choose where to go:</p>
+                
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
+                    {pages.map((page) => (
+                        <Link key={page.name} to={createPageUrl(page.page)} className="group">
+                            <div className={`bg-gradient-to-br ${page.color} rounded-2xl shadow-lg p-6 hover:shadow-xl transition-all hover:-translate-y-1 text-white h-full`}>
+                                <div className="w-14 h-14 rounded-xl bg-white/20 flex items-center justify-center mb-4">
+                                    <page.icon className="w-7 h-7 text-white" />
                                 </div>
-                                <div className="flex-1">
-                                    <h3 className="font-semibold text-gray-900 group-hover:text-purple-600 transition-colors flex items-center gap-2">
-                                        {feature.label}
-                                        <ArrowRight className="w-4 h-4 opacity-0 group-hover:opacity-100 transition-opacity" />
-                                    </h3>
-                                    <p className="text-sm text-gray-500 mt-1">{feature.description}</p>
-                                </div>
+                                <h3 className="font-bold text-xl mb-2">{page.name}</h3>
+                                <p className="text-white/80 text-sm">{page.description}</p>
                             </div>
                         </Link>
                     ))}
-                </div>
-
-                {/* Quick Links */}
-                <div className="mt-8 flex flex-wrap gap-3">
-                    <Link
-                        to={createPageUrl('Settings')}
-                        className="flex items-center gap-2 px-4 py-2 bg-white rounded-full border border-gray-200 text-gray-600 hover:border-purple-300 hover:text-purple-600 transition-all"
-                    >
-                        <Settings className="w-4 h-4" />
-                        Settings
-                    </Link>
-                    <Link
-                        to={createPageUrl('TermsOfUse')}
-                        className="flex items-center gap-2 px-4 py-2 bg-white rounded-full border border-gray-200 text-gray-600 hover:border-purple-300 hover:text-purple-600 transition-all"
-                    >
-                        <ScrollText className="w-4 h-4" />
-                        Terms of Use
-                    </Link>
                 </div>
             </div>
         </div>

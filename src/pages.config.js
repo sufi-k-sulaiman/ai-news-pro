@@ -19,6 +19,8 @@ import Governance from './pages/Governance';
 import CookiePolicy from './pages/CookiePolicy';
 import TermsOfUse from './pages/TermsOfUse';
 import Teams from './pages/Teams';
+import AIHub from './pages/AIHub';
+import Tasks from './pages/Tasks';
 import __Layout from './Layout.jsx';
 
 
@@ -44,6 +46,8 @@ export const PAGES = {
     "CookiePolicy": CookiePolicy,
     "TermsOfUse": TermsOfUse,
     "Teams": Teams,
+    "AIHub": AIHub,
+    "Tasks": Tasks,
 }
 
 export const pagesConfig = {

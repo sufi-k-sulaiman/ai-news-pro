@@ -838,10 +838,32 @@ export default function SpaceBattleGame({ onExit }) {
             if (score + 1 === 10) setAwards(a => [...a, 'gold']);
         }
         
-        if (currentQuestion < questions.length - 1) {
-            setCurrentQuestion(c => c + 1);
+        // If level complete and answered enough questions, proceed to next level
+        if (levelComplete) {
+            if (correct && score >= currentLevel) {
+                // Move to next level
+                setCurrentLevel(c => c + 1);
+                setCurrentQuestion(0);
+                setLevelComplete(false);
+                setScreen('game');
+            } else if (currentQuestion < Math.min(questions.length - 1, currentLevel + 1)) {
+                setCurrentQuestion(c => c + 1);
+            } else if (!correct) {
+                // Failed quiz - game over
+                setScreen('results');
+            } else {
+                setCurrentLevel(c => c + 1);
+                setCurrentQuestion(0);
+                setLevelComplete(false);
+                setScreen('game');
+            }
         } else {
-            setScreen('results');
+            // Normal game over quiz
+            if (currentQuestion < questions.length - 1) {
+                setCurrentQuestion(c => c + 1);
+            } else {
+                setScreen('results');
+            }
         }
     };
 

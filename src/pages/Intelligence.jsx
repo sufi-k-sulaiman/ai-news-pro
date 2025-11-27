@@ -405,8 +405,8 @@ Provide:
                                                     <Tooltip />
                                                     <Area type="monotone" dataKey="upper" stroke="none" fill="url(#confBand)" />
                                                     <Area type="monotone" dataKey="lower" stroke="none" fill="#fff" />
-                                                    <Line type="monotone" dataKey="actual" stroke="#8B5CF6" strokeWidth={2} dot={false} />
-                                                    <Line type="monotone" dataKey="forecast" stroke="#10B981" strokeWidth={2} strokeDasharray="5 5" dot={false} />
+                                                    <Area type="monotone" dataKey="actual" stroke="#8B5CF6" fill="transparent" strokeWidth={2} dot={false} />
+                                                    <Area type="monotone" dataKey="forecast" stroke="#10B981" fill="transparent" strokeWidth={2} strokeDasharray="5 5" dot={false} />
                                                 </AreaChart>
                                             </ResponsiveContainer>
                                         </div>

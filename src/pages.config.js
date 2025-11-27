@@ -15,6 +15,7 @@ import Intelligence from './pages/Intelligence';
 import Notes from './pages/Notes';
 import Comms from './pages/Comms';
 import Games from './pages/Games';
+import __Layout from './Layout.jsx';
 
 
 export const PAGES = {
@@ -40,4 +41,5 @@ export const PAGES = {
 export const pagesConfig = {
     mainPage: "TestFunctions",
     Pages: PAGES,
+    Layout: __Layout,
 };

@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import { Gamepad2, Rocket, Target } from 'lucide-react';
 import PageLayout from '../components/PageLayout';
-import SpaceBattleGame from '../components/games/SpaceBattleGame';
 import WordShooter from '../components/games/WordShooter';
+import SpaceBattleGame from '../components/games/SpaceBattleGame';
 import { Button } from '@/components/ui/button';
 
 export default function Games() {
@@ -29,29 +29,29 @@ export default function Games() {
                     </div>
 
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                        {/* Space Battle Game Card */}
-                        <div className="bg-gray-800/50 backdrop-blur-lg rounded-2xl p-8 border border-cyan-500/20 text-center flex flex-col">
-                            <div className="w-24 h-24 bg-gradient-to-br from-cyan-500 to-blue-600 rounded-xl flex items-center justify-center mx-auto mb-4">
-                                <Rocket className="w-12 h-12 text-white" />
-                            </div>
-                            <h2 className="text-2xl font-bold text-white mb-2">Space Battle</h2>
-                            <p className="text-gray-400 mb-6 flex-grow">Destroy alien ships to learn programming concepts!</p>
-                            <Button onClick={() => setActiveGame('space-battle')} size="lg" className="w-full bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-600 hover:to-blue-700">
-                                Play Now
-                            </Button>
-                        </div>
-                        
-                        {/* Word Shooter Game Card */}
-                        <div className="bg-gray-800/50 backdrop-blur-lg rounded-2xl p-8 border border-purple-500/20 text-center flex flex-col">
-                            <div className="w-24 h-24 bg-gradient-to-br from-purple-500 to-pink-600 rounded-xl flex items-center justify-center mx-auto mb-4">
-                                <Target className="w-12 h-12 text-white" />
-                            </div>
-                            <h2 className="text-2xl font-bold text-white mb-2">Word Shooter</h2>
-                            <p className="text-gray-400 mb-6 flex-grow">Gamified vocabulary learning with AI-powered word sets.</p>
-                            <Button onClick={() => setActiveGame('word-shooter')} size="lg" className="w-full bg-gradient-to-r from-purple-500 to-pink-600 hover:from-purple-600 hover:to-pink-700">
-                                Play Now
-                            </Button>
-                        </div>
+                      {/* Space Battle Game Card */}
+                      <div className="bg-gray-800/50 backdrop-blur-lg rounded-2xl p-8 border border-cyan-500/20 text-center flex flex-col">
+                          <div className="w-24 h-24 bg-gradient-to-br from-cyan-500 to-blue-600 rounded-xl flex items-center justify-center mx-auto mb-4">
+                              <Rocket className="w-12 h-12 text-white" />
+                          </div>
+                          <h2 className="text-2xl font-bold text-white mb-2">Space Battle</h2>
+                          <p className="text-gray-400 mb-6 flex-grow">Destroy alien ships and test your knowledge!</p>
+                          <Button onClick={() => setActiveGame('space-battle')} size="lg" className="w-full bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-600 hover:to-blue-700">
+                              Play Now
+                          </Button>
+                      </div>
+
+                      {/* Word Shooter Game Card */}
+                      <div className="bg-gray-800/50 backdrop-blur-lg rounded-2xl p-8 border border-purple-500/20 text-center flex flex-col">
+                          <div className="w-24 h-24 bg-gradient-to-br from-purple-500 to-pink-600 rounded-xl flex items-center justify-center mx-auto mb-4">
+                              <Target className="w-12 h-12 text-white" />
+                          </div>
+                          <h2 className="text-2xl font-bold text-white mb-2">Word Shooter</h2>
+                          <p className="text-gray-400 mb-6 flex-grow">Gamified vocabulary learning with AI-powered word sets.</p>
+                          <Button onClick={() => setActiveGame('word-shooter')} size="lg" className="w-full bg-gradient-to-r from-purple-500 to-pink-600 hover:from-purple-600 hover:to-pink-700">
+                              Play Now
+                          </Button>
+                      </div>
                     </div>
                 </div>
             </div>

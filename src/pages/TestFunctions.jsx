@@ -8,15 +8,13 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Loader2, CheckCircle, XCircle, Send, FileText, Download, CreditCard, MessageSquare, Bot, Sparkles, Image, Mail, Grid3X3, Search, Home, Settings, Radio, BarChart3, TestTube } from "lucide-react";
-import PageLayout from '../components/PageLayout';
-
 const allPages = [
-    { name: 'Home', href: createPageUrl('Home'), icon: Home },
-    { name: 'AI Hub', href: createPageUrl('AIHub'), icon: Sparkles },
-    { name: 'SearchPods', href: createPageUrl('SearchPods'), icon: Radio },
-    { name: 'Settings', href: createPageUrl('Settings'), icon: Settings },
-    { name: 'Dashboard', href: createPageUrl('DashboardComponents'), icon: BarChart3 },
-    { name: 'Template', href: createPageUrl('Template'), icon: FileText },
+    { name: 'Home', page: 'Home', icon: Home },
+    { name: 'AI Hub', page: 'AIHub', icon: Sparkles },
+    { name: 'SearchPods', page: 'SearchPods', icon: Radio },
+    { name: 'Settings', page: 'Settings', icon: Settings },
+    { name: 'Dashboard', page: 'DashboardComponents', icon: BarChart3 },
+    { name: 'Template', page: 'Template', icon: FileText },
 ];
 
 export default function TestFunctions() {
@@ -87,7 +85,6 @@ export default function TestFunctions() {
     );
 
     return (
-        <PageLayout activePage="" searchPlaceholder="Search functions...">
             <div className="p-6">
                 <div className="max-w-4xl mx-auto">
                     <h1 className="text-3xl font-bold mb-2">Test Functions</h1>
@@ -98,7 +95,7 @@ export default function TestFunctions() {
                         <h2 className="text-lg font-semibold mb-3">All Pages</h2>
                         <div className="flex flex-wrap gap-2">
                             {allPages.map((page) => (
-                                <Link key={page.name} to={page.href}>
+                                <Link key={page.name} to={createPageUrl(page.page)}>
                                     <Button variant="outline" size="sm" className="gap-2">
                                         <page.icon className="w-4 h-4" />
                                         {page.name}
@@ -192,6 +189,5 @@ export default function TestFunctions() {
                     </Tabs>
                 </div>
             </div>
-        </PageLayout>
     );
 }

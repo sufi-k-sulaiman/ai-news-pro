@@ -103,6 +103,12 @@ const AnimatedBars = ({ isPlaying = false, color = '#10B981' }) => {
 };
 
 export default function SearchPods() {
+    useEffect(() => {
+        document.title = 'Search and Ai generated Audio Podcasts';
+        document.querySelector('meta[name="description"]')?.setAttribute('content', 'SearchPods delivers AI generated audio podcasts, making discovery simple and productivity smarter.');
+        document.querySelector('meta[name="keywords"]')?.setAttribute('content', 'Ai Podcasts, SearchPods');
+    }, []);
+
     const [searchQuery, setSearchQuery] = useState('');
     const [categoryData, setCategoryData] = useState({});
     const [expandedCategory, setExpandedCategory] = useState(null);

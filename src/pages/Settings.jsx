@@ -16,6 +16,12 @@ const speakText = (text) => {
 };
 
 export default function Settings() {
+    useEffect(() => {
+        document.title = 'Personalized control for 1cPublishing';
+        document.querySelector('meta[name="description"]')?.setAttribute('content', 'Personalized usability, simplify customization, and empower every user experience.');
+        document.querySelector('meta[name="keywords"]')?.setAttribute('content', 'usability, accessibility');
+    }, []);
+
     const [fontSize, setFontSize] = useState(() => localStorage.getItem('fontSize') || 'medium');
     const [cognitiveMode, setCognitiveMode] = useState(() => localStorage.getItem('cognitiveMode') || 'none');
     const [theme, setTheme] = useState(() => localStorage.getItem('theme') || 'light');

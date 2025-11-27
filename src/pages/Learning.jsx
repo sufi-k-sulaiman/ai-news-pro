@@ -45,6 +45,12 @@ const RANKS = [
 ];
 
 export default function Learning() {
+    useEffect(() => {
+        document.title = 'Smart Learning Archipelago';
+        document.querySelector('meta[name="description"]')?.setAttribute('content', 'Learning Archipelago uses AI agents to create automated learning islands for growth on all subjects.');
+        document.querySelector('meta[name="keywords"]')?.setAttribute('content', 'Learning Archipelago, Learning islands');
+    }, []);
+
     const [selectedSubjects, setSelectedSubjects] = useState([SUBJECTS[0]]); // Default to first subject
     const [subTopics, setSubTopics] = useState([]);
     const [loadingTopics, setLoadingTopics] = useState(false);

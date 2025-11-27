@@ -110,6 +110,12 @@ const CATEGORIES = [
 ];
 
 export default function News() {
+    useEffect(() => {
+        document.title = 'News articles hub for around the world';
+        document.querySelector('meta[name="description"]')?.setAttribute('content', 'Global hub for trusted news articles, delivering accurate reporting and insights worldwide.');
+        document.querySelector('meta[name="keywords"]')?.setAttribute('content', 'News articles, news article');
+    }, []);
+
     const [searchQuery, setSearchQuery] = useState('');
     const [activeCategory, setActiveCategory] = useState('technology');
     const [expandedCategory, setExpandedCategory] = useState(null);

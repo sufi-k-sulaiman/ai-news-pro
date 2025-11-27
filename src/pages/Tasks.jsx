@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { DragDropContext } from '@hello-pangea/dnd';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
@@ -20,6 +20,12 @@ const TASK_CATEGORIES = [
 ];
 
 const TasksPage = () => {
+  useEffect(() => {
+    document.title = 'Tasks manager for smarter workflows and productivity';
+    document.querySelector('meta[name="description"]')?.setAttribute('content', 'Tasks management software with Ai streamlines workflows, boosts productivity.');
+    document.querySelector('meta[name="keywords"]')?.setAttribute('content', 'Tasks management software, Tasks management');
+  }, []);
+
   const queryClient = useQueryClient();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedTask, setSelectedTask] = useState(null);

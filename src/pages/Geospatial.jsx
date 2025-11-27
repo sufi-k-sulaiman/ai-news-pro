@@ -46,6 +46,12 @@ const REGIONS = [
 const COLORS = ['#8B5CF6', '#10B981', '#F59E0B', '#EF4444', '#3B82F6', '#EC4899', '#0EA5E9', '#6366F1'];
 
 export default function Geospatial() {
+    useEffect(() => {
+        document.title = 'Geospatial Intelligence Hub';
+        document.querySelector('meta[name="description"]')?.setAttribute('content', 'Geospatial intelligence platform delivering AI powered insights, and spatial analytics.');
+        document.querySelector('meta[name="keywords"]')?.setAttribute('content', 'Geospatial, Geospatial intelligence');
+    }, []);
+
     const [activeDomain, setActiveDomain] = useState('economy');
     const [selectedRegion, setSelectedRegion] = useState('all');
     const [searchQuery, setSearchQuery] = useState('');

@@ -932,6 +932,12 @@ function generateStockData(stockInfo) {
 // Stock Markets
 
 export default function Markets() {
+    useEffect(() => {
+        document.title = 'MarketsPro ai automated insights';
+        document.querySelector('meta[name="description"]')?.setAttribute('content', 'MarketsPro delivers automated insights with AI stock predictions to empower smarter trading decisions.');
+        document.querySelector('meta[name="keywords"]')?.setAttribute('content', 'MarketsPro, Ai stock predictions');
+    }, []);
+
     const [stocks, setStocks] = useState([]);
     const [searchQuery, setSearchQuery] = useState('');
     const [activePreset, setActivePreset] = useState('all');

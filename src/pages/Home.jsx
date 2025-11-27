@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
 import { Sparkles, Radio, Settings, Brain, FileText, BarChart3, GraduationCap, ListTodo, Lightbulb, StickyNote, Newspaper, Gamepad2, Globe } from "lucide-react";
@@ -20,6 +20,12 @@ const pages = [
 ];
 
 export default function HomePage() {
+    useEffect(() => {
+        document.title = '1cPublishing, Ai Powered Platform to boost productivity';
+        document.querySelector('meta[name="description"]')?.setAttribute('content', 'AI powered platform with smart agents designed to boost productivity, efficiency, and growth.');
+        document.querySelector('meta[name="keywords"]')?.setAttribute('content', '1cPublishing, Ai Platform, Ai Agents');
+    }, []);
+
     return (
         <div className="p-4 md:p-8">
             <div className="max-w-5xl mx-auto">

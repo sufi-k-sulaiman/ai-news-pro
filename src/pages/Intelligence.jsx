@@ -40,6 +40,12 @@ const MODEL_TYPES = ['ARIMA', 'LSTM', 'Transformer', 'Ensemble', 'Gradient Boost
 const COLORS = ['#8B5CF6', '#10B981', '#F59E0B', '#EF4444', '#3B82F6', '#EC4899', '#0EA5E9', '#6366F1'];
 
 export default function Intelligence() {
+    useEffect(() => {
+        document.title = 'AI Intelligence for automated decision making';
+        document.querySelector('meta[name="description"]')?.setAttribute('content', 'Intelligence platform delivering automated insights and smarter decisions for growth.');
+        document.querySelector('meta[name="keywords"]')?.setAttribute('content', 'AI Intelligence, Intelligence');
+    }, []);
+
     const [activeTab, setActiveTab] = useState('forecast');
     const [selectedDomain, setSelectedDomain] = useState('Economy');
     const [timeHorizon, setTimeHorizon] = useState('Monthly');

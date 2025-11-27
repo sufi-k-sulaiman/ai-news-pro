@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Mail, MessageSquare, Headphones, Building2, Send, ArrowLeft, Loader2, ExternalLink } from 'lucide-react';
 import { base44 } from '@/api/base44Client';
 import { Button } from "@/components/ui/button";
@@ -144,6 +144,12 @@ const ContactCard = ({ icon: Icon, title, description, email, buttonText, color,
 };
 
 export default function ContactUs() {
+    useEffect(() => {
+        document.title = 'Contact and support page for 1cPublishing.com';
+        document.querySelector('meta[name="description"]')?.setAttribute('content', 'Connect with us for 1cPublishing and all applications related topics.');
+        document.querySelector('meta[name="keywords"]')?.setAttribute('content', '1cPublishing support, 1cPublishing Contact Us');
+    }, []);
+
     return (
         <div className="min-h-screen bg-gray-50 p-4 md:p-8">
             <div className="max-w-5xl mx-auto">

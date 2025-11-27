@@ -14,6 +14,12 @@ import ATSAnalysis from '@/components/resume/ATSAnalysis';
 import ExportOptions from '@/components/resume/ExportOptions';
 
 export default function ResumeBuilder() {
+    useEffect(() => {
+        document.title = 'ResumePro AI create smarter resumes';
+        document.querySelector('meta[name="description"]')?.setAttribute('content', 'Resume creator builds smarter resumes with insights to boost careers and success.');
+        document.querySelector('meta[name="keywords"]')?.setAttribute('content', 'ResumePro, resume creator');
+    }, []);
+
     const [activeTab, setActiveTab] = useState('builder');
     const [isGenerating, setIsGenerating] = useState(false);
     const [generatedResume, setGeneratedResume] = useState(null);

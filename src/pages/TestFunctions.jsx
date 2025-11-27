@@ -423,61 +423,31 @@ export default function TestFunctions() {
                             <CardDescription>Invite users to access your 1cPublishing app</CardDescription>
                         </CardHeader>
                         <CardContent className="space-y-4">
-                            <div className="grid grid-cols-2 gap-4">
-                                <div className="space-y-2">
-                                    <label className="text-sm font-medium text-gray-700">Full Name *</label>
-                                    <Input
-                                        value={inviteFullName}
-                                        onChange={(e) => setInviteFullName(e.target.value)}
-                                        placeholder="John Doe"
-                                    />
-                                </div>
-                                <div className="space-y-2">
-                                    <label className="text-sm font-medium text-gray-700">Email Address *</label>
-                                    <Input
-                                        value={inviteEmail}
-                                        onChange={(e) => setInviteEmail(e.target.value)}
-                                        placeholder="colleague@company.com"
-                                        type="email"
-                                    />
-                                </div>
+                            <div className="bg-amber-50 border border-amber-200 rounded-lg p-4 mb-4">
+                                <p className="text-amber-800 text-sm">
+                                    <strong>Note:</strong> User invitations must be sent from the Base44 dashboard. 
+                                    Click the <strong>"Share"</strong> button in the top-right corner of the dashboard to invite users.
+                                </p>
                             </div>
-                            <div className="space-y-2">
-                                <label className="text-sm font-medium text-gray-700">Access Level *</label>
-                                <Select value={inviteRole} onValueChange={setInviteRole}>
-                                    <SelectTrigger>
-                                        <SelectValue placeholder="Select role" />
-                                    </SelectTrigger>
-                                    <SelectContent>
-                                        <SelectItem value="user">
-                                            <div className="flex flex-col">
-                                                <span>User</span>
-                                                <span className="text-xs text-gray-500">Can use the app</span>
-                                            </div>
-                                        </SelectItem>
-                                        <SelectItem value="admin">
-                                            <div className="flex flex-col">
-                                                <span>Admin</span>
-                                                <span className="text-xs text-gray-500">Full access to all features</span>
-                                            </div>
-                                        </SelectItem>
-                                    </SelectContent>
-                                </Select>
+                            
+                            <div className="bg-gray-50 rounded-lg p-6 border border-gray-200">
+                                <h4 className="font-medium text-gray-900 mb-4">How to invite users:</h4>
+                                <ol className="list-decimal list-inside space-y-2 text-gray-600">
+                                    <li>Go to the Base44 dashboard</li>
+                                    <li>Click the <strong>"Share"</strong> button in the top-right</li>
+                                    <li>Enter the user's email address</li>
+                                    <li>Select the access level (User or Admin)</li>
+                                    <li>Click "Send Invitation"</li>
+                                </ol>
                             </div>
-                            <Button
-                                onClick={() => runTest('invite', () => 
-                                    base44.auth.inviteUser({
-                                        email: inviteEmail,
-                                        full_name: inviteFullName,
-                                        role: inviteRole
-                                    })
-                                )}
-                                disabled={loading === 'invite' || !inviteEmail || !inviteFullName}
-                                className="bg-orange-500 hover:bg-orange-600 gap-2"
-                            >
-                                {loading === 'invite' ? <Loader2 className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />}
-                                Send Invitation
-                            </Button>
+
+                            <div className="mt-6">
+                                <h4 className="font-medium text-gray-900 mb-2">Public Access URL:</h4>
+                                <div className="bg-gray-100 rounded-lg p-3 font-mono text-sm text-purple-600">
+                                    https://1cpublishing.com
+                                </div>
+                                <p className="text-xs text-gray-500 mt-1">Anyone with this link can access your app</p>
+                            </div>
                         </CardContent>
                     </Card>
                 </TabsContent>

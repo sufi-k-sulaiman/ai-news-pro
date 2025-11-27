@@ -563,7 +563,6 @@ export default function Qwirey() {
                                     </div>
                             </>
                         )}
-                        )}
                     </div>
                 )}
 

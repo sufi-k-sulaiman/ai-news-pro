@@ -68,7 +68,6 @@ export default function ResumeBuilder() {
             <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
                 <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-6">
                     <div className="flex items-center gap-3">
-                        <div className="w-12 h-12 rounded-xl bg-purple-100 flex items-center justify-center"><FileText className="w-6 h-6 text-purple-600" /></div>
                         <div><h1 className="text-2xl font-bold text-gray-900">Resume Builder</h1><p className="text-gray-500 text-sm">Resume Automation</p></div>
                     </div>
                     <TabsList className="bg-gray-100"><TabsTrigger value="builder" className="flex items-center gap-2"><Sparkles className="w-4 h-4" /> Builder</TabsTrigger><TabsTrigger value="resume" className="flex items-center gap-2"><FileText className="w-4 h-4" /> Resume</TabsTrigger><TabsTrigger value="export" className="flex items-center gap-2"><Download className="w-4 h-4" /> Export</TabsTrigger></TabsList>

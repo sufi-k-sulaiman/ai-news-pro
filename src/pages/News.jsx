@@ -35,8 +35,12 @@ const NewsCard = ({ article, index }) => {
                 {imageLoading ? (
                     <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-gray-100 to-gray-200">
                         <div className="flex flex-col items-center gap-2">
-                            <ImageIcon className="w-8 h-8 text-gray-300 animate-pulse" />
-                            <span className="text-xs text-gray-400">Generating...</span>
+                            <img 
+                                src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/692729a5f5180fbd43f297e9/1cplogo.png" 
+                                alt="1cPublishing" 
+                                className="w-12 h-12 object-contain opacity-30 animate-pulse"
+                            />
+                            <span className="text-xs text-gray-400">Loading...</span>
                         </div>
                     </div>
                 ) : imageUrl ? (

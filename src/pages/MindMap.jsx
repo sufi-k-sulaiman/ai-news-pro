@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Brain, Plus, Loader2, Sparkles, ZoomIn, ZoomOut, Move, Trash2, Edit2, X, Check } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -7,12 +7,52 @@ import { base44 } from '@/api/base44Client';
 
 const COLORS = ['#8B5CF6', '#10B981', '#F59E0B', '#EF4444', '#3B82F6', '#EC4899', '#0EA5E9', '#6366F1'];
 
-export default function MindMap() {
+export default function MindMapPage() {
     const [topic, setTopic] = useState('');
-    const [nodes, setNodes] = useState([]);
+        const [nodes, setNodes] = useState([]);
     const [loading, setLoading] = useState(false);
     const [selectedNode, setSelectedNode] = useState(null);
     const [zoom, setZoom] = useState(1);
+    const [savedMaps, setSavedMaps] = useState([]);
+    const [currentMapId, setCurrentMapId] = useState(null);
+
+    const { data: mindMapsData, isLoading: isLoadingMaps } = useQuery({
+        queryKey: ['mindMaps'],
+        queryFn: () => base44.entities.MindMap.list(),
+        onSuccess: (data) => {
+            setSavedMaps(data || []);
+        }
+    });
+
+    const createMapMutation = useMutation({
+        mutationFn: (mapData) => base44.entities.MindMap.create(mapData),
+        onSuccess: (newMap) => {
+            setSavedMaps(prev => [...prev, newMap]);
+            setCurrentMapId(newMap.id);
+            toast.success('Mind map saved!');
+        }
+    });
+
+    const updateMapMutation = useMutation({
+        mutationFn: ({id, mapData}) => base44.entities.MindMap.update(id, mapData),
+        onSuccess: (updatedMap) => {
+            setSavedMaps(prev => prev.map(m => m.id === updatedMap.id ? updatedMap : m));
+            toast.success('Mind map updated!');
+        }
+    });
+
+    const deleteMapMutation = useMutation({
+        mutationFn: (id) => base44.entities.MindMap.delete(id),
+        onSuccess: (deletedId) => {
+            setSavedMaps(prev => prev.filter(m => m.id !== deletedId));
+            if (currentMapId === deletedId) {
+                setNodes([]);
+                setTopic('');
+                setCurrentMapId(null);
+            }
+            toast.success('Mind map deleted.');
+        }
+    });
 
     const generateMindMap = async () => {
         if (!topic.trim() || loading) return;
@@ -109,12 +149,24 @@ export default function MindMap() {
             });
 
             setNodes(newNodes);
+            const user = await base44.auth.me();
+            if (currentMapId) {
+                updateMapMutation.mutate({ id: currentMapId, mapData: { topic, nodes: newNodes } });
+            } else if (user) {
+                createMapMutation.mutate({ topic, nodes: newNodes, userId: user.id });
+            }
         } catch (error) {
             console.error('Failed to generate mind map:', error);
         } finally {
             setLoading(false);
         }
     };
+
+        const loadMap = (map) => {
+        setTopic(map.topic);
+        setNodes(map.nodes);
+        setCurrentMapId(map.id);
+    }
 
     const handleNodeClick = (node) => {
         setSelectedNode(selectedNode?.id === node.id ? null : node);
@@ -141,7 +193,19 @@ export default function MindMap() {
 
     return (
         <div className="min-h-screen bg-gray-50 p-4 md:p-6">
-            <div className="max-w-7xl mx-auto">
+            <div className="flex gap-6 max-w-full mx-auto">
+                <div className="w-64 bg-white rounded-xl border border-gray-200 p-4">
+                    <h2 className="text-lg font-bold mb-4">My Mind Maps</h2>
+                    <div className="space-y-2">
+                        {isLoadingMaps ? <p>Loading maps...</p> : savedMaps.map(map => (
+                            <div key={map.id} onClick={() => loadMap(map)} className={`p-2 rounded-lg cursor-pointer ${currentMapId === map.id ? 'bg-purple-100' : 'hover:bg-gray-100'}`}>
+                                <p className="font-semibold text-sm truncate">{map.topic}</p>
+                                <p className="text-xs text-gray-500">{map.nodes.length} nodes</p>
+                            </div>
+                        ))}
+                    </div>
+                </div>
+                <div className="flex-1">
                 {/* Header */}
                 <div className="bg-gradient-to-r from-pink-600 to-rose-600 rounded-2xl p-6 mb-6 text-white">
                     <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
@@ -294,6 +358,6 @@ export default function MindMap() {
                     </div>
                 )}
             </div>
-        </div>
+            </div>
     );
 }

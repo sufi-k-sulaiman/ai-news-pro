@@ -19,7 +19,7 @@ const pages = [
     { name: 'Settings', page: 'Settings', icon: Settings, description: 'Customize your experience with accessibility options', color: 'from-gray-600 to-slate-600' },
 ];
 
-export default function Home() {
+export default function HomePage() {
     return (
         <div className="p-4 md:p-8">
             <div className="max-w-5xl mx-auto">

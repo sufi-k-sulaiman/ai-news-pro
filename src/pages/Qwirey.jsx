@@ -7,6 +7,7 @@ import { Input } from "@/components/ui/input";
 import { LOGO_URL } from '@/components/NavigationConfig';
 import ReactMarkdown from 'react-markdown';
 import { BarChart, Bar, PieChart, Pie, Cell, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
+import { toast } from 'sonner';
 
 // AI Model Icons - Real brand colors and designs
 const GPT4Icon = () => (
@@ -182,8 +183,9 @@ export default function Qwirey() {
         if (fileInputRef.current) fileInputRef.current.value = '';
     };
 
-    const handleSubmit = async () => {
-        if (!prompt.trim() && !fileContent) return;
+    const handleSubmit = async (followUpPrompt) => {
+        const currentPrompt = typeof followUpPrompt === 'string' ? followUpPrompt : prompt;
+        if (!currentPrompt.trim() && !fileContent) return;
         
         setLoading(true);
         setResult(null);
@@ -309,17 +311,7 @@ Also suggest 3 follow-up questions the user might want to ask.`,
     return (
         <div className="min-h-screen bg-white p-4 md:p-8">
             <div className="max-w-4xl mx-auto">
-                {/* Header with Logo */}
-                <div className="text-center mb-8">
-                    <div className="flex items-center justify-center gap-3 mb-2">
-                        <img src={LOGO_URL} alt="1cPublishing" className="w-12 h-12 rounded-xl" />
-                        <div className="text-left">
-                            <h1 className="text-2xl font-bold text-gray-900">1cPublishing</h1>
-                            <p className="text-purple-600 text-sm font-medium">AI Powered</p>
-                        </div>
-                    </div>
-                    <p className="text-gray-500 mt-3">Your all-in-one AI assistant</p>
-                </div>
+                
 
                 {/* Model Selection */}
                 <div className="flex flex-wrap justify-center gap-3 mb-8">

@@ -93,7 +93,7 @@ function TreeNode({ node, colorIndex = 0, onExplore, onLearn, depth = 0, nodeRef
                 <p className="font-semibold text-sm leading-tight mb-2 break-words">{node.name}</p>
                 <div className="flex gap-1.5 justify-center flex-wrap">
                     <button
-                        onClick={handleExplore}
+                        onClick={(e) => { e.stopPropagation(); handleExplore(); }}
                         disabled={isExpanding}
                         className="flex items-center gap-1 px-2.5 py-1 bg-white/20 hover:bg-white/30 rounded-md text-xs font-medium transition-colors disabled:opacity-50"
                     >
@@ -105,7 +105,7 @@ function TreeNode({ node, colorIndex = 0, onExplore, onLearn, depth = 0, nodeRef
                         {isExpanding ? '...' : 'Explore'}
                     </button>
                     <button
-                        onClick={() => onLearn(node)}
+                        onClick={(e) => { e.stopPropagation(); onLearn(node); }}
                         className="flex items-center gap-1 px-2.5 py-1 bg-white/20 hover:bg-white/30 rounded-md text-xs font-medium transition-colors"
                     >
                         <BookOpen className="w-3 h-3" />
@@ -739,12 +739,12 @@ export default function MindMapPage() {
                         />
                     ) : (
                         <div 
-                            className={`relative flex justify-center overflow-auto pt-4 ${spacePressed || annotationMode ? 'select-none' : ''} ${spacePressed ? 'cursor-grab' : ''} ${isDragging ? 'cursor-grabbing' : ''} ${annotationMode === 'draw' || annotationMode === 'rectangle' || annotationMode === 'circle' ? 'cursor-crosshair' : ''} ${annotationMode === 'text' ? 'cursor-text' : ''} ${annotationMode === 'eraser' ? 'cursor-pointer' : ''}`}
+                            className={`relative flex justify-center overflow-auto pt-4 ${spacePressed ? 'select-none cursor-grab' : ''} ${isDragging ? 'cursor-grabbing' : ''}`}
                             ref={canvasOverlayRef}
-                            onMouseDown={(annotationMode || spacePressed) ? handleCanvasMouseDown : undefined}
-                            onMouseMove={(annotationMode || spacePressed || isDragging) ? handleCanvasMouseMove : undefined}
-                            onMouseUp={(annotationMode || spacePressed || isDragging) ? handleCanvasMouseUp : undefined}
-                            onMouseLeave={(annotationMode || spacePressed || isDragging) ? handleCanvasMouseUp : undefined}
+                            onMouseDown={spacePressed ? handleCanvasMouseDown : undefined}
+                            onMouseMove={(spacePressed || isDragging) ? handleCanvasMouseMove : undefined}
+                            onMouseUp={(spacePressed || isDragging) ? handleCanvasMouseUp : undefined}
+                            onMouseLeave={(spacePressed || isDragging) ? handleCanvasMouseUp : undefined}
                             style={{ height: '100%', width: '100%' }}
                         >
                             {renderAnnotations()}
@@ -762,7 +762,7 @@ export default function MindMapPage() {
                             )}
                             <div 
                                 className="min-w-max px-8 transition-transform duration-75"
-                                style={{ transform: `translate(${panOffset.x}px, ${panOffset.y}px)`, pointerEvents: annotationMode ? 'none' : 'auto' }}
+                                style={{ transform: `translate(${panOffset.x}px, ${panOffset.y}px)` }}
                                 ref={mindmapRef}
                             >
                                 <TreeNode

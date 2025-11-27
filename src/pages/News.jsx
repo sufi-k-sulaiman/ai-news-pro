@@ -1,4 +1,11 @@
 import React, { useState, useEffect } from 'react';
+
+const pulseAnimation = `
+@keyframes pulse {
+    0%, 100% { opacity: 0.4; transform: scale(1); }
+    50% { opacity: 0.8; transform: scale(1.05); }
+}
+`;
 import { base44 } from '@/api/base44Client';
 import { Newspaper, Search, Loader2, ExternalLink, RefreshCw, TrendingUp, Clock, Globe, Image as ImageIcon } from 'lucide-react';
 import { Button } from "@/components/ui/button";

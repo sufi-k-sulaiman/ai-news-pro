@@ -889,6 +889,7 @@ export default function SpaceBattleGame({ onExit }) {
     
     if (screen === 'quiz') {
         const q = questions[currentQuestion];
+        const questionsNeeded = levelComplete ? currentLevel + 1 : questions.length;
         return (
             <div className="fixed inset-0 bg-[#0a0f1a] z-[9999] flex">
                 {/* Left panel - Radar */}
@@ -905,14 +906,30 @@ export default function SpaceBattleGame({ onExit }) {
                             <circle cx="140" cy="80" r="5" fill="#00ffff"/>
                             <circle cx="100" cy="150" r="6" fill="#00ff88"/>
                         </svg>
+                        {levelComplete && (
+                            <div className="absolute inset-0 flex items-center justify-center">
+                                <div className="text-center">
+                                    <Trophy className="w-16 h-16 text-yellow-400 mx-auto mb-2" />
+                                    <p className="text-cyan-400 font-bold">LEVEL {currentLevel}</p>
+                                    <p className="text-white text-sm">COMPLETE!</p>
+                                </div>
+                            </div>
+                        )}
                     </div>
                 </div>
 
                 {/* Right panel - Question */}
-                <div className="flex-1 flex flex-col justify-end p-8">
+                <div className="flex-1 flex flex-col justify-center p-8">
+                    {levelComplete && (
+                        <div className="bg-gradient-to-r from-cyan-900/50 to-purple-900/50 border border-cyan-500/50 rounded-lg p-4 mb-4 max-w-2xl">
+                            <p className="text-cyan-400 font-bold text-lg">🎯 Level {currentLevel} Complete!</p>
+                            <p className="text-gray-300">Answer {currentLevel + 1} questions correctly to unlock Level {currentLevel + 1}</p>
+                            <p className="text-green-400 mt-2">Correct answers: {score} / {currentLevel + 1} needed</p>
+                        </div>
+                    )}
                     <div className="bg-[#0d1420] border border-gray-700 rounded-lg p-8 max-w-2xl">
                         <div className="flex justify-between items-center mb-4">
-                            <span className="text-cyan-400 font-mono">Technical track</span>
+                            <span className="text-cyan-400 font-mono">{levelComplete ? `Level ${currentLevel} Quiz` : 'Technical track'}</span>
                             <div className="flex items-center gap-2">
                                 <img src={LOGO_URL} alt="1cPublishing" className="w-6 h-6 rounded" />
                                 <span className="text-gray-400 font-mono">1cPublishing</span>
@@ -929,7 +946,7 @@ export default function SpaceBattleGame({ onExit }) {
                                 Yes
                             </Button>
                         </div>
-                        <p className="text-right text-gray-500 mt-6 font-mono">Question {currentQuestion + 1}</p>
+                        <p className="text-right text-gray-500 mt-6 font-mono">Question {currentQuestion + 1} {levelComplete ? `/ ${questionsNeeded}` : ''}</p>
                     </div>
                 </div>
             </div>

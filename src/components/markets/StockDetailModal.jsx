@@ -1343,24 +1343,38 @@ export default function StockDetailModal({ stock, isOpen, onClose }) {
                     const shares = investmentAmount / stock.price;
                     const futurePrice = stock.price * Math.pow(1 + expectedReturn / 100, yearsToHold);
                     const futureValue = shares * futurePrice;
-                    return { shares: shares.toFixed(2), futurePrice: futurePrice.toFixed(2), futureValue: futureValue.toFixed(2), profit: (futureValue - investmentAmount).toFixed(2) };
+                    const annualDividend = (stock.dividend || 2) * shares;
+                    const totalDividends = annualDividend * yearsToHold;
+                    return { 
+                        shares: shares.toFixed(2), 
+                        futurePrice: futurePrice.toFixed(2), 
+                        futureValue: futureValue.toFixed(2), 
+                        profit: (futureValue - investmentAmount).toFixed(2),
+                        annualDividend: annualDividend.toFixed(2),
+                        totalDividends: totalDividends.toFixed(2),
+                        totalReturn: (futureValue + totalDividends - investmentAmount).toFixed(2)
+                    };
                 };
                 const simResult = calculateFutureValue();
                 const projectionData = Array.from({ length: yearsToHold + 1 }, (_, i) => ({
                     year: `Year ${i}`,
-                    value: investmentAmount * Math.pow(1 + expectedReturn / 100, i)
+                    value: investmentAmount * Math.pow(1 + expectedReturn / 100, i),
+                    withDividends: investmentAmount * Math.pow(1 + expectedReturn / 100, i) + ((stock.dividend || 2) * (investmentAmount / stock.price) * i)
                 }));
                 return (
                     <div className="space-y-6">
                         <div className="bg-gradient-to-br from-purple-50 to-blue-50 rounded-2xl border border-purple-200 p-6">
-                            <div className="flex items-center gap-2 mb-6">
-                                <Calculator className="w-5 h-5 text-purple-600" />
-                                <h3 className="font-semibold text-gray-900">Investment Simulator</h3>
+                            <div className="flex items-center justify-between mb-6">
+                                <div className="flex items-center gap-2">
+                                    <Calculator className="w-5 h-5 text-purple-600" />
+                                    <h3 className="font-semibold text-gray-900">Investment Simulator</h3>
+                                </div>
+                                <span className="text-xs text-gray-500 bg-white px-3 py-1 rounded-full">$100 to $4,000,000</span>
                             </div>
                             <div className="grid grid-cols-3 gap-6 mb-6">
                                 <div>
                                     <label className="text-sm text-gray-600 mb-2 block">Investment Amount</label>
-                                    <div className="flex gap-2 mb-2">
+                                    <div className="flex flex-wrap gap-1 mb-2">
                                         {[100, 1000, 10000, 100000, 1000000, 4000000].map(amt => (
                                             <button key={amt} onClick={() => setInvestmentAmount(amt)} className={`px-2 py-1 text-xs rounded ${investmentAmount === amt ? 'bg-purple-600 text-white' : 'bg-white text-gray-600 border'}`}>
                                                 ${amt >= 1000000 ? `${amt/1000000}M` : amt >= 1000 ? `${amt/1000}K` : amt}
@@ -1378,44 +1392,80 @@ export default function StockDetailModal({ stock, isOpen, onClose }) {
                                     <Slider value={[expectedReturn]} onValueChange={(v) => setExpectedReturn(v[0])} min={-20} max={50} step={1} className="mt-4" />
                                 </div>
                             </div>
-                            <div className="grid grid-cols-4 gap-4">
+                            <div className="grid grid-cols-5 gap-3">
                                 <div className="bg-white rounded-xl p-4 text-center">
-                                    <p className="text-sm text-gray-500">Shares Bought</p>
-                                    <p className="text-2xl font-bold text-gray-900">{simResult.shares}</p>
+                                    <p className="text-xs text-gray-500">Shares Ownership</p>
+                                    <p className="text-xl font-bold text-gray-900">{simResult.shares}</p>
                                 </div>
                                 <div className="bg-white rounded-xl p-4 text-center">
-                                    <p className="text-sm text-gray-500">Future Price</p>
-                                    <p className="text-2xl font-bold text-blue-600">${simResult.futurePrice}</p>
+                                    <p className="text-xs text-gray-500">Future Price</p>
+                                    <p className="text-xl font-bold text-blue-600">${simResult.futurePrice}</p>
                                 </div>
                                 <div className="bg-white rounded-xl p-4 text-center">
-                                    <p className="text-sm text-gray-500">Future Value</p>
-                                    <p className="text-2xl font-bold text-purple-600">${Number(simResult.futureValue).toLocaleString()}</p>
+                                    <p className="text-xs text-gray-500">Future Value</p>
+                                    <p className="text-xl font-bold text-purple-600">${Number(simResult.futureValue).toLocaleString()}</p>
                                 </div>
                                 <div className="bg-white rounded-xl p-4 text-center">
-                                    <p className="text-sm text-gray-500">Total Profit</p>
-                                    <p className={`text-2xl font-bold ${Number(simResult.profit) >= 0 ? 'text-green-600' : 'text-red-600'}`}>
-                                        {Number(simResult.profit) >= 0 ? '+' : ''}${Number(simResult.profit).toLocaleString()}
+                                    <p className="text-xs text-gray-500">Annual Dividend</p>
+                                    <p className="text-xl font-bold text-green-600">${Number(simResult.annualDividend).toLocaleString()}</p>
+                                </div>
+                                <div className="bg-white rounded-xl p-4 text-center">
+                                    <p className="text-xs text-gray-500">Total Return</p>
+                                    <p className={`text-xl font-bold ${Number(simResult.totalReturn) >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+                                        {Number(simResult.totalReturn) >= 0 ? '+' : ''}${Number(simResult.totalReturn).toLocaleString()}
                                     </p>
                                 </div>
                             </div>
                         </div>
-                        <div className="bg-white rounded-2xl border border-gray-200 p-6">
-                            <h4 className="font-semibold text-gray-900 mb-4">Investment Projection</h4>
-                            <div className="h-64">
-                                <ResponsiveContainer width="100%" height="100%">
-                                    <AreaChart data={projectionData}>
-                                        <defs>
-                                            <linearGradient id="projGradient" x1="0" y1="0" x2="0" y2="1">
-                                                <stop offset="5%" stopColor="#8B5CF6" stopOpacity={0.3}/>
-                                                <stop offset="95%" stopColor="#8B5CF6" stopOpacity={0}/>
-                                            </linearGradient>
-                                        </defs>
-                                        <XAxis dataKey="year" tick={{ fontSize: 10 }} />
-                                        <YAxis tick={{ fontSize: 10 }} tickFormatter={(v) => `$${(v/1000).toFixed(0)}K`} />
-                                        <Tooltip formatter={(v) => `$${Number(v).toLocaleString()}`} />
-                                        <Area type="monotone" dataKey="value" stroke="#8B5CF6" strokeWidth={2} fill="url(#projGradient)" />
-                                    </AreaChart>
-                                </ResponsiveContainer>
+                        
+                        <div className="grid grid-cols-2 gap-6">
+                            <div className="bg-white rounded-2xl border border-gray-200 p-6">
+                                <h4 className="font-semibold text-gray-900 mb-4">Investment Projection</h4>
+                                <div className="h-56">
+                                    <ResponsiveContainer width="100%" height="100%">
+                                        <AreaChart data={projectionData}>
+                                            <defs>
+                                                <linearGradient id="projGradient" x1="0" y1="0" x2="0" y2="1">
+                                                    <stop offset="5%" stopColor="#8B5CF6" stopOpacity={0.3}/>
+                                                    <stop offset="95%" stopColor="#8B5CF6" stopOpacity={0}/>
+                                                </linearGradient>
+                                                <linearGradient id="divGradient" x1="0" y1="0" x2="0" y2="1">
+                                                    <stop offset="5%" stopColor="#10B981" stopOpacity={0.3}/>
+                                                    <stop offset="95%" stopColor="#10B981" stopOpacity={0}/>
+                                                </linearGradient>
+                                            </defs>
+                                            <XAxis dataKey="year" tick={{ fontSize: 10 }} />
+                                            <YAxis tick={{ fontSize: 10 }} tickFormatter={(v) => `$${(v/1000).toFixed(0)}K`} />
+                                            <Tooltip formatter={(v) => `$${Number(v).toLocaleString()}`} />
+                                            <Area type="monotone" dataKey="withDividends" stroke="#10B981" strokeWidth={2} fill="url(#divGradient)" name="With Dividends" />
+                                            <Area type="monotone" dataKey="value" stroke="#8B5CF6" strokeWidth={2} fill="url(#projGradient)" name="Capital Only" />
+                                        </AreaChart>
+                                    </ResponsiveContainer>
+                                </div>
+                            </div>
+                            
+                            <div className="bg-white rounded-2xl border border-gray-200 p-6">
+                                <h4 className="font-semibold text-gray-900 mb-4">Investment Strategy</h4>
+                                <div className="space-y-4">
+                                    <div className="p-4 bg-blue-50 rounded-xl">
+                                        <p className="text-sm font-medium text-blue-900">Dollar-Cost Averaging Suggested</p>
+                                        <p className="text-xs text-blue-700 mt-1">Consider investing ${(investmentAmount / 12).toFixed(0)}/month over 12 months</p>
+                                    </div>
+                                    <div className="p-4 bg-green-50 rounded-xl">
+                                        <p className="text-sm font-medium text-green-900">Guidance: Start Gradually</p>
+                                        <p className="text-xs text-green-700 mt-1">Begin with 25% position, add on pullbacks</p>
+                                    </div>
+                                    <div className="grid grid-cols-2 gap-3">
+                                        <div className="p-3 bg-gray-50 rounded-lg text-center">
+                                            <p className="text-xs text-gray-500">Total Dividends</p>
+                                            <p className="text-lg font-bold text-green-600">${Number(simResult.totalDividends).toLocaleString()}</p>
+                                        </div>
+                                        <div className="p-3 bg-gray-50 rounded-lg text-center">
+                                            <p className="text-xs text-gray-500">Yield on Cost</p>
+                                            <p className="text-lg font-bold text-purple-600">{((Number(simResult.annualDividend) / investmentAmount) * 100).toFixed(2)}%</p>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>

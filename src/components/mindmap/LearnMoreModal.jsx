@@ -180,7 +180,7 @@ For each document, provide the actual URL where it can be found.`,
 
     return (
         <Dialog open={isOpen} onOpenChange={onClose}>
-            <DialogContent className="max-w-5xl max-h-[90vh] p-0 overflow-hidden">
+            <DialogContent className="max-w-5xl max-h-[90vh] p-0 overflow-y-auto">
                 <div className="flex flex-col h-full">
                     {/* Header */}
                     <div className="bg-gradient-to-r from-purple-600 to-indigo-600 p-6 text-white">

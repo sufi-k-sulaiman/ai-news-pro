@@ -145,6 +145,9 @@ export default function SpaceBattleGame({ onExit }) {
             cameraShake: 0,
             fov: 90,
             viewAngle: 0,
+            mouseX: canvas.width / 2,
+            mouseY: canvas.height / 2,
+            bombs: 3,
         };
         gameStateRef.current = state;
 

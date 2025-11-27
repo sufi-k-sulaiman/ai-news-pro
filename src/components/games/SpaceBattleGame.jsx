@@ -197,15 +197,15 @@ export default function SpaceBattleGame({ onExit }) {
             keys[e.key.toLowerCase()] = true;
             if (e.code === 'Space') {
                 e.preventDefault();
-                // Fire from crosshair position
-                state.bullets.push({ 
-                    x: state.mouseX - canvas.width / 2, 
-                    y: state.mouseY, 
-                    z: 1,
-                    speed: 0.15,
-                    scale: 1,
+                // Fire laser from crosshair position
+                state.lasers.push({ 
+                    startX: canvas.width / 2,
+                    startY: canvas.height * 0.85,
                     targetX: state.mouseX,
-                    targetY: state.mouseY
+                    targetY: state.mouseY,
+                    progress: 0,
+                    speed: 0.08,
+                    color: ALIEN_COLORS[Math.floor(Math.random() * ALIEN_COLORS.length)]
                 });
                 state.cameraShake = 3;
             }

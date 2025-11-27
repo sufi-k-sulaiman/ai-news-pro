@@ -1,27 +1,30 @@
 import React, { useEffect } from 'react';
+import { Button } from "@/components/ui/button";
+import { Download, Copy, Check } from 'lucide-react';
 
 const BASE_URL = 'https://1cpublishing.base44.app';
 
 const pages = [
-    { name: 'Qwirey', description: 'AI-powered chat interface for interacting with various language models including GPT-4, Claude, and Gemini.' },
-    { name: 'MindMap', description: 'AI neural networks create interactive knowledge trees to explore knowledge.' },
-    { name: 'SearchPods', description: 'Search for and generate AI-powered audio podcasts on any topic.' },
-    { name: 'Markets', description: 'Stock market data with filtering, search capabilities, and detailed financial metrics.' },
-    { name: 'News', description: 'Latest news aggregation and AI-powered news summaries.' },
-    { name: 'Learning', description: 'Dynamic learning hub with AI-generated personalized learning islands and gamification.' },
-    { name: 'Geospatial', description: 'Dashboard for visualizing and analyzing geospatial intelligence data across regions.' },
-    { name: 'Intelligence', description: 'AI-powered analytics and decision-making tools for forecasting and scenario building.' },
-    { name: 'ResumeBuilder', description: 'Create, analyze, and export professional resumes with AI assistance and ATS compatibility.' },
-    { name: 'Tasks', description: 'Task management with drag-and-drop organization and visual data representation.' },
-    { name: 'Notes', description: 'AI-powered note-taking with rich text editing and AI assistance for text and image generation.' },
-    { name: 'Games', description: 'Educational arcade games including Space Battle and Word Shooter for gamified learning.' },
-    { name: 'Settings', description: 'Personalized control for usability, simplify customization, and empower every user experience.' },
-    { name: 'TermsOfUse', description: 'Terms of use, licensing, data usage policies, and legal information for 1cPublishing.' },
-    { name: 'ContactUs', description: 'Contact form for sales inquiries, feedback, and support requests.' },
-    { name: 'SiteMap', description: 'Complete listing of all pages and their descriptions for easy navigation.' },
+    { name: 'Qwirey', priority: '1.0' },
+    { name: 'MindMap', priority: '0.9' },
+    { name: 'SearchPods', priority: '0.8' },
+    { name: 'Markets', priority: '0.8' },
+    { name: 'News', priority: '0.8' },
+    { name: 'Learning', priority: '0.8' },
+    { name: 'Geospatial', priority: '0.8' },
+    { name: 'Intelligence', priority: '0.8' },
+    { name: 'ResumeBuilder', priority: '0.7' },
+    { name: 'Tasks', priority: '0.7' },
+    { name: 'Notes', priority: '0.7' },
+    { name: 'Games', priority: '0.6' },
+    { name: 'Settings', priority: '0.5' },
+    { name: 'TermsOfUse', priority: '0.4' },
+    { name: 'ContactUs', priority: '0.5' },
 ];
 
 export default function SiteMap() {
+    const [copied, setCopied] = React.useState(false);
+
     useEffect(() => {
         document.title = 'Site Map - 1cPublishing';
         
@@ -46,20 +49,52 @@ export default function SiteMap() {
 
     const today = new Date().toISOString().split('T')[0];
 
-    return (
-        <div className="min-h-screen bg-white p-4 font-mono text-sm">
-            <pre className="whitespace-pre-wrap text-gray-800">
-{`<?xml version="1.0" encoding="UTF-8"?>
+    const xmlContent = `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
 ${pages.map(page => `  <url>
     <loc>${BASE_URL}/${page.name}</loc>
     <lastmod>${today}</lastmod>
     <changefreq>weekly</changefreq>
-    <priority>${page.name === 'Qwirey' ? '1.0' : '0.8'}</priority>
-    <!-- ${page.description} -->
+    <priority>${page.priority}</priority>
   </url>`).join('\n')}
-</urlset>`}
-            </pre>
+</urlset>`;
+
+    const handleDownload = () => {
+        const blob = new Blob([xmlContent], { type: 'application/xml' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'sitemap.xml';
+        a.click();
+        URL.revokeObjectURL(url);
+    };
+
+    const handleCopy = () => {
+        navigator.clipboard.writeText(xmlContent);
+        setCopied(true);
+        setTimeout(() => setCopied(false), 2000);
+    };
+
+    return (
+        <div className="min-h-screen bg-gray-900 text-gray-100 p-4">
+            <div className="max-w-4xl mx-auto">
+                <div className="flex items-center justify-between mb-4">
+                    <h1 className="text-lg font-semibold text-gray-300">sitemap.xml</h1>
+                    <div className="flex gap-2">
+                        <Button variant="outline" size="sm" onClick={handleCopy} className="gap-2 bg-gray-800 border-gray-700 text-gray-300 hover:bg-gray-700">
+                            {copied ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
+                            {copied ? 'Copied' : 'Copy'}
+                        </Button>
+                        <Button variant="outline" size="sm" onClick={handleDownload} className="gap-2 bg-gray-800 border-gray-700 text-gray-300 hover:bg-gray-700">
+                            <Download className="w-4 h-4" />
+                            Download
+                        </Button>
+                    </div>
+                </div>
+                <pre className="bg-gray-950 rounded-lg p-4 overflow-x-auto text-sm font-mono leading-relaxed">
+                    <code className="text-green-400">{xmlContent}</code>
+                </pre>
+            </div>
         </div>
     );
 }

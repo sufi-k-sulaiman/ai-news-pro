@@ -74,7 +74,7 @@ function TreeNode({ node, colorIndex = 0, onExplore, onLearn, depth = 0 }) {
     return (
         <div className="flex flex-col items-center">
             {/* Node Card */}
-            <div className={`${color.bg} text-white rounded-xl px-4 py-3 shadow-lg min-w-[140px] max-w-[200px] text-center transition-all hover:scale-105 hover:shadow-xl`}>
+            <div className={`${color.bg} text-white rounded-xl px-5 py-4 shadow-lg min-w-[175px] max-w-[250px] text-center transition-all hover:scale-105 hover:shadow-xl`}>
                 <p className="font-semibold text-sm leading-tight mb-2 break-words">{node.name}</p>
                 <div className="flex gap-1.5 justify-center flex-wrap">
                     <button

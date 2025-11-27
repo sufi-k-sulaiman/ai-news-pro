@@ -103,12 +103,12 @@ function TreeNode({ node, colorIndex = 0, onExplore, onLearn, depth = 0 }) {
             {/* Children - Triangular layout */}
             {hasChildren && isExpanded && (
                 <>
-                    <div className="w-0.5 h-8 bg-gray-300" />
+                    <div className="h-8" />
                     <div className="relative">
                         <div className={`flex ${getSpacing()} justify-center`}>
                             {children.map((child, i) => (
                                 <div key={i} className="flex flex-col items-center">
-                                    <div className="w-0.5 h-6 bg-gray-300" />
+                                    <div className="h-6" />
                                     <TreeNode
                                         node={child}
                                         colorIndex={colorIndex + i + 1 + depth * 2}
@@ -126,7 +126,7 @@ function TreeNode({ node, colorIndex = 0, onExplore, onLearn, depth = 0 }) {
             {/* Loading indicator for expanding */}
             {isExpanding && (
                 <div className="mt-4 flex flex-col items-center">
-                    <div className="w-0.5 h-6 bg-gray-300" />
+                    <div className="h-6" />
                     <div className="flex gap-2 items-center text-gray-500 bg-gray-100 rounded-lg px-4 py-2">
                         <Loader2 className="w-4 h-4 animate-spin text-purple-500" />
                         <span className="text-sm">Expanding...</span>

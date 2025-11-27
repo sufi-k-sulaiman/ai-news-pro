@@ -1,6 +1,4 @@
 import React, { useEffect } from 'react';
-import { Button } from "@/components/ui/button";
-import { Download, Copy, Check } from 'lucide-react';
 
 const BASE_URL = 'https://1cpublishing.base44.app';
 
@@ -23,12 +21,7 @@ const pages = [
 ];
 
 export default function SiteMapXml() {
-    const [copied, setCopied] = React.useState(false);
-
     useEffect(() => {
-        document.title = 'Site Map - 1cPublishing';
-        
-        // Hide header, sidebar, footer
         const header = document.querySelector('header');
         const sidebar = document.querySelector('aside');
         const footer = document.querySelector('footer');
@@ -59,42 +52,5 @@ ${pages.map(page => `  <url>
   </url>`).join('\n')}
 </urlset>`;
 
-    const handleDownload = () => {
-        const blob = new Blob([xmlContent], { type: 'application/xml' });
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = 'sitemap.xml';
-        a.click();
-        URL.revokeObjectURL(url);
-    };
-
-    const handleCopy = () => {
-        navigator.clipboard.writeText(xmlContent);
-        setCopied(true);
-        setTimeout(() => setCopied(false), 2000);
-    };
-
-    return (
-        <div className="min-h-screen bg-gray-900 text-gray-100 p-4">
-            <div className="max-w-4xl mx-auto">
-                <div className="flex items-center justify-between mb-4">
-                    <h1 className="text-lg font-semibold text-gray-300">sitemap.xml</h1>
-                    <div className="flex gap-2">
-                        <Button variant="outline" size="sm" onClick={handleCopy} className="gap-2 bg-gray-800 border-gray-700 text-gray-300 hover:bg-gray-700">
-                            {copied ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
-                            {copied ? 'Copied' : 'Copy'}
-                        </Button>
-                        <Button variant="outline" size="sm" onClick={handleDownload} className="gap-2 bg-gray-800 border-gray-700 text-gray-300 hover:bg-gray-700">
-                            <Download className="w-4 h-4" />
-                            Download
-                        </Button>
-                    </div>
-                </div>
-                <pre className="bg-gray-950 rounded-lg p-4 overflow-x-auto text-sm font-mono leading-relaxed">
-                    <code className="text-green-400">{xmlContent}</code>
-                </pre>
-            </div>
-        </div>
-    );
+    return <pre style={{ margin: 0, padding: 0, fontFamily: 'monospace', fontSize: '12px' }}>{xmlContent}</pre>;
 }

@@ -1326,60 +1326,92 @@ export default function StockDetailModal({ stock, isOpen, onClose }) {
                     { year: '2023', dividend: 4.0 },
                     { year: '2024', dividend: 4.4 }
                 ];
+                const yieldStrategy = {
+                    dividendYield: data.yield || stock.dividend || 2.4,
+                    growthExpectation: data.growthRate || 8.5,
+                    totalYield: (data.yield || stock.dividend || 2.4) + (data.growthRate || 8.5)
+                };
                 return (
                     <div className="space-y-6">
-                        <div className="bg-white rounded-2xl border border-gray-200 p-6">
-                            <div className="flex items-center justify-between mb-6">
+                        <div className="bg-gradient-to-br from-green-50 to-emerald-50 rounded-2xl border border-green-200 p-6">
+                            <div className="flex items-center justify-between mb-4">
                                 <div className="flex items-center gap-2">
-                                    <Percent className="w-5 h-5 text-purple-600" />
-                                    <h3 className="font-semibold text-gray-900">Dividend Overview</h3>
+                                    <Percent className="w-5 h-5 text-green-600" />
+                                    <h3 className="font-semibold text-gray-900">Yield Strategy</h3>
                                 </div>
-                                <span className={`px-3 py-1 rounded-full text-sm font-medium ${
-                                    (data.safetyScore || 75) >= 70 ? 'bg-green-100 text-green-700' : 'bg-yellow-100 text-yellow-700'
-                                }`}>
-                                    Safety: {data.safetyScore || 75}/100
+                                <span className="px-3 py-1 bg-green-100 text-green-700 text-sm font-medium rounded-full">
+                                    Income & Growth
                                 </span>
                             </div>
-                            <div className="grid grid-cols-4 gap-4 mb-6">
-                                <div className="bg-purple-50 rounded-xl p-4 text-center">
-                                    <p className="text-sm text-gray-600">Yield</p>
-                                    <p className="text-2xl font-bold text-purple-600">{data.yield || stock.dividend || 2.4}%</p>
+                            <div className="grid grid-cols-3 gap-4 mb-4">
+                                <div className="bg-white rounded-xl p-4 text-center">
+                                    <p className="text-xs text-gray-500 mb-1">Dividend Provided</p>
+                                    <p className="text-2xl font-bold text-green-600">{yieldStrategy.dividendYield}%</p>
                                 </div>
-                                <div className="bg-green-50 rounded-xl p-4 text-center">
-                                    <p className="text-sm text-gray-600">Annual</p>
-                                    <p className="text-2xl font-bold text-green-600">${data.annualDividend || 4.40}</p>
+                                <div className="bg-white rounded-xl p-4 text-center">
+                                    <p className="text-xs text-gray-500 mb-1">Growth Expectation</p>
+                                    <p className="text-2xl font-bold text-blue-600">{yieldStrategy.growthExpectation}%</p>
                                 </div>
-                                <div className="bg-blue-50 rounded-xl p-4 text-center">
-                                    <p className="text-sm text-gray-600">Growth (5Y)</p>
-                                    <p className="text-2xl font-bold text-blue-600">{data.growthRate || 8.5}%</p>
-                                </div>
-                                <div className="bg-orange-50 rounded-xl p-4 text-center">
-                                    <p className="text-sm text-gray-600">Payout Ratio</p>
-                                    <p className="text-2xl font-bold text-orange-600">{data.payoutRatio || 45}%</p>
+                                <div className="bg-white rounded-xl p-4 text-center">
+                                    <p className="text-xs text-gray-500 mb-1">Total Yield Combo</p>
+                                    <p className="text-2xl font-bold text-purple-600">{yieldStrategy.totalYield.toFixed(1)}%</p>
                                 </div>
                             </div>
-                            <div className="h-48">
-                                <ResponsiveContainer width="100%" height="100%">
-                                    <BarChart data={dividendHistory}>
-                                        <XAxis dataKey="year" tick={{ fontSize: 11 }} />
-                                        <YAxis tick={{ fontSize: 11 }} tickFormatter={(v) => `$${v}`} />
-                                        <Tooltip formatter={(v) => `$${v}`} />
-                                        <Bar dataKey="dividend" fill="#8B5CF6" radius={[4, 4, 0, 0]} />
-                                    </BarChart>
-                                </ResponsiveContainer>
+                            <p className="text-sm text-gray-600">Strategy suitable for income and growth investors seeking {yieldStrategy.dividendYield}% current yield with {yieldStrategy.growthExpectation}% dividend growth potential.</p>
+                        </div>
+                        
+                        <div className="grid grid-cols-2 gap-6">
+                            <div className="bg-white rounded-2xl border border-gray-200 p-6">
+                                <div className="flex items-center justify-between mb-4">
+                                    <h3 className="font-semibold text-gray-900">Dividend Metrics</h3>
+                                    <span className={`px-3 py-1 rounded-full text-sm font-medium ${
+                                        (data.safetyScore || 75) >= 70 ? 'bg-green-100 text-green-700' : 'bg-yellow-100 text-yellow-700'
+                                    }`}>
+                                        Safety: {data.safetyScore || 75}/100
+                                    </span>
+                                </div>
+                                <div className="grid grid-cols-2 gap-3">
+                                    <div className="bg-purple-50 rounded-xl p-3 text-center">
+                                        <p className="text-xs text-gray-500">Annual Dividend</p>
+                                        <p className="text-xl font-bold text-purple-600">${data.annualDividend || 4.40}</p>
+                                    </div>
+                                    <div className="bg-orange-50 rounded-xl p-3 text-center">
+                                        <p className="text-xs text-gray-500">Payout Ratio</p>
+                                        <p className="text-xl font-bold text-orange-600">{data.payoutRatio || 45}%</p>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div className="bg-white rounded-2xl border border-gray-200 p-6">
+                                <h4 className="font-semibold text-gray-900 mb-4">Dividend Schedule</h4>
+                                <div className="space-y-2">
+                                    <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                                        <span className="text-sm text-gray-600">Ex-Dividend Date</span>
+                                        <span className="text-sm font-medium text-gray-900">{data.exDividendDate || 'Feb 15, 2025'}</span>
+                                    </div>
+                                    <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                                        <span className="text-sm text-gray-600">Payment Date</span>
+                                        <span className="text-sm font-medium text-gray-900">Mar 1, 2025</span>
+                                    </div>
+                                    <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                                        <span className="text-sm text-gray-600">Frequency</span>
+                                        <span className="text-sm font-medium text-gray-900">Quarterly</span>
+                                    </div>
+                                </div>
                             </div>
                         </div>
+                        
                         <div className="bg-white rounded-2xl border border-gray-200 p-6">
-                            <h4 className="font-semibold text-gray-900 mb-4">Dividend Schedule</h4>
-                            <div className="grid grid-cols-2 gap-4">
-                                <div className="p-4 bg-gray-50 rounded-xl">
-                                    <p className="text-sm text-gray-500">Ex-Dividend Date</p>
-                                    <p className="text-lg font-bold text-gray-900">{data.exDividendDate || 'Feb 15, 2025'}</p>
-                                </div>
-                                <div className="p-4 bg-gray-50 rounded-xl">
-                                    <p className="text-sm text-gray-500">Payment Date</p>
-                                    <p className="text-lg font-bold text-gray-900">Mar 1, 2025</p>
-                                </div>
+                            <h4 className="font-semibold text-gray-900 mb-4">Dividend Growth History</h4>
+                            <div className="h-48">
+                                <ResponsiveContainer width="100%" height="100%">
+                                    <ReLineChart data={dividendHistory}>
+                                        <XAxis dataKey="year" tick={{ fontSize: 11 }} />
+                                        <YAxis tick={{ fontSize: 11 }} tickFormatter={(v) => `$${v}`} />
+                                        <Tooltip formatter={(v) => [`$${v}`, 'Annual Dividend']} />
+                                        <Line type="monotone" dataKey="dividend" stroke="#8B5CF6" strokeWidth={2} dot={{ fill: '#8B5CF6', r: 4 }} />
+                                    </ReLineChart>
+                                </ResponsiveContainer>
                             </div>
                         </div>
                     </div>

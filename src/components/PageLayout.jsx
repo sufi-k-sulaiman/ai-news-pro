@@ -102,6 +102,14 @@ export default function PageLayout({ children, activePage, onSearch, searchPlace
                                 </p>
                             </div>
                         </Link>
+                        <Button
+                            variant="ghost"
+                            size="icon"
+                            onClick={() => setSidebarOpen(!sidebarOpen)}
+                            className="hover:bg-gray-100 hidden md:flex ml-2"
+                        >
+                            {sidebarOpen ? <ChevronLeft className="w-5 h-5 text-purple-600" /> : <Menu className="w-5 h-5 text-purple-600" />}
+                        </Button>
                     </div>
 
                     {showSearch ? (
@@ -138,18 +146,7 @@ export default function PageLayout({ children, activePage, onSearch, searchPlace
 
                 {/* Sidebar */}
                 <aside className={`${sidebarOpen ? 'w-64 translate-x-0' : 'w-0 -translate-x-full md:translate-x-0'} transition-all duration-300 overflow-hidden border-r flex-shrink-0 fixed md:relative z-50 md:z-auto h-[calc(100vh-72px)] md:h-auto ${getSidebarClasses()}`}>
-                    {/* Menu toggle at top right of sidebar */}
-                    <div className="flex justify-end p-2 border-b border-gray-200">
-                        <Button
-                            variant="ghost"
-                            size="icon"
-                            onClick={() => setSidebarOpen(!sidebarOpen)}
-                            className="hover:bg-gray-100"
-                        >
-                            {sidebarOpen ? <ChevronLeft className="w-5 h-5 text-purple-600" /> : <Menu className="w-5 h-5 text-purple-600" />}
-                        </Button>
-                    </div>
-                    <nav className="px-4 py-4 space-y-1">
+                    <nav className="px-4 py-6 space-y-1">
                         {menuItems.map((item, index) => (
                             <Link
                                 key={index}

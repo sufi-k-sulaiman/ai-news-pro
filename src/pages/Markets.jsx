@@ -1336,13 +1336,7 @@ export default function Markets() {
             {/* Header */}
             <header className="bg-white sticky top-0 z-40 border-b border-gray-200 shadow-sm h-[72px]">
                 <div className="flex items-center justify-between px-4 h-full">
-                    <div className="flex items-center gap-4">
-                        <Button variant="ghost" size="icon" onClick={() => setSidebarOpen(!sidebarOpen)} className="hover:bg-gray-100 md:hidden">
-                            <Menu className="w-5 h-5 text-purple-600" />
-                        </Button>
-                        <Button variant="ghost" size="icon" onClick={() => setSidebarOpen(!sidebarOpen)} className="hover:bg-gray-100 hidden md:flex">
-                            {sidebarOpen ? <ChevronLeft className="w-5 h-5 text-purple-600" /> : <Menu className="w-5 h-5 text-purple-600" />}
-                        </Button>
+                    <div className="flex items-center gap-2">
                         <Link to={createPageUrl('Home')} className="flex items-center gap-3 hover:opacity-80">
                             <img src={LOGO_URL} alt="1cPublishing" className="h-10 w-10 object-contain" />
                             <div className="hidden sm:block">
@@ -1370,16 +1364,21 @@ export default function Markets() {
                             <span className="hidden md:inline">Refresh</span>
                         </Button>
                         <span className="text-sm text-gray-500 hidden md:block">{stocks.length} stocks</span>
+                        <Button variant="ghost" size="icon" onClick={() => setSidebarOpen(!sidebarOpen)} className="hover:bg-gray-100">
+                            {sidebarOpen ? <ChevronLeft className="w-5 h-5 text-purple-600" /> : <Menu className="w-5 h-5 text-purple-600" />}
+                        </Button>
                     </div>
-                </div>
+                    </div>
 
-                <StockTicker stocks={topMovers} />
             </header>
-
+            
+            {/* Ticker below header, not overlapping sidebar */}
+            <div className="sticky top-[72px] z-30 bg-gray-100 border-b border-gray-200">
+                <StockTicker stocks={topMovers} />
             <div className="flex flex-1">
                 {sidebarOpen && <div className="fixed inset-0 bg-black/50 z-40 md:hidden" onClick={() => setSidebarOpen(false)} />}
 
-                <aside className={`${sidebarOpen ? 'w-64 translate-x-0' : 'w-0 -translate-x-full md:translate-x-0'} transition-all duration-300 overflow-hidden bg-white border-r border-gray-200 flex-shrink-0 fixed md:relative z-50 md:z-auto h-[calc(100vh-120px)] md:h-auto`}>
+                <aside className={`${sidebarOpen ? 'w-64 translate-x-0' : 'w-0 -translate-x-full md:translate-x-0'} transition-all duration-300 overflow-hidden bg-white border-r border-gray-200 flex-shrink-0 fixed md:relative z-40 md:z-auto h-[calc(100vh-120px)] md:h-auto top-[120px] md:top-0`}>
                     <nav className="p-4 space-y-2">
                         {menuItems.map((item, index) => (
                             <Link key={index} to={item.href} onClick={() => window.innerWidth < 768 && setSidebarOpen(false)} className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-colors ${item.label === 'Markets' ? 'bg-purple-100 text-purple-700' : 'text-gray-700 hover:bg-purple-50 hover:text-purple-600'}`}>

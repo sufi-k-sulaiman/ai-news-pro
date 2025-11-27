@@ -2,10 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { base44 } from "@/api/base44Client";
-import { 
-    Play, Pause, X, Loader2, Target, Zap, Trophy, Heart, Clock, 
-    Crosshair, Volume2, VolumeX, RotateCcw, ChevronRight, Lock
-} from 'lucide-react';
+import { X, Loader2, Award, Trophy, Target } from 'lucide-react';
 
 const TOPICS = {
     programming: [
@@ -39,29 +36,35 @@ const TOPICS = {
 };
 
 export default function SpaceBattleGame({ onExit }) {
-    const [screen, setScreen] = useState('menu'); // menu, loading, game
+    const [screen, setScreen] = useState('menu');
     const [activeCategory, setActiveCategory] = useState('programming');
-    const [enemyData, setEnemyData] = useState([]);
+    const [questions, setQuestions] = useState([]);
+    const [currentQuestion, setCurrentQuestion] = useState(0);
+    const [score, setScore] = useState(0);
     const [loading, setLoading] = useState(false);
-    const [currentLevel, setCurrentLevel] = useState(1);
-    const [unlockedLevels, setUnlockedLevels] = useState([1]);
+    const [selectedTopic, setSelectedTopic] = useState(null);
+    const [awards, setAwards] = useState([]);
+    const [showQuestion, setShowQuestion] = useState(false);
     const canvasRef = useRef(null);
     const gameStateRef = useRef(null);
 
-    const generateEnemyData = async (topic) => {
+    const generateQuestions = async (topic) => {
         setLoading(true);
         setScreen('loading');
+        setSelectedTopic(topic);
         try {
             const result = await base44.integrations.Core.InvokeLLM({
-                prompt: `Generate 20 educational terms for: "${topic}". Each should have a term, definition, and fun fact. Return as JSON: { "enemies": [{ "term": "Algorithm", "definition": "Step-by-step procedure", "funFact": "The word comes from mathematician Al-Khwarizmi" }] }`,
+                prompt: `Generate 15 educational Yes/No questions for: "${topic}". Each question should test knowledge. Return as JSON: { "questions": [{ "question": "Is Python a programming language?", "answer": true, "explanation": "Python is indeed a high-level programming language" }] }`,
                 response_json_schema: {
                     type: "object",
                     properties: {
-                        enemies: { type: "array", items: { type: "object", properties: { term: { type: "string" }, definition: { type: "string" }, funFact: { type: "string" } } } }
+                        questions: { type: "array", items: { type: "object", properties: { question: { type: "string" }, answer: { type: "boolean" }, explanation: { type: "string" } } } }
                     }
                 }
             });
-            setEnemyData(result.enemies || []);
+            setQuestions(result.questions || []);
+            setCurrentQuestion(0);
+            setScore(0);
             setScreen('game');
         } catch (error) {
             console.error('Failed to generate:', error);
@@ -71,17 +74,14 @@ export default function SpaceBattleGame({ onExit }) {
         }
     };
 
-    const handleStartGame = (topic) => {
-        generateEnemyData(topic.topic);
-    };
-
-    // Canvas game loop
+    // FPS Canvas rendering with parallax
     useEffect(() => {
-        if (screen !== 'game' || !canvasRef.current || enemyData.length === 0) return;
+        if (screen !== 'game' || !canvasRef.current) return;
 
         const canvas = canvasRef.current;
         const ctx = canvas.getContext('2d');
         let animationId;
+        let time = 0;
 
         const resize = () => {
             canvas.width = window.innerWidth;
@@ -90,437 +90,224 @@ export default function SpaceBattleGame({ onExit }) {
         resize();
         window.addEventListener('resize', resize);
 
-        // Game state
+        // Game state for FPS world
         const state = {
-            mouseX: canvas.width / 2,
-            mouseY: canvas.height / 2,
-            score: 0,
-            combo: 0,
-            health: 100,
-            ammo: 30,
-            maxAmmo: 30,
-            reloading: false,
-            reloadTime: 0,
+            playerX: 0,
+            playerY: 0,
+            lookAngle: 0,
+            targetX: 0,
+            targetY: 0,
             enemies: [],
-            bullets: [],
             particles: [],
-            explosions: [],
-            floatingTexts: [],
-            enemyQueue: [...enemyData].sort(() => Math.random() - 0.5),
-            spawnTimer: 0,
-            gameOver: false,
-            paused: false,
-            kills: 0,
-            time: 120,
-            lastTime: Date.now(),
-            muzzleFlash: 0,
-            screenShake: 0,
-            damageFlash: 0,
+            radarBlips: [],
         };
         gameStateRef.current = state;
 
-        // Event handlers
+        // Spawn enemies at different depths
+        const spawnEnemies = () => {
+            state.enemies = [];
+            for (let i = 0; i < 5; i++) {
+                state.enemies.push({
+                    x: (Math.random() - 0.5) * 800,
+                    y: 100 + Math.random() * 300,
+                    z: 200 + i * 150,
+                    type: ['tank', 'helicopter', 'drone'][Math.floor(Math.random() * 3)],
+                    vx: (Math.random() - 0.5) * 2,
+                });
+            }
+            // Radar blips
+            state.radarBlips = state.enemies.map(e => ({
+                angle: Math.atan2(e.x, e.z),
+                dist: Math.sqrt(e.x * e.x + e.z * e.z) / 1000,
+            }));
+        };
+        spawnEnemies();
+
         const handleMouseMove = (e) => {
-            state.mouseX = e.clientX;
-            state.mouseY = e.clientY;
-        };
-
-        const handleClick = (e) => {
-            if (state.gameOver || state.paused) return;
-            if (state.reloading) return;
-            if (state.ammo <= 0) {
-                state.reloading = true;
-                state.reloadTime = 60;
-                return;
-            }
-
-            state.ammo--;
-            state.muzzleFlash = 5;
-            state.screenShake = 3;
-
-            // Check hit
-            const hitEnemy = state.enemies.find(enemy => {
-                const dx = e.clientX - enemy.x;
-                const dy = e.clientY - enemy.y;
-                return Math.sqrt(dx * dx + dy * dy) < enemy.size;
-            });
-
-            if (hitEnemy) {
-                hitEnemy.health--;
-                // Hit particles
-                for (let i = 0; i < 10; i++) {
-                    state.particles.push({
-                        x: hitEnemy.x, y: hitEnemy.y,
-                        vx: (Math.random() - 0.5) * 10,
-                        vy: (Math.random() - 0.5) * 10,
-                        life: 30, color: '#ff4444', size: 3
-                    });
-                }
-
-                if (hitEnemy.health <= 0) {
-                    // Explosion
-                    state.explosions.push({ x: hitEnemy.x, y: hitEnemy.y, radius: 0, maxRadius: 80, life: 30 });
-                    
-                    // Show knowledge
-                    state.floatingTexts.push({
-                        x: hitEnemy.x, y: hitEnemy.y - 50,
-                        text: hitEnemy.data.term,
-                        subtext: hitEnemy.data.definition,
-                        fact: hitEnemy.data.funFact,
-                        life: 180, vy: -1, size: 24
-                    });
-
-                    state.combo++;
-                    state.score += 100 * state.combo;
-                    state.kills++;
-                    state.enemies = state.enemies.filter(e => e !== hitEnemy);
-
-                    // Spawn more particles
-                    for (let i = 0; i < 30; i++) {
-                        const angle = (Math.PI * 2 * i) / 30;
-                        state.particles.push({
-                            x: hitEnemy.x, y: hitEnemy.y,
-                            vx: Math.cos(angle) * (5 + Math.random() * 5),
-                            vy: Math.sin(angle) * (5 + Math.random() * 5),
-                            life: 40, color: hitEnemy.color, size: 4
-                        });
-                    }
-                }
-            } else {
-                state.combo = 0;
-            }
-
-            // Bullet trail
-            state.bullets.push({
-                x1: canvas.width / 2, y1: canvas.height - 50,
-                x2: e.clientX, y2: e.clientY, life: 5
-            });
-        };
-
-        const handleKeyDown = (e) => {
-            if (e.key === 'r' || e.key === 'R') {
-                if (!state.reloading && state.ammo < state.maxAmmo) {
-                    state.reloading = true;
-                    state.reloadTime = 60;
-                }
-            }
-            if (e.key === 'p' || e.key === 'P') state.paused = !state.paused;
-            if (e.key === 'Escape') onExit();
+            state.targetX = e.clientX;
+            state.targetY = e.clientY;
+            state.lookAngle = (e.clientX - canvas.width / 2) / canvas.width * 0.5;
         };
 
         window.addEventListener('mousemove', handleMouseMove);
-        window.addEventListener('click', handleClick);
-        window.addEventListener('keydown', handleKeyDown);
 
-        // Spawn enemy
-        const spawnEnemy = () => {
-            if (state.enemyQueue.length === 0) return;
-            const data = state.enemyQueue.shift();
-            const colors = ['#ef4444', '#f59e0b', '#22c55e', '#3b82f6', '#8b5cf6', '#ec4899'];
-            const side = Math.floor(Math.random() * 4);
-            let x, y;
-            if (side === 0) { x = Math.random() * canvas.width; y = -50; }
-            else if (side === 1) { x = canvas.width + 50; y = Math.random() * canvas.height * 0.7; }
-            else if (side === 2) { x = Math.random() * canvas.width; y = -50; }
-            else { x = -50; y = Math.random() * canvas.height * 0.7; }
-
-            state.enemies.push({
-                x, y,
-                targetX: canvas.width / 2 + (Math.random() - 0.5) * 400,
-                targetY: canvas.height / 2 + (Math.random() - 0.5) * 200,
-                size: 40 + Math.random() * 20,
-                health: 2,
-                maxHealth: 2,
-                speed: 1 + Math.random() * 2,
-                color: colors[Math.floor(Math.random() * colors.length)],
-                data,
-                wobble: Math.random() * Math.PI * 2,
-            });
-        };
-
-        // Game loop
         const gameLoop = () => {
-            const now = Date.now();
-            const dt = (now - state.lastTime) / 1000;
-            state.lastTime = now;
+            time += 0.016;
+            const w = canvas.width;
+            const h = canvas.height;
 
-            if (!state.paused && !state.gameOver) {
-                state.time -= dt;
-                if (state.time <= 0) state.gameOver = true;
-            }
+            // Dark blue gradient sky
+            const skyGrad = ctx.createLinearGradient(0, 0, 0, h * 0.6);
+            skyGrad.addColorStop(0, '#0a1628');
+            skyGrad.addColorStop(1, '#1a2d4a');
+            ctx.fillStyle = skyGrad;
+            ctx.fillRect(0, 0, w, h);
 
-            // Clear with slight trail
-            ctx.fillStyle = 'rgba(10, 10, 20, 0.3)';
-            ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-            // Damage flash
-            if (state.damageFlash > 0) {
-                ctx.fillStyle = `rgba(255, 0, 0, ${state.damageFlash / 20})`;
-                ctx.fillRect(0, 0, canvas.width, canvas.height);
-                state.damageFlash--;
-            }
-
-            // Screen shake
-            if (state.screenShake > 0) {
-                ctx.save();
-                ctx.translate((Math.random() - 0.5) * state.screenShake * 2, (Math.random() - 0.5) * state.screenShake * 2);
-                state.screenShake--;
-            }
-
-            if (!state.paused && !state.gameOver) {
-                // Reload
-                if (state.reloading) {
-                    state.reloadTime--;
-                    if (state.reloadTime <= 0) {
-                        state.ammo = state.maxAmmo;
-                        state.reloading = false;
-                    }
-                }
-
-                // Spawn
-                state.spawnTimer++;
-                if (state.spawnTimer > 90 && state.enemies.length < 8 && state.enemyQueue.length > 0) {
-                    spawnEnemy();
-                    state.spawnTimer = 0;
-                }
-
-                // Update enemies
-                state.enemies.forEach(enemy => {
-                    enemy.wobble += 0.05;
-                    const dx = enemy.targetX - enemy.x;
-                    const dy = enemy.targetY - enemy.y;
-                    enemy.x += dx * 0.02 + Math.sin(enemy.wobble) * 2;
-                    enemy.y += dy * 0.02 + Math.cos(enemy.wobble) * 1;
-
-                    // Enemy attacks when close to center
-                    if (Math.abs(enemy.x - canvas.width/2) < 100 && Math.abs(enemy.y - canvas.height/2) < 100) {
-                        state.health -= 0.1;
-                        state.damageFlash = 10;
-                        if (state.health <= 0) state.gameOver = true;
-                    }
-                });
-            }
-
-            // Draw doom-style corridor effect
-            const gradient = ctx.createRadialGradient(canvas.width/2, canvas.height/2, 0, canvas.width/2, canvas.height/2, canvas.width);
-            gradient.addColorStop(0, 'rgba(30, 30, 50, 0.3)');
-            gradient.addColorStop(1, 'rgba(0, 0, 0, 0.8)');
-            ctx.fillStyle = gradient;
-            ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-            // Draw floor grid
-            ctx.strokeStyle = 'rgba(100, 100, 150, 0.2)';
-            ctx.lineWidth = 1;
-            for (let i = 0; i < 20; i++) {
-                const y = canvas.height * 0.6 + i * 20;
-                const perspective = i / 20;
+            // Stars (far background - slow parallax)
+            ctx.fillStyle = '#ffffff';
+            for (let i = 0; i < 50; i++) {
+                const sx = ((i * 137 + state.lookAngle * 20) % w + w) % w;
+                const sy = (i * 73) % (h * 0.4);
+                ctx.globalAlpha = 0.3 + Math.sin(time + i) * 0.2;
                 ctx.beginPath();
-                ctx.moveTo(canvas.width * 0.2 * (1 - perspective), y);
-                ctx.lineTo(canvas.width * (0.8 + 0.2 * perspective), y);
-                ctx.stroke();
-            }
-
-            // Draw enemies
-            state.enemies.forEach(enemy => {
-                // Shadow
-                ctx.fillStyle = 'rgba(0, 0, 0, 0.3)';
-                ctx.beginPath();
-                ctx.ellipse(enemy.x, enemy.y + enemy.size * 0.8, enemy.size * 0.6, enemy.size * 0.2, 0, 0, Math.PI * 2);
+                ctx.arc(sx, sy, 1, 0, Math.PI * 2);
                 ctx.fill();
+            }
+            ctx.globalAlpha = 1;
 
-                // Enemy body (demon-like)
-                const glow = ctx.createRadialGradient(enemy.x, enemy.y, 0, enemy.x, enemy.y, enemy.size);
-                glow.addColorStop(0, enemy.color);
-                glow.addColorStop(0.5, enemy.color);
-                glow.addColorStop(1, 'rgba(0,0,0,0)');
-                ctx.fillStyle = glow;
-                ctx.beginPath();
-                ctx.arc(enemy.x, enemy.y, enemy.size, 0, Math.PI * 2);
-                ctx.fill();
-
-                // Eyes
-                ctx.fillStyle = '#fff';
-                ctx.beginPath();
-                ctx.arc(enemy.x - enemy.size * 0.3, enemy.y - enemy.size * 0.2, enemy.size * 0.15, 0, Math.PI * 2);
-                ctx.arc(enemy.x + enemy.size * 0.3, enemy.y - enemy.size * 0.2, enemy.size * 0.15, 0, Math.PI * 2);
-                ctx.fill();
-                ctx.fillStyle = '#000';
-                ctx.beginPath();
-                ctx.arc(enemy.x - enemy.size * 0.3, enemy.y - enemy.size * 0.2, enemy.size * 0.08, 0, Math.PI * 2);
-                ctx.arc(enemy.x + enemy.size * 0.3, enemy.y - enemy.size * 0.2, enemy.size * 0.08, 0, Math.PI * 2);
-                ctx.fill();
-
-                // Health bar
-                ctx.fillStyle = '#333';
-                ctx.fillRect(enemy.x - 25, enemy.y - enemy.size - 15, 50, 6);
-                ctx.fillStyle = enemy.health > 1 ? '#22c55e' : '#ef4444';
-                ctx.fillRect(enemy.x - 25, enemy.y - enemy.size - 15, 50 * (enemy.health / enemy.maxHealth), 6);
-
-                // Term label
-                ctx.fillStyle = '#fff';
-                ctx.font = 'bold 14px Arial';
-                ctx.textAlign = 'center';
-                ctx.fillText(enemy.data.term, enemy.x, enemy.y + enemy.size + 20);
-            });
-
-            // Draw explosions
-            state.explosions = state.explosions.filter(exp => {
-                exp.radius += 5;
-                exp.life--;
-                ctx.strokeStyle = `rgba(255, 200, 50, ${exp.life / 30})`;
-                ctx.lineWidth = 3;
-                ctx.beginPath();
-                ctx.arc(exp.x, exp.y, exp.radius, 0, Math.PI * 2);
-                ctx.stroke();
-                return exp.life > 0;
-            });
-
-            // Draw particles
-            state.particles = state.particles.filter(p => {
-                p.x += p.vx;
-                p.y += p.vy;
-                p.vy += 0.2;
-                p.life--;
-                ctx.fillStyle = p.color;
-                ctx.globalAlpha = p.life / 40;
-                ctx.beginPath();
-                ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
-                ctx.fill();
-                ctx.globalAlpha = 1;
-                return p.life > 0;
-            });
-
-            // Draw bullet trails
-            state.bullets = state.bullets.filter(b => {
-                b.life--;
-                ctx.strokeStyle = `rgba(255, 255, 100, ${b.life / 5})`;
-                ctx.lineWidth = 2;
-                ctx.beginPath();
-                ctx.moveTo(b.x1, b.y1);
-                ctx.lineTo(b.x2, b.y2);
-                ctx.stroke();
-                return b.life > 0;
-            });
-
-            // Draw floating texts (knowledge popups)
-            state.floatingTexts = state.floatingTexts.filter(ft => {
-                ft.y += ft.vy;
-                ft.life--;
-                const alpha = Math.min(1, ft.life / 60);
-                
-                // Background
-                ctx.fillStyle = `rgba(0, 0, 0, ${alpha * 0.8})`;
-                ctx.fillRect(ft.x - 150, ft.y - 40, 300, 100);
-                ctx.strokeStyle = `rgba(100, 200, 255, ${alpha})`;
-                ctx.lineWidth = 2;
-                ctx.strokeRect(ft.x - 150, ft.y - 40, 300, 100);
-
-                // Text
-                ctx.fillStyle = `rgba(100, 200, 255, ${alpha})`;
-                ctx.font = 'bold 18px Arial';
-                ctx.textAlign = 'center';
-                ctx.fillText(ft.text, ft.x, ft.y - 15);
-                
-                ctx.fillStyle = `rgba(200, 200, 200, ${alpha})`;
-                ctx.font = '12px Arial';
-                ctx.fillText(ft.subtext?.slice(0, 50) + '...', ft.x, ft.y + 5);
-                
-                ctx.fillStyle = `rgba(255, 200, 100, ${alpha})`;
-                ctx.font = 'italic 11px Arial';
-                ctx.fillText('💡 ' + (ft.fact?.slice(0, 45) || '') + '...', ft.x, ft.y + 25);
-
-                return ft.life > 0;
-            });
-
-            // Draw weapon/crosshair
-            ctx.save();
-            ctx.translate(state.mouseX, state.mouseY);
-
-            // Crosshair
-            ctx.strokeStyle = state.reloading ? '#ff4444' : '#00ff00';
-            ctx.lineWidth = 2;
+            // Mountains (mid background - medium parallax)
+            const mountainParallax = state.lookAngle * 100;
+            ctx.fillStyle = '#1a2d4a';
             ctx.beginPath();
-            ctx.arc(0, 0, 20, 0, Math.PI * 2);
-            ctx.stroke();
-            ctx.beginPath();
-            ctx.moveTo(-30, 0); ctx.lineTo(-10, 0);
-            ctx.moveTo(30, 0); ctx.lineTo(10, 0);
-            ctx.moveTo(0, -30); ctx.lineTo(0, -10);
-            ctx.moveTo(0, 30); ctx.lineTo(0, 10);
-            ctx.stroke();
-            ctx.fillStyle = '#ff0000';
-            ctx.beginPath();
-            ctx.arc(0, 0, 3, 0, Math.PI * 2);
+            ctx.moveTo(-100 + mountainParallax, h * 0.55);
+            for (let x = -100; x <= w + 100; x += 80) {
+                const peakH = 50 + Math.sin(x * 0.01) * 30 + Math.cos(x * 0.02) * 20;
+                ctx.lineTo(x + mountainParallax, h * 0.55 - peakH);
+            }
+            ctx.lineTo(w + 100 + mountainParallax, h * 0.55);
+            ctx.closePath();
             ctx.fill();
-            ctx.restore();
 
-            // Muzzle flash
-            if (state.muzzleFlash > 0) {
-                ctx.fillStyle = `rgba(255, 200, 50, ${state.muzzleFlash / 5})`;
+            // Closer mountains (faster parallax)
+            const mountain2Parallax = state.lookAngle * 200;
+            ctx.fillStyle = '#243b55';
+            ctx.beginPath();
+            ctx.moveTo(-100 + mountain2Parallax, h * 0.6);
+            for (let x = -100; x <= w + 100; x += 60) {
+                const peakH = 30 + Math.sin(x * 0.015 + 1) * 25;
+                ctx.lineTo(x + mountain2Parallax, h * 0.6 - peakH);
+            }
+            ctx.lineTo(w + 100 + mountain2Parallax, h * 0.6);
+            ctx.closePath();
+            ctx.fill();
+
+            // Ground plane with perspective grid
+            const groundY = h * 0.6;
+            const groundGrad = ctx.createLinearGradient(0, groundY, 0, h);
+            groundGrad.addColorStop(0, '#1a2d4a');
+            groundGrad.addColorStop(1, '#0d1a2d');
+            ctx.fillStyle = groundGrad;
+            ctx.fillRect(0, groundY, w, h - groundY);
+
+            // Perspective grid lines
+            ctx.strokeStyle = 'rgba(50, 100, 150, 0.3)';
+            ctx.lineWidth = 1;
+            const vanishY = groundY;
+            const vanishX = w / 2 - state.lookAngle * 500;
+
+            // Horizontal lines with perspective
+            for (let i = 1; i <= 15; i++) {
+                const y = groundY + (i / 15) * (h - groundY) * 0.9;
+                const perspective = (y - groundY) / (h - groundY);
+                const leftX = vanishX - (vanishX + 200) * perspective;
+                const rightX = vanishX + (w - vanishX + 200) * perspective;
+                ctx.globalAlpha = 0.1 + perspective * 0.3;
                 ctx.beginPath();
-                ctx.arc(canvas.width / 2, canvas.height - 30, 30, 0, Math.PI * 2);
-                ctx.fill();
-                state.muzzleFlash--;
+                ctx.moveTo(leftX, y);
+                ctx.lineTo(rightX, y);
+                ctx.stroke();
             }
 
-            // Gun at bottom
-            ctx.fillStyle = '#333';
-            ctx.fillRect(canvas.width / 2 - 40, canvas.height - 80, 80, 100);
-            ctx.fillStyle = '#555';
-            ctx.fillRect(canvas.width / 2 - 30, canvas.height - 120, 60, 50);
-
-            if (state.screenShake > 0) ctx.restore();
-
-            // HUD
-            ctx.fillStyle = '#fff';
-            ctx.font = 'bold 24px Arial';
-            ctx.textAlign = 'left';
-            ctx.fillText(`SCORE: ${state.score}`, 20, 40);
-            ctx.fillText(`COMBO: x${state.combo}`, 20, 70);
-            ctx.fillText(`TIME: ${Math.ceil(state.time)}s`, 20, 100);
-            ctx.fillText(`KILLS: ${state.kills}/${enemyData.length}`, 20, 130);
-
-            // Health bar
-            ctx.fillStyle = '#333';
-            ctx.fillRect(canvas.width - 220, 20, 200, 20);
-            ctx.fillStyle = state.health > 30 ? '#22c55e' : '#ef4444';
-            ctx.fillRect(canvas.width - 220, 20, 200 * (state.health / 100), 20);
-            ctx.fillStyle = '#fff';
-            ctx.font = '14px Arial';
-            ctx.textAlign = 'right';
-            ctx.fillText(`HEALTH: ${Math.ceil(state.health)}%`, canvas.width - 20, 55);
-
-            // Ammo
-            ctx.fillText(`AMMO: ${state.ammo}/${state.maxAmmo}${state.reloading ? ' RELOADING...' : ''}`, canvas.width - 20, 80);
-
-            // Pause/Game Over overlay
-            if (state.paused) {
-                ctx.fillStyle = 'rgba(0, 0, 0, 0.8)';
-                ctx.fillRect(0, 0, canvas.width, canvas.height);
-                ctx.fillStyle = '#fff';
-                ctx.font = 'bold 60px Arial';
-                ctx.textAlign = 'center';
-                ctx.fillText('PAUSED', canvas.width / 2, canvas.height / 2 - 20);
-                ctx.font = '24px Arial';
-                ctx.fillText('Press P to resume | ESC to exit', canvas.width / 2, canvas.height / 2 + 30);
+            // Vertical lines converging to vanishing point
+            for (let i = -10; i <= 10; i++) {
+                const baseX = vanishX + i * 150;
+                ctx.beginPath();
+                ctx.moveTo(vanishX, vanishY);
+                ctx.lineTo(baseX, h);
+                ctx.stroke();
             }
+            ctx.globalAlpha = 1;
 
-            if (state.gameOver) {
-                ctx.fillStyle = 'rgba(0, 0, 0, 0.9)';
-                ctx.fillRect(0, 0, canvas.width, canvas.height);
-                ctx.fillStyle = '#ef4444';
-                ctx.font = 'bold 60px Arial';
-                ctx.textAlign = 'center';
-                ctx.fillText('MISSION COMPLETE', canvas.width / 2, canvas.height / 2 - 60);
-                ctx.fillStyle = '#3b82f6';
-                ctx.font = 'bold 36px Arial';
-                ctx.fillText(`Final Score: ${state.score}`, canvas.width / 2, canvas.height / 2);
-                ctx.fillText(`Enemies Defeated: ${state.kills}`, canvas.width / 2, canvas.height / 2 + 50);
-                ctx.fillStyle = '#888';
-                ctx.font = '24px Arial';
-                ctx.fillText('Press ESC to return', canvas.width / 2, canvas.height / 2 + 120);
-                return;
-            }
+            // Draw enemies with 3D perspective
+            state.enemies.forEach((enemy, idx) => {
+                enemy.x += enemy.vx;
+                if (Math.abs(enemy.x) > 500) enemy.vx *= -1;
+
+                // Project 3D to 2D with perspective
+                const fov = 500;
+                const scale = fov / (enemy.z + fov);
+                const screenX = w / 2 + (enemy.x - state.lookAngle * enemy.z) * scale;
+                const screenY = groundY - enemy.y * scale;
+                const size = 60 * scale;
+
+                if (scale > 0.1 && screenX > -100 && screenX < w + 100) {
+                    // Shadow on ground
+                    ctx.fillStyle = 'rgba(0, 0, 0, 0.3)';
+                    ctx.beginPath();
+                    ctx.ellipse(screenX, groundY + 10 * scale, size * 0.5, size * 0.15, 0, 0, Math.PI * 2);
+                    ctx.fill();
+
+                    // Draw enemy based on type
+                    if (enemy.type === 'tank') {
+                        drawTank(ctx, screenX, screenY, size);
+                    } else if (enemy.type === 'helicopter') {
+                        drawHelicopter(ctx, screenX, screenY - size * 0.5, size, time);
+                    } else {
+                        drawDrone(ctx, screenX, screenY - size * 0.3, size * 0.6, time);
+                    }
+                }
+            });
+
+            // Draw crosshair/targeting reticle
+            const cx = w / 2;
+            const cy = h / 2 - 50;
+            ctx.strokeStyle = '#00ffff';
+            ctx.lineWidth = 2;
+            
+            // Outer brackets
+            ctx.beginPath();
+            ctx.moveTo(cx - 40, cy - 30); ctx.lineTo(cx - 40, cy - 40); ctx.lineTo(cx - 30, cy - 40);
+            ctx.moveTo(cx + 30, cy - 40); ctx.lineTo(cx + 40, cy - 40); ctx.lineTo(cx + 40, cy - 30);
+            ctx.moveTo(cx + 40, cy + 30); ctx.lineTo(cx + 40, cy + 40); ctx.lineTo(cx + 30, cy + 40);
+            ctx.moveTo(cx - 30, cy + 40); ctx.lineTo(cx - 40, cy + 40); ctx.lineTo(cx - 40, cy + 30);
+            ctx.stroke();
+
+            // Center dot
+            ctx.fillStyle = '#ff3333';
+            ctx.beginPath();
+            ctx.arc(cx, cy, 4, 0, Math.PI * 2);
+            ctx.fill();
+
+            // Crosshair lines
+            ctx.strokeStyle = '#00ffff';
+            ctx.globalAlpha = 0.5;
+            ctx.beginPath();
+            ctx.moveTo(cx - 20, cy); ctx.lineTo(cx - 8, cy);
+            ctx.moveTo(cx + 8, cy); ctx.lineTo(cx + 20, cy);
+            ctx.moveTo(cx, cy - 20); ctx.lineTo(cx, cy - 8);
+            ctx.moveTo(cx, cy + 8); ctx.lineTo(cx, cy + 20);
+            ctx.stroke();
+            ctx.globalAlpha = 1;
+
+            // Draw scale/distance markers
+            ctx.fillStyle = '#00ffff';
+            ctx.font = '12px monospace';
+            ctx.textAlign = 'center';
+            ctx.fillText('10', cx - 60, cy + 70);
+            ctx.fillText('10', cx + 60, cy + 70);
+            
+            // Vertical scale line
+            ctx.strokeStyle = '#00ffff';
+            ctx.lineWidth = 1;
+            ctx.beginPath();
+            ctx.moveTo(cx, cy + 50);
+            ctx.lineTo(cx, cy + 80);
+            ctx.stroke();
+
+            // Draw radar (bottom left)
+            drawRadar(ctx, 120, h - 150, 100, state.radarBlips, time);
+
+            // Draw compass (top right)
+            drawCompass(ctx, w - 100, 100, 60, state.lookAngle);
+
+            // Draw score gauge (top right)
+            drawScoreGauge(ctx, w - 200, 100, 50, score, questions.length);
+
+            // Draw awards section
+            drawAwards(ctx, 250, 80);
+
+            // Draw topic buttons (left side)
+            drawTopicButtons(ctx, 30, 80, selectedTopic);
 
             animationId = requestAnimationFrame(gameLoop);
         };
@@ -530,29 +317,95 @@ export default function SpaceBattleGame({ onExit }) {
         return () => {
             window.removeEventListener('resize', resize);
             window.removeEventListener('mousemove', handleMouseMove);
-            window.removeEventListener('click', handleClick);
-            window.removeEventListener('keydown', handleKeyDown);
             cancelAnimationFrame(animationId);
         };
-    }, [screen, enemyData, onExit]);
+    }, [screen, score, questions.length, selectedTopic]);
+
+    const handleAnswer = (answer) => {
+        const correct = questions[currentQuestion]?.answer === answer;
+        if (correct) {
+            setScore(s => s + 1);
+            if (score + 1 === 5) setAwards(a => [...a, 'bronze']);
+            if (score + 1 === 10) setAwards(a => [...a, 'silver']);
+            if (score + 1 === 15) setAwards(a => [...a, 'gold']);
+        }
+        
+        if (currentQuestion < questions.length - 1) {
+            setCurrentQuestion(c => c + 1);
+        } else {
+            setScreen('results');
+        }
+    };
 
     if (screen === 'loading') {
         return (
-            <div className="fixed inset-0 flex items-center justify-center bg-black z-[9999]">
+            <div className="fixed inset-0 flex items-center justify-center bg-[#0a1628] z-[9999]">
                 <div className="text-center">
-                    <Loader2 className="w-20 h-20 animate-spin mx-auto mb-6 text-red-500" />
-                    <h2 className="text-3xl font-bold mb-2 text-white">Generating Enemies...</h2>
-                    <p className="text-lg text-gray-400">AI is creating your battle arena</p>
+                    <Loader2 className="w-20 h-20 animate-spin mx-auto mb-6 text-cyan-400" />
+                    <h2 className="text-3xl font-bold mb-2 text-white">Initializing Battle Zone...</h2>
+                    <p className="text-lg text-gray-400">AI is generating your mission</p>
                 </div>
             </div>
         );
     }
 
-    if (screen === 'game') {
+    if (screen === 'results') {
         return (
-            <div className="fixed inset-0 bg-black z-[9999] cursor-none">
-                <canvas ref={canvasRef} className="block w-full h-full" />
-                <Button onClick={onExit} className="absolute top-4 right-4 bg-red-600 hover:bg-red-700" size="sm">
+            <div className="fixed inset-0 bg-[#0a1628] z-[9999] flex items-center justify-center">
+                <Card className="p-10 bg-[#1a2d4a] border-cyan-500/50 text-center max-w-lg">
+                    <Trophy className="w-24 h-24 mx-auto mb-6 text-yellow-400" />
+                    <h2 className="text-4xl font-bold text-white mb-4">Mission Complete!</h2>
+                    <p className="text-2xl text-cyan-400 mb-6">Score: {score}/{questions.length}</p>
+                    <div className="flex justify-center gap-4 mb-8">
+                        {awards.includes('gold') && <Award className="w-12 h-12 text-yellow-400" />}
+                        {awards.includes('silver') && <Award className="w-12 h-12 text-gray-300" />}
+                        {awards.includes('bronze') && <Award className="w-12 h-12 text-amber-600" />}
+                    </div>
+                    <div className="flex gap-4">
+                        <Button onClick={() => setScreen('menu')} className="flex-1 bg-gray-700">
+                            New Mission
+                        </Button>
+                        <Button onClick={onExit} className="flex-1 bg-cyan-600">
+                            Exit
+                        </Button>
+                    </div>
+                </Card>
+            </div>
+        );
+    }
+
+    if (screen === 'game') {
+        const q = questions[currentQuestion];
+        return (
+            <div className="fixed inset-0 bg-[#0a1628] z-[9999]">
+                <canvas ref={canvasRef} className="absolute inset-0" />
+                
+                {/* Question panel */}
+                <div className="absolute bottom-8 left-1/2 -translate-x-1/2 w-full max-w-2xl px-4">
+                    <Card className="p-6 bg-[#0d1a2d]/95 border border-cyan-500/30 backdrop-blur">
+                        <div className="flex justify-between items-center mb-4">
+                            <span className="text-cyan-400 font-bold">Technical Track</span>
+                            <span className="text-gray-400">Question {currentQuestion + 1}</span>
+                        </div>
+                        <h3 className="text-xl text-white mb-6">{q?.question}</h3>
+                        <div className="flex gap-4">
+                            <Button 
+                                onClick={() => handleAnswer(false)}
+                                className="flex-1 h-14 text-lg border-2 border-red-500/50 bg-transparent hover:bg-red-500/20 text-red-400"
+                            >
+                                No
+                            </Button>
+                            <Button 
+                                onClick={() => handleAnswer(true)}
+                                className="flex-1 h-14 text-lg border-2 border-green-500/50 bg-transparent hover:bg-green-500/20 text-green-400"
+                            >
+                                Yes
+                            </Button>
+                        </div>
+                    </Card>
+                </div>
+
+                <Button onClick={onExit} className="absolute top-4 right-4 bg-red-600/80 hover:bg-red-700">
                     <X className="w-4 h-4 mr-1" /> Exit
                 </Button>
             </div>
@@ -561,32 +414,34 @@ export default function SpaceBattleGame({ onExit }) {
 
     // Menu screen
     return (
-        <div className="fixed inset-0 bg-gradient-to-b from-gray-900 via-red-950 to-black z-[9999] overflow-auto p-8">
+        <div className="fixed inset-0 bg-gradient-to-b from-[#0a1628] to-[#1a2d4a] z-[9999] overflow-auto p-8">
             <Button onClick={onExit} className="absolute top-4 right-4 bg-red-600 hover:bg-red-700">
                 <X className="w-4 h-4 mr-2" /> Close
             </Button>
 
             <div className="max-w-5xl mx-auto">
                 <div className="text-center mb-10">
-                    <div className="text-6xl mb-6">🔫</div>
-                    <h1 className="text-5xl font-black text-white mb-4" style={{ textShadow: '0 0 40px rgba(239, 68, 68, 0.5)' }}>KNOWLEDGE DOOM</h1>
-                    <p className="text-xl text-gray-400">First-Person Educational Shooter</p>
+                    <div className="text-6xl mb-6">🎯</div>
+                    <h1 className="text-5xl font-black text-white mb-4" style={{ textShadow: '0 0 40px rgba(0, 255, 255, 0.5)' }}>
+                        TACTICAL KNOWLEDGE
+                    </h1>
+                    <p className="text-xl text-cyan-400">First-Person Educational Combat</p>
                 </div>
 
-                <Card className="p-6 mb-8 bg-gray-900/80 border-red-500/50">
+                <Card className="p-6 mb-8 bg-[#1a2d4a]/80 border-cyan-500/30">
                     <div className="flex gap-2 mb-6 flex-wrap justify-center">
                         {Object.keys(TOPICS).map(cat => (
                             <Button key={cat} onClick={() => setActiveCategory(cat)}
-                                className={`px-5 py-2 ${activeCategory === cat ? 'bg-gradient-to-r from-red-600 to-orange-600' : 'bg-gray-700'} text-white`}>
+                                className={`px-5 py-2 ${activeCategory === cat ? 'bg-gradient-to-r from-cyan-600 to-blue-600' : 'bg-gray-700'} text-white`}>
                                 {cat.charAt(0).toUpperCase() + cat.slice(1)}
                             </Button>
                         ))}
                     </div>
 
                     <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-                        {TOPICS[activeCategory].map((topic, i) => (
-                            <Button key={topic.id} onClick={() => handleStartGame(topic)} 
-                                className="h-24 text-left justify-start p-6 bg-gradient-to-r from-red-700 to-red-800 hover:from-red-600 hover:to-red-700 text-white">
+                        {TOPICS[activeCategory].map((topic) => (
+                            <Button key={topic.id} onClick={() => generateQuestions(topic.topic)} 
+                                className="h-24 text-left justify-start p-6 bg-gradient-to-r from-cyan-700/50 to-blue-700/50 hover:from-cyan-600 hover:to-blue-600 text-white border border-cyan-500/30">
                                 <div>
                                     <div className="text-lg font-bold mb-1">{topic.label}</div>
                                     <div className="text-xs opacity-80">{topic.topic}</div>
@@ -597,27 +452,288 @@ export default function SpaceBattleGame({ onExit }) {
                 </Card>
 
                 <div className="grid grid-cols-3 gap-6">
-                    <Card className="p-6 text-center bg-gray-900/80 border-gray-700">
-                        <Crosshair className="w-12 h-12 mx-auto mb-4 text-red-500" />
-                        <h3 className="text-lg font-bold mb-2 text-white">Aim & Shoot</h3>
-                        <p className="text-sm text-gray-400">Click to destroy enemies and learn</p>
+                    <Card className="p-6 text-center bg-[#1a2d4a]/80 border-cyan-500/30">
+                        <Target className="w-12 h-12 mx-auto mb-4 text-cyan-400" />
+                        <h3 className="text-lg font-bold mb-2 text-white">Track Targets</h3>
+                        <p className="text-sm text-gray-400">Answer questions to score</p>
                     </Card>
-                    <Card className="p-6 text-center bg-gray-900/80 border-gray-700">
-                        <Zap className="w-12 h-12 mx-auto mb-4 text-yellow-500" />
-                        <h3 className="text-lg font-bold mb-2 text-white">Build Combos</h3>
-                        <p className="text-sm text-gray-400">Chain kills for bonus points</p>
+                    <Card className="p-6 text-center bg-[#1a2d4a]/80 border-cyan-500/30">
+                        <Award className="w-12 h-12 mx-auto mb-4 text-yellow-400" />
+                        <h3 className="text-lg font-bold mb-2 text-white">Earn Medals</h3>
+                        <p className="text-sm text-gray-400">Bronze, Silver, Gold awards</p>
                     </Card>
-                    <Card className="p-6 text-center bg-gray-900/80 border-gray-700">
+                    <Card className="p-6 text-center bg-[#1a2d4a]/80 border-cyan-500/30">
                         <Trophy className="w-12 h-12 mx-auto mb-4 text-amber-500" />
-                        <h3 className="text-lg font-bold mb-2 text-white">Learn Facts</h3>
-                        <p className="text-sm text-gray-400">Each kill reveals knowledge</p>
+                        <h3 className="text-lg font-bold mb-2 text-white">Complete Mission</h3>
+                        <p className="text-sm text-gray-400">Master each knowledge area</p>
                     </Card>
-                </div>
-
-                <div className="text-center mt-8 text-gray-500 text-sm">
-                    <p>Controls: Mouse to aim | Click to shoot | R to reload | P to pause | ESC to exit</p>
                 </div>
             </div>
         </div>
     );
+}
+
+// Draw helper functions
+function drawTank(ctx, x, y, size) {
+    ctx.fillStyle = '#2d4a3a';
+    // Body
+    ctx.fillRect(x - size * 0.5, y - size * 0.2, size, size * 0.4);
+    // Turret
+    ctx.fillRect(x - size * 0.2, y - size * 0.4, size * 0.4, size * 0.25);
+    // Barrel
+    ctx.fillRect(x + size * 0.1, y - size * 0.35, size * 0.5, size * 0.1);
+    // Tracks
+    ctx.fillStyle = '#1a2d2a';
+    ctx.fillRect(x - size * 0.55, y + size * 0.1, size * 0.2, size * 0.15);
+    ctx.fillRect(x + size * 0.35, y + size * 0.1, size * 0.2, size * 0.15);
+    // Flag
+    ctx.fillStyle = '#00ff00';
+    ctx.fillRect(x + size * 0.3, y - size * 0.6, size * 0.05, size * 0.3);
+    ctx.fillRect(x + size * 0.35, y - size * 0.6, size * 0.15, size * 0.1);
+}
+
+function drawHelicopter(ctx, x, y, size, time) {
+    ctx.fillStyle = '#3a4a5a';
+    // Body
+    ctx.beginPath();
+    ctx.ellipse(x, y, size * 0.4, size * 0.2, 0, 0, Math.PI * 2);
+    ctx.fill();
+    // Tail
+    ctx.fillRect(x + size * 0.3, y - size * 0.05, size * 0.4, size * 0.1);
+    // Tail rotor
+    ctx.fillRect(x + size * 0.65, y - size * 0.15, size * 0.05, size * 0.3);
+    // Main rotor (animated)
+    ctx.strokeStyle = '#5a6a7a';
+    ctx.lineWidth = 3;
+    ctx.beginPath();
+    const rotorAngle = time * 20;
+    ctx.moveTo(x - size * 0.5 * Math.cos(rotorAngle), y - size * 0.3);
+    ctx.lineTo(x + size * 0.5 * Math.cos(rotorAngle), y - size * 0.3);
+    ctx.stroke();
+    ctx.beginPath();
+    ctx.moveTo(x - size * 0.5 * Math.sin(rotorAngle), y - size * 0.3);
+    ctx.lineTo(x + size * 0.5 * Math.sin(rotorAngle), y - size * 0.3);
+    ctx.stroke();
+}
+
+function drawDrone(ctx, x, y, size, time) {
+    ctx.fillStyle = '#4a5a6a';
+    // Body
+    ctx.beginPath();
+    ctx.moveTo(x, y - size * 0.3);
+    ctx.lineTo(x + size * 0.3, y + size * 0.2);
+    ctx.lineTo(x - size * 0.3, y + size * 0.2);
+    ctx.closePath();
+    ctx.fill();
+    // Wings
+    ctx.fillRect(x - size * 0.5, y, size, size * 0.08);
+    // Light
+    ctx.fillStyle = time % 1 > 0.5 ? '#00ffff' : '#004444';
+    ctx.beginPath();
+    ctx.arc(x, y + size * 0.1, size * 0.08, 0, Math.PI * 2);
+    ctx.fill();
+}
+
+function drawRadar(ctx, x, y, radius, blips, time) {
+    // Outer ring
+    ctx.strokeStyle = '#00ffff';
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.arc(x, y, radius, 0, Math.PI * 2);
+    ctx.stroke();
+
+    // Inner rings
+    ctx.globalAlpha = 0.3;
+    ctx.beginPath();
+    ctx.arc(x, y, radius * 0.66, 0, Math.PI * 2);
+    ctx.stroke();
+    ctx.beginPath();
+    ctx.arc(x, y, radius * 0.33, 0, Math.PI * 2);
+    ctx.stroke();
+    ctx.globalAlpha = 1;
+
+    // Sweep line
+    const sweepAngle = time * 2;
+    ctx.strokeStyle = '#00ffff';
+    ctx.globalAlpha = 0.5;
+    ctx.beginPath();
+    ctx.moveTo(x, y);
+    ctx.lineTo(x + Math.cos(sweepAngle) * radius, y + Math.sin(sweepAngle) * radius);
+    ctx.stroke();
+    ctx.globalAlpha = 1;
+
+    // Blips
+    ctx.fillStyle = '#00ffff';
+    blips.forEach(blip => {
+        const bx = x + Math.sin(blip.angle) * radius * blip.dist;
+        const by = y - Math.cos(blip.angle) * radius * blip.dist;
+        ctx.beginPath();
+        ctx.arc(bx, by, 4, 0, Math.PI * 2);
+        ctx.fill();
+    });
+
+    // Center icon (player)
+    ctx.fillStyle = '#00ff00';
+    ctx.beginPath();
+    ctx.moveTo(x, y - 8);
+    ctx.lineTo(x + 5, y + 5);
+    ctx.lineTo(x - 5, y + 5);
+    ctx.closePath();
+    ctx.fill();
+}
+
+function drawCompass(ctx, x, y, radius, angle) {
+    // Outer ring
+    ctx.strokeStyle = '#00ffff';
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.arc(x, y, radius, 0, Math.PI * 2);
+    ctx.stroke();
+
+    // Direction labels
+    ctx.fillStyle = '#00ffff';
+    ctx.font = 'bold 12px monospace';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    
+    const dirs = ['N', 'E', 'S', 'W'];
+    dirs.forEach((dir, i) => {
+        const a = (i * Math.PI / 2) - angle;
+        const dx = x + Math.sin(a) * (radius - 15);
+        const dy = y - Math.cos(a) * (radius - 15);
+        ctx.fillStyle = dir === 'N' ? '#ff3333' : '#00ffff';
+        ctx.fillText(dir, dx, dy);
+    });
+
+    // Center arrow (always points up)
+    ctx.fillStyle = '#00ffff';
+    ctx.beginPath();
+    ctx.moveTo(x, y - 20);
+    ctx.lineTo(x + 8, y + 10);
+    ctx.lineTo(x, y + 5);
+    ctx.lineTo(x - 8, y + 10);
+    ctx.closePath();
+    ctx.fill();
+
+    // Triangle marker at top
+    ctx.fillStyle = '#00ffff';
+    ctx.beginPath();
+    ctx.moveTo(x, y - radius - 10);
+    ctx.lineTo(x - 6, y - radius);
+    ctx.lineTo(x + 6, y - radius);
+    ctx.closePath();
+    ctx.fill();
+}
+
+function drawScoreGauge(ctx, x, y, radius, score, total) {
+    const percent = total > 0 ? score / total : 0;
+    
+    // Background arc
+    ctx.strokeStyle = '#1a2d4a';
+    ctx.lineWidth = 8;
+    ctx.beginPath();
+    ctx.arc(x, y, radius, Math.PI * 0.75, Math.PI * 2.25);
+    ctx.stroke();
+
+    // Progress arc
+    const endAngle = Math.PI * 0.75 + (Math.PI * 1.5 * percent);
+    ctx.strokeStyle = percent > 0.7 ? '#00ff00' : percent > 0.4 ? '#ffff00' : '#ff3333';
+    ctx.beginPath();
+    ctx.arc(x, y, radius, Math.PI * 0.75, endAngle);
+    ctx.stroke();
+
+    // Score text
+    ctx.fillStyle = '#00ff00';
+    ctx.font = 'bold 16px monospace';
+    ctx.textAlign = 'center';
+    ctx.fillText(score, x, y + 5);
+    
+    ctx.fillStyle = '#888';
+    ctx.font = '10px monospace';
+    ctx.fillText('/' + total, x, y + 18);
+
+    // Label
+    ctx.fillStyle = '#888';
+    ctx.font = '10px monospace';
+    ctx.fillText('Exam Score', x, y + radius + 15);
+}
+
+function drawAwards(ctx, x, y) {
+    ctx.fillStyle = '#00ffff';
+    ctx.font = 'bold 14px monospace';
+    ctx.textAlign = 'left';
+    ctx.fillText('Awards', x, y - 30);
+    
+    ctx.fillStyle = '#888';
+    ctx.font = '12px monospace';
+    ctx.fillText('Medals to be won', x, y - 12);
+
+    // Medal placeholders
+    const medals = [
+        { x: x, color: '#00ffff', shape: 'ribbon' },
+        { x: x + 50, color: '#ffd700', shape: 'star' },
+        { x: x + 100, color: '#c0c0c0', shape: 'medal' },
+    ];
+
+    medals.forEach(medal => {
+        ctx.strokeStyle = medal.color;
+        ctx.fillStyle = medal.color;
+        ctx.lineWidth = 2;
+        
+        if (medal.shape === 'ribbon') {
+            // Ribbon medal
+            ctx.beginPath();
+            ctx.moveTo(medal.x + 15, y);
+            ctx.lineTo(medal.x + 5, y + 30);
+            ctx.lineTo(medal.x + 15, y + 25);
+            ctx.lineTo(medal.x + 25, y + 30);
+            ctx.closePath();
+            ctx.stroke();
+            ctx.beginPath();
+            ctx.arc(medal.x + 15, y + 40, 8, 0, Math.PI * 2);
+            ctx.stroke();
+        } else if (medal.shape === 'star') {
+            // Star medal
+            ctx.beginPath();
+            for (let i = 0; i < 5; i++) {
+                const angle = (i * 4 * Math.PI / 5) - Math.PI / 2;
+                const px = medal.x + 15 + Math.cos(angle) * 12;
+                const py = y + 25 + Math.sin(angle) * 12;
+                if (i === 0) ctx.moveTo(px, py);
+                else ctx.lineTo(px, py);
+            }
+            ctx.closePath();
+            ctx.stroke();
+        } else {
+            // Circle medal
+            ctx.beginPath();
+            ctx.arc(medal.x + 15, y + 25, 12, 0, Math.PI * 2);
+            ctx.stroke();
+            ctx.beginPath();
+            ctx.arc(medal.x + 15, y + 25, 6, 0, Math.PI * 2);
+            ctx.fill();
+        }
+    });
+}
+
+function drawTopicButtons(ctx, x, y, selectedTopic) {
+    const topics = ['User Management', 'Adding Direct to Cloud devices', 'Adding Direct to Cloud devices', 'Adding appliances'];
+    
+    topics.forEach((topic, i) => {
+        const btnY = y + i * 45;
+        const isSelected = i === 0;
+        
+        // Button background
+        ctx.fillStyle = isSelected ? '#00bcd4' : 'rgba(50, 70, 90, 0.8)';
+        ctx.beginPath();
+        ctx.roundRect(x, btnY, 180, 35, 5);
+        ctx.fill();
+        
+        // Button text
+        ctx.fillStyle = isSelected ? '#000' : '#aaa';
+        ctx.font = '12px sans-serif';
+        ctx.textAlign = 'left';
+        ctx.textBaseline = 'middle';
+        ctx.fillText(topic.slice(0, 25), x + 10, btnY + 17);
+    });
 }

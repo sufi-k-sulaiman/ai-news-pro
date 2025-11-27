@@ -6,7 +6,8 @@ import StockCard from '@/components/markets/StockCard';
 import StockTicker from '@/components/markets/StockTicker';
 import FilterChips from '@/components/markets/FilterChips';
 import StockDetailModal from '@/components/markets/StockDetailModal';
-import { EmptyState } from '@/components/ErrorDisplay';
+import { EmptyState, LoadingState } from '@/components/ErrorDisplay';
+import { base44 } from '@/api/base44Client';
 
 const PRESET_FILTERS = [
     { id: 'all', label: 'All Stocks', icon: BarChart3 },
@@ -937,8 +938,9 @@ export default function Markets() {
     const [filters, setFilters] = useState({ market: 'All Markets', sector: 'All Sectors', industry: 'All Industries', moat: 'Any', roe: 'Any', pe: 'Any', zscore: 'Any' });
     const [selectedStock, setSelectedStock] = useState(null);
     const [showStockModal, setShowStockModal] = useState(false);
+    const [loading, setLoading] = useState(true);
 
-    useEffect(() => { setStocks(STOCK_DATA.map(generateStockData)); }, []);
+    useEffect(() => { fetchStockData(); }, []);
 
     // Listen for header search changes
     useEffect(() => {
@@ -947,7 +949,97 @@ export default function Markets() {
         return () => window.removeEventListener('headerSearchChange', handleHeaderSearch);
     }, []);
 
-    const refreshStocks = () => setStocks(STOCK_DATA.map(generateStockData));
+    const fetchStockData = async () => {
+        setLoading(true);
+        try {
+            // Get a random batch of 30 stocks to fetch real data for
+            const stockBatch = STOCK_DATA.sort(() => Math.random() - 0.5).slice(0, 30);
+            const tickers = stockBatch.map(s => s.ticker).join(', ');
+            
+            const response = await base44.integrations.Core.InvokeLLM({
+                prompt: `Provide current stock market data for these tickers: ${tickers}
+
+For each stock, provide realistic current market data including:
+- Current price (realistic based on recent trading)
+- Daily change percentage (-5% to +5% typical range)
+- Trading volume
+- Key financial metrics: MOAT score (0-100), ROE %, P/E ratio, Z-Score, EPS, Dividend yield
+
+Return data for all ${stockBatch.length} stocks.`,
+                add_context_from_internet: true,
+                response_json_schema: {
+                    type: "object",
+                    properties: {
+                        stocks: {
+                            type: "array",
+                            items: {
+                                type: "object",
+                                properties: {
+                                    ticker: { type: "string" },
+                                    price: { type: "number" },
+                                    change: { type: "number" },
+                                    volume: { type: "string" },
+                                    moat: { type: "number" },
+                                    roe: { type: "number" },
+                                    pe: { type: "number" },
+                                    zscore: { type: "number" },
+                                    eps: { type: "number" },
+                                    dividend: { type: "number" },
+                                    sgr: { type: "number" }
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+
+            // Merge LLM data with our stock info
+            const llmStocks = response?.stocks || [];
+            const updatedStocks = STOCK_DATA.map(stock => {
+                const llmData = llmStocks.find(s => s.ticker === stock.ticker);
+                if (llmData) {
+                    const history = [];
+                    let price = llmData.price * 0.9;
+                    for (let i = 0; i < 20; i++) { 
+                        price = price * (1 + (Math.random() - 0.48) * 0.02); 
+                        history.push(Math.round(price * 100) / 100); 
+                    }
+                    return {
+                        ...stock,
+                        price: llmData.price,
+                        change: llmData.change,
+                        volume: llmData.volume || `${(Math.random() * 50 + 5).toFixed(1)}M`,
+                        moat: llmData.moat || 50 + Math.floor(Math.random() * 40),
+                        roe: llmData.roe || 10 + Math.floor(Math.random() * 25),
+                        roic: (llmData.roe || 15) - 2 + Math.floor(Math.random() * 5),
+                        roa: Math.floor((llmData.roe || 15) * 0.6),
+                        pe: llmData.pe || 15 + Math.floor(Math.random() * 25),
+                        peg: Math.round(((llmData.pe || 20) / (llmData.sgr || 10)) * 100) / 100,
+                        zscore: llmData.zscore || 2 + Math.random() * 2,
+                        eps: llmData.eps || 1 + Math.random() * 10,
+                        dividend: llmData.dividend || Math.random() * 3,
+                        sgr: llmData.sgr || 5 + Math.floor(Math.random() * 20),
+                        beta: Math.round((0.7 + Math.random() * 0.8) * 100) / 100,
+                        fcf: Math.floor(Math.random() * 5000) + 500,
+                        eva: 40 + Math.floor(Math.random() * 50),
+                        aiRating: 55 + Math.floor(Math.random() * 40),
+                        history
+                    };
+                }
+                return generateStockData(stock);
+            });
+
+            setStocks(updatedStocks);
+        } catch (error) {
+            console.error('Error fetching stock data:', error);
+            // Fallback to generated data
+            setStocks(STOCK_DATA.map(generateStockData));
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const refreshStocks = () => fetchStockData();
     const handleStockClick = (stock) => { setSelectedStock(stock); setShowStockModal(true); };
 
     const filteredStocks = useMemo(() => {
@@ -982,8 +1074,8 @@ export default function Markets() {
             <div className="flex items-center gap-2 flex-wrap">
                 <FilterChips filters={filters} setFilters={setFilters} filterOptions={FILTER_OPTIONS} sectors={sectors} />
                 <span className="px-4 py-2 rounded-full border border-purple-300 bg-white text-purple-600 text-sm font-medium">{stocks.length} stocks</span>
-                <button onClick={refreshStocks} className="w-10 h-10 rounded-full border border-gray-200 bg-white hover:bg-gray-50 flex items-center justify-center transition-colors">
-                    <RefreshCw className="w-4 h-4 text-gray-600" />
+                <button onClick={refreshStocks} disabled={loading} className="w-10 h-10 rounded-full border border-gray-200 bg-white hover:bg-gray-50 flex items-center justify-center transition-colors disabled:opacity-50">
+                    <RefreshCw className={`w-4 h-4 text-gray-600 ${loading ? 'animate-spin' : ''}`} />
                 </button>
             </div>
 
@@ -991,11 +1083,15 @@ export default function Markets() {
                 <p className="text-gray-600">Showing <span className="font-bold text-gray-900">{filteredStocks.length}</span> of {stocks.length} stocks</p>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-                {filteredStocks.map((stock, i) => (<StockCard key={stock.ticker || i} stock={stock} onClick={handleStockClick} />))}
-            </div>
+            {loading ? (
+                <LoadingState message="Fetching latest market data..." size="large" />
+            ) : (
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+                    {filteredStocks.map((stock, i) => (<StockCard key={stock.ticker || i} stock={stock} onClick={handleStockClick} />))}
+                </div>
+            )}
 
-            {filteredStocks.length === 0 && (
+            {!loading && filteredStocks.length === 0 && (
                 <EmptyState 
                     icon={BarChart3}
                     title="No Stocks Found"

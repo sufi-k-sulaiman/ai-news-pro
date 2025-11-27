@@ -128,20 +128,26 @@ export default function ErrorDisplay({
 
 // Loading state component for consistency
 export function LoadingState({ message = 'Loading...', size = 'default' }) {
+    const logoSize = size === 'large' ? 'w-16 h-16' : 'w-12 h-12';
+    const spinnerSize = size === 'large' ? 'w-20 h-20' : 'w-16 h-16';
+    
     return (
         <div className={`flex flex-col items-center justify-center ${size === 'large' ? 'min-h-[400px]' : 'py-12'}`}>
             <style>{`
                 @keyframes logoPulse {
-                    0%, 100% { opacity: 0.3; transform: scale(1); }
-                    50% { opacity: 0.6; transform: scale(1.05); }
+                    0%, 100% { opacity: 0.4; transform: scale(1); }
+                    50% { opacity: 0.7; transform: scale(1.03); }
                 }
             `}</style>
-            <img 
-                src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/692729a5f5180fbd43f297e9/622024f26_image-loading-logo.png" 
-                alt="Loading" 
-                className="w-12 h-12 object-contain mb-4 grayscale"
-                style={{ animation: 'logoPulse 1.5s ease-in-out infinite' }}
-            />
+            <div className="relative mb-4 flex items-center justify-center">
+                <div className={`absolute ${spinnerSize} rounded-full border-4 border-purple-200 border-t-purple-600 animate-spin`} />
+                <img 
+                    src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/692729a5f5180fbd43f297e9/622024f26_image-loading-logo.png" 
+                    alt="Loading" 
+                    className={`${logoSize} object-contain grayscale opacity-50`}
+                    style={{ animation: 'logoPulse 1.5s ease-in-out infinite' }}
+                />
+            </div>
             <p className="text-gray-600">{message}</p>
         </div>
     );

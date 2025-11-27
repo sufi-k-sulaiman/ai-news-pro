@@ -750,51 +750,84 @@ export default function StockDetailModal({ stock, isOpen, onClose }) {
                 );
 
             case 'sentiment':
+                const sentimentGaugeData = [
+                    { name: 'Fear', value: 35, fill: '#EF4444' },
+                    { name: 'Neutral', value: 30, fill: '#F59E0B' },
+                    { name: 'Greed', value: 35, fill: '#10B981' }
+                ];
+                const currentSentiment = (data.sentimentScore || 42) > 65 ? 2 : (data.sentimentScore || 42) > 35 ? 1 : 0;
                 return (
                     <div className="space-y-6">
-                        <div className="bg-white rounded-2xl border border-gray-200 p-6">
-                            <div className="flex items-center justify-between mb-6">
-                                <div className="flex items-center gap-2">
+                        <div className="grid grid-cols-2 gap-6">
+                            <div className="bg-white rounded-2xl border border-gray-200 p-6">
+                                <div className="flex items-center gap-2 mb-4">
                                     <Brain className="w-5 h-5 text-purple-600" />
-                                    <h3 className="font-semibold text-gray-900">Market Sentiment</h3>
+                                    <h3 className="font-semibold text-gray-900">Sentiment Indicator</h3>
                                 </div>
-                                <div className="text-right">
-                                    <p className="text-3xl font-bold text-purple-600">{data.sentimentScore || 72}</p>
-                                    <p className="text-sm text-gray-500">Sentiment Score</p>
+                                <div className="text-center mb-4">
+                                    <p className="text-5xl font-bold text-orange-600">{data.sentimentScore || 42}</p>
+                                    <p className="text-sm text-gray-500 mt-1">Fear Index</p>
                                 </div>
+                                <div className="h-40">
+                                    <ResponsiveContainer width="100%" height="100%">
+                                        <RePieChart>
+                                            <Pie data={sentimentGaugeData} dataKey="value" cx="50%" cy="50%" startAngle={180} endAngle={0} innerRadius={60} outerRadius={80}>
+                                                {sentimentGaugeData.map((entry, i) => <Cell key={i} fill={entry.fill} opacity={i === currentSentiment ? 1 : 0.3} />)}
+                                            </Pie>
+                                        </RePieChart>
+                                    </ResponsiveContainer>
+                                </div>
+                                <p className="text-center text-sm text-gray-600 mt-2">Current: <span className="font-bold text-orange-700">Pessimism Elevated</span></p>
                             </div>
                             
-                            <div className="grid grid-cols-3 gap-4 mb-6">
-                                <div className="bg-green-50 rounded-xl p-4 text-center">
-                                    <p className="text-2xl font-bold text-green-600">{data.analystRatings?.buy || 18}</p>
-                                    <p className="text-sm text-gray-600">Buy</p>
+                            <div className="bg-white rounded-2xl border border-gray-200 p-6">
+                                <h3 className="font-semibold text-gray-900 mb-4">Analyst Ratings</h3>
+                                <div className="grid grid-cols-3 gap-3 mb-4">
+                                    <div className="bg-green-50 rounded-xl p-4 text-center">
+                                        <p className="text-2xl font-bold text-green-600">{data.analystRatings?.buy || 18}</p>
+                                        <p className="text-sm text-gray-600">Buy</p>
+                                    </div>
+                                    <div className="bg-yellow-50 rounded-xl p-4 text-center">
+                                        <p className="text-2xl font-bold text-yellow-600">{data.analystRatings?.hold || 8}</p>
+                                        <p className="text-sm text-gray-600">Hold</p>
+                                    </div>
+                                    <div className="bg-red-50 rounded-xl p-4 text-center">
+                                        <p className="text-2xl font-bold text-red-600">{data.analystRatings?.sell || 2}</p>
+                                        <p className="text-sm text-gray-600">Sell</p>
+                                    </div>
                                 </div>
-                                <div className="bg-yellow-50 rounded-xl p-4 text-center">
-                                    <p className="text-2xl font-bold text-yellow-600">{data.analystRatings?.hold || 8}</p>
-                                    <p className="text-sm text-gray-600">Hold</p>
-                                </div>
-                                <div className="bg-red-50 rounded-xl p-4 text-center">
-                                    <p className="text-2xl font-bold text-red-600">{data.analystRatings?.sell || 2}</p>
-                                    <p className="text-sm text-gray-600">Sell</p>
+                                <div className="p-4 bg-purple-50 rounded-lg">
+                                    <p className="text-sm text-gray-700">Market Expectations: <span className="font-bold text-purple-700">Aggressive</span></p>
+                                    <p className="text-xs text-gray-500 mt-1">Risks under-recognized, contrarian opportunity</p>
                                 </div>
                             </div>
+                        </div>
 
-                            <div className="space-y-3">
-                                <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-                                    <span className="text-sm text-gray-600">Institutional Ownership</span>
-                                    <span className={`font-medium ${data.institutionalChange === 'Increasing' ? 'text-green-600' : 'text-gray-700'}`}>
+                        <div className="bg-white rounded-2xl border border-gray-200 p-6">
+                            <h4 className="font-semibold text-gray-900 mb-4">Ownership & Activity</h4>
+                            <div className="grid grid-cols-3 gap-4">
+                                <div className="p-4 bg-gray-50 rounded-lg">
+                                    <p className="text-sm text-gray-600">Institutional Ownership</p>
+                                    <p className={`text-xl font-bold mt-1 ${data.institutionalChange === 'Increasing' ? 'text-green-600' : 'text-gray-900'}`}>
                                         {data.institutionalChange || 'Increasing'}
-                                    </span>
+                                    </p>
                                 </div>
-                                <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-                                    <span className="text-sm text-gray-600">Insider Activity</span>
-                                    <span className="font-medium text-gray-700">{data.insiderActivity || 'Net buying'}</span>
+                                <div className="p-4 bg-gray-50 rounded-lg">
+                                    <p className="text-sm text-gray-600">Insider Activity</p>
+                                    <p className="text-xl font-bold text-gray-900 mt-1">{data.insiderActivity || 'Net buying'}</p>
                                 </div>
-                                <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-                                    <span className="text-sm text-gray-600">Short Interest</span>
-                                    <span className="font-medium text-gray-700">{data.shortInterest || 2.4}%</span>
+                                <div className="p-4 bg-gray-50 rounded-lg">
+                                    <p className="text-sm text-gray-600">Short Interest</p>
+                                    <p className="text-xl font-bold text-gray-900 mt-1">{data.shortInterest || 2.4}%</p>
                                 </div>
                             </div>
+                        </div>
+                        
+                        <div className="bg-blue-50 rounded-2xl border border-blue-200 p-6">
+                            <h4 className="font-semibold text-blue-900 mb-3 flex items-center gap-2">
+                                <Info className="w-4 h-4" /> Contrarian View
+                            </h4>
+                            <p className="text-sm text-blue-800">Value investor framework highlights opportunity when sentiment is depressed. Current fear levels may indicate attractive entry point for long-term investors.</p>
                         </div>
                     </div>
                 );

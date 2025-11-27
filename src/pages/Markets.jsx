@@ -2,10 +2,10 @@ import React, { useState, useEffect, useMemo } from 'react';
 import { Search, RefreshCw, TrendingUp, TrendingDown, Shield, Zap, DollarSign, BarChart3, Activity } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import StockCard from '../components/markets/StockCard';
-import StockTicker from '../components/markets/StockTicker';
-import FilterChips from '../components/markets/FilterChips';
-import StockDetailModal from '../components/markets/StockDetailModal';
+import StockCard from '@/components/markets/StockCard';
+import StockTicker from '@/components/markets/StockTicker';
+import FilterChips from '@/components/markets/FilterChips';
+import StockDetailModal from '@/components/markets/StockDetailModal';
 
 const PRESET_FILTERS = [
     { id: 'all', label: 'All Stocks', icon: BarChart3 },

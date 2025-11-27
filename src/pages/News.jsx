@@ -180,7 +180,7 @@ The URL must be a direct link to the article page, not a search results page.`,
                         <div className="flex items-center gap-4">
                             <div>
                                 <h1 className="text-2xl md:text-3xl font-bold">News</h1>
-                                <p className="text-white/80">AI-Powered News Aggregator</p>
+                                <p className="text-white/80">Ai-Powered News Aggregator</p>
                             </div>
                         </div>
                         {lastUpdated && (

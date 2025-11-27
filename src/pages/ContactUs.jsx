@@ -63,16 +63,13 @@ export default function ContactUs() {
                         icon={Headphones}
                         title="Contact Support"
                         description="If you need assistance using the 1cPublishing application or the Portal, our support team is ready to help."
-                        email="support@1cPublishing.com"
+                        email="help@1cPublishing.com"
                         buttonText="Contact Support"
                         color="#3B82F6"
                     />
                 </div>
 
-                {/* Footer */}
-                <div className="text-center text-gray-500 text-sm">
-                    <p>© 2025 1cPublishing Inc. All rights reserved.</p>
-                </div>
+
             </div>
         </div>
     );

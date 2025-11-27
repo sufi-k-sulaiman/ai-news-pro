@@ -1,15 +1,12 @@
 import React from 'react';
-import { FileText, Shield, Database, Search, Ban, Copyright, Lock, ExternalLink, AlertTriangle, Scale, Users } from 'lucide-react';
+import { FileText } from 'lucide-react';
 
-const Section = ({ number, title, icon: Icon, children }) => (
+const Section = ({ number, title, children }) => (
     <div className="mb-8">
         <div className="flex items-center gap-3 mb-3">
-            <div className="w-10 h-10 rounded-xl bg-purple-100 flex items-center justify-center">
-                <Icon className="w-5 h-5 text-purple-600" />
-            </div>
             <h2 className="text-xl font-bold text-gray-900">{number}. {title}</h2>
         </div>
-        <div className="text-gray-600 leading-relaxed pl-13 ml-13">{children}</div>
+        <div className="text-gray-600 leading-relaxed">{children}</div>
     </div>
 );
 
@@ -42,7 +39,7 @@ export default function TermsOfUse() {
 
                 {/* Sections */}
                 <div className="bg-white rounded-2xl border border-gray-200 p-8">
-                    <Section number="1" title="Grant of License" icon={Shield}>
+                    <Section number="1" title="Grant of License">
                         <p className="mb-3">
                             Subject to compliance with these Terms, 1cPublishing grants you a personal, non-exclusive, non-transferable, revocable license to use the Services and access content ("Content") available through the Services. Unless otherwise attributed to third parties, all text, graphics, data, and other materials provided are 1cPublishing's property. Any rights not expressly granted are reserved.
                         </p>
@@ -53,7 +50,7 @@ export default function TermsOfUse() {
                         </ul>
                     </Section>
 
-                    <Section number="2" title="User Research Data" icon={Database}>
+                    <Section number="2" title="User Research Data">
                         <p className="mb-3">
                             1cPublishing collects and analyzes user research data to improve its Services and provide meaningful insights. By using the Services, you consent to 1cPublishing collecting, processing, and storing data as described in our Privacy Policy.
                         </p>
@@ -64,7 +61,7 @@ export default function TermsOfUse() {
                         </ul>
                     </Section>
 
-                    <Section number="3" title="Data Requests" icon={Search}>
+                    <Section number="3" title="Data Requests">
                         <p className="mb-3">
                             1cPublishing supports transparency and data-driven decision-making. Users may request access to specific datasets or research materials through our designated data request process.
                         </p>
@@ -75,7 +72,7 @@ export default function TermsOfUse() {
                         </ul>
                     </Section>
 
-                    <Section number="4" title="Special Research" icon={FileText}>
+                    <Section number="4" title="Special Research">
                         <p className="mb-3">
                             1cPublishing offers tailored research services ("Special Research") for clients seeking customized insights or reports.
                         </p>
@@ -86,7 +83,7 @@ export default function TermsOfUse() {
                         </ul>
                     </Section>
 
-                    <Section number="5" title="Prohibited Conduct" icon={Ban}>
+                    <Section number="5" title="Prohibited Conduct">
                         <p className="mb-3">You agree not to:</p>
                         <ul className="list-disc list-inside space-y-2 text-gray-600">
                             <li>Engage in activities that violate applicable laws or infringe on the rights of others.</li>
@@ -97,53 +94,50 @@ export default function TermsOfUse() {
                         <p className="mt-3 text-gray-600">1cPublishing reserves the right to investigate, suspend, or terminate accounts for any violations.</p>
                     </Section>
 
-                    <Section number="6" title="Intellectual Property Rights" icon={Copyright}>
+                    <Section number="6" title="Intellectual Property Rights">
                         <p>
                             All Content, trademarks, logos, and designs made available through the Services are owned by or licensed to 1cPublishing unless otherwise specified. You may not use 1cPublishing trademarks or intellectual property without prior written consent.
                         </p>
                     </Section>
 
-                    <Section number="7" title="Privacy Policy" icon={Lock}>
+                    <Section number="7" title="Privacy Policy">
                         <p>
                             Your use of the Services is subject to 1cPublishing's Privacy Policy, which outlines how we collect, use, and protect your data. By using the Services, you consent to the terms of our Privacy Policy.
                         </p>
                     </Section>
 
-                    <Section number="8" title="Third-Party Links" icon={ExternalLink}>
+                    <Section number="8" title="Third-Party Links">
                         <p>
                             The Services may include links to external websites. 1cPublishing is not responsible for the availability or content of third-party sites and does not endorse or assume liability for them. Use third-party links at your own risk.
                         </p>
                     </Section>
 
-                    <Section number="9" title="Disclaimer of Warranties" icon={AlertTriangle}>
+                    <Section number="9" title="Disclaimer of Warranties">
                         <p>
                             The Services are provided on an "as is" basis without warranties of any kind, including fitness for a particular purpose or non-infringement. 1cPublishing does not guarantee uninterrupted or error-free access to the Services.
                         </p>
                     </Section>
 
-                    <Section number="10" title="Limitation of Liability" icon={Scale}>
+                    <Section number="10" title="Limitation of Liability">
                         <p>
                             To the fullest extent permitted by law, 1cPublishing is not liable for any damages, including indirect, incidental, or consequential damages, arising from your use of the Services.
                         </p>
                     </Section>
 
-                    <Section number="11" title="Indemnification" icon={Shield}>
+                    <Section number="11" title="Indemnification">
                         <p>
                             You agree to indemnify and hold 1cPublishing harmless from any claims, losses, or damages resulting from your breach of these Terms or misuse of the Services.
                         </p>
                     </Section>
 
-                    <Section number="12" title="User Contributions" icon={Users}>
+                    <Section number="12" title="User Contributions">
                         <p>
                             1cPublishing reserves the right to manage user contributions, including submissions of ideas, feedback, or other materials. Users agree that contributions may be utilized by 1cPublishing without limitation.
                         </p>
                     </Section>
                 </div>
 
-                {/* Footer */}
-                <div className="text-center mt-8 text-gray-500 text-sm">
-                    <p>© 2025 1cPublishing Inc. All rights reserved.</p>
-                </div>
+
             </div>
         </div>
     );

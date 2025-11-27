@@ -445,7 +445,11 @@ export default function SpaceBattleGame({ onExit }) {
                 bullet.z += bullet.speed;
                 
                 const scale = bullet.z;
-                const screenY = canvas.height * 0.6 - (1 - bullet.z) * 400 * bullet.z;
+                // Bullet moves toward target
+                const startY = canvas.height * 0.8;
+                const targetY = bullet.targetY || canvas.height * 0.3;
+                const screenY = startY - (startY - targetY) * (bullet.z - 1) * 3;
+                const screenX = centerX + (bullet.targetX - centerX) * (bullet.z - 1) * 2;
                 const size = 8 / (bullet.z + 0.5);
                 
                 // Bullet tracer effect
@@ -453,7 +457,7 @@ export default function SpaceBattleGame({ onExit }) {
                 ctx.shadowBlur = 15;
                 ctx.shadowColor = '#00ffff';
                 ctx.beginPath();
-                ctx.arc(centerX, screenY, size, 0, Math.PI * 2);
+                ctx.arc(screenX, screenY, size, 0, Math.PI * 2);
                 ctx.fill();
                 ctx.shadowBlur = 0;
 

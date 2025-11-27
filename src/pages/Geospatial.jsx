@@ -12,15 +12,15 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { base44 } from '@/api/base44Client';
 import { AreaChart, Area, ResponsiveContainer, BarChart, Bar, XAxis, YAxis, Tooltip, PieChart, Pie, Cell, RadarChart, Radar, PolarGrid, PolarAngleAxis, PolarRadiusAxis, Legend, LineChart, Line } from 'recharts';
-import InteractiveMap from '../components/geospatial/InteractiveMap';
+import InteractiveMap from '@/components/geospatial/InteractiveMap';
 
 // Dashboard Components
-import ColoredMetricCard from '../components/dashboard/ColoredMetricCard';
-import StackedBarChart from '../components/dashboard/StackedBarChart';
-import AreaChartWithMarkers from '../components/dashboard/AreaChartWithMarkers';
-import SemiCircleProgress from '../components/dashboard/SemiCircleProgress';
-import BudgetDonutCard from '../components/dashboard/BudgetDonutCard';
-import CountryVisitorsCard from '../components/dashboard/CountryVisitorsCard';
+import ColoredMetricCard from '@/components/dashboard/ColoredMetricCard';
+import StackedBarChart from '@/components/dashboard/StackedBarChart';
+import AreaChartWithMarkers from '@/components/dashboard/AreaChartWithMarkers';
+import SemiCircleProgress from '@/components/dashboard/SemiCircleProgress';
+import BudgetDonutCard from '@/components/dashboard/BudgetDonutCard';
+import CountryVisitorsCard from '@/components/dashboard/CountryVisitorsCard';
 
 const DOMAINS = [
     { id: 'governance', name: 'Governance', icon: Building2, color: '#6366F1', description: 'Administrative mapping, infrastructure oversight, policy simulation' },

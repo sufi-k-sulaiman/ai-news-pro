@@ -8,10 +8,10 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Checkbox } from "@/components/ui/checkbox";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
-import { TemplateSelector, RESUME_TEMPLATES } from '../components/resume/ResumeTemplates';
-import ResumePreview from '../components/resume/ResumePreview';
-import ATSAnalysis from '../components/resume/ATSAnalysis';
-import ExportOptions from '../components/resume/ExportOptions';
+import { TemplateSelector, RESUME_TEMPLATES } from '@/components/resume/ResumeTemplates';
+import ResumePreview from '@/components/resume/ResumePreview';
+import ATSAnalysis from '@/components/resume/ATSAnalysis';
+import ExportOptions from '@/components/resume/ExportOptions';
 
 export default function ResumeBuilder() {
     const [activeTab, setActiveTab] = useState('builder');

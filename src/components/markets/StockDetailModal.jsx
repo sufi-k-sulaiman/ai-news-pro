@@ -1069,49 +1069,113 @@ export default function StockDetailModal({ stock, isOpen, onClose }) {
                 );
 
             case 'financials':
+                const roeBreakdown = [
+                    { factor: 'Margin Contribution', value: 28, fill: '#10B981' },
+                    { factor: 'Asset Usage', value: 32, fill: '#3B82F6' },
+                    { factor: 'Leverage Effect', value: 40, fill: '#8B5CF6' }
+                ];
+                const financialRatios = [
+                    { ratio: 'Earnings (P/E)', value: stock.pe || 20, benchmark: 22, status: 'Attractive' },
+                    { ratio: 'Growth (PEG)', value: stock.peg || 1.2, benchmark: 1.5, status: 'Attractive' },
+                    { ratio: 'Capital Efficiency', value: 18, benchmark: 15, status: 'Solid' },
+                    { ratio: 'Asset Efficiency', value: 0.8, benchmark: 1.2, status: 'Low' },
+                    { ratio: 'Debt Level', value: 0.45, benchmark: 0.5, status: 'Moderate' },
+                    { ratio: 'Liquidity', value: 2.1, benchmark: 2.0, status: 'Reasonable' }
+                ];
                 return (
                     <div className="space-y-6">
+                        <div className="grid grid-cols-2 gap-6">
+                            <div className="bg-white rounded-2xl border border-gray-200 p-6">
+                                <h3 className="font-semibold text-gray-900 mb-4 flex items-center gap-2">
+                                    <Sparkles className="w-4 h-4 text-green-600" /> Equity Efficiency
+                                </h3>
+                                <div className="mb-4">
+                                    <div className="flex items-center justify-between mb-2">
+                                        <span className="text-sm text-gray-600">ROE</span>
+                                        <span className="text-2xl font-bold text-green-600">{stock.roe}%</span>
+                                    </div>
+                                    <p className="text-xs text-gray-500">Adjusted equity returns: {stock.roe}% (boosted by efficiency)</p>
+                                </div>
+                                <div className="h-44">
+                                    <ResponsiveContainer width="100%" height="100%">
+                                        <BarChart data={roeBreakdown} layout="horizontal">
+                                            <XAxis type="number" tick={{ fontSize: 10 }} />
+                                            <YAxis type="category" dataKey="factor" tick={{ fontSize: 10 }} width={120} />
+                                            <Tooltip />
+                                            <Bar dataKey="value" radius={[0, 4, 4, 0]}>
+                                                {roeBreakdown.map((entry, i) => <Cell key={i} fill={entry.fill} />)}
+                                            </Bar>
+                                        </BarChart>
+                                    </ResponsiveContainer>
+                                </div>
+                            </div>
+                            
+                            <div className="bg-white rounded-2xl border border-gray-200 p-6">
+                                <h3 className="font-semibold text-gray-900 mb-4">Growth Sustainability</h3>
+                                <div className="space-y-3">
+                                    <div className="p-3 bg-green-50 rounded-lg">
+                                        <div className="flex items-center justify-between mb-1">
+                                            <span className="text-sm text-gray-600">Retained Earnings</span>
+                                            <span className="font-bold text-green-600">55%</span>
+                                        </div>
+                                        <p className="text-xs text-gray-500">Support expansion</p>
+                                    </div>
+                                    <div className="p-3 bg-blue-50 rounded-lg">
+                                        <div className="flex items-center justify-between mb-1">
+                                            <span className="text-sm text-gray-600">Self-Funded Growth</span>
+                                            <span className="font-bold text-blue-600">Possible</span>
+                                        </div>
+                                        <p className="text-xs text-gray-500">Minimal dilution risk</p>
+                                    </div>
+                                    <div className="p-3 bg-purple-50 rounded-lg">
+                                        <div className="flex items-center justify-between mb-1">
+                                            <span className="text-sm text-gray-600">Earnings Quality</span>
+                                            <span className="font-bold text-purple-600">Consistent</span>
+                                        </div>
+                                        <p className="text-xs text-gray-500">Low volatility in EPS</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
                         <div className="bg-white rounded-2xl border border-gray-200 p-6">
-                            <div className="flex items-center gap-2 mb-4">
-                                <Activity className="w-5 h-5 text-purple-600" />
-                                <h3 className="font-semibold text-gray-900">Financial Health</h3>
-                            </div>
-                            <div className="grid grid-cols-2 gap-6 mb-6">
-                                <div>
-                                    <p className="text-sm text-gray-500 mb-2">Balance Sheet Score</p>
-                                    <div className="flex items-center gap-3">
-                                        <div className="flex-1 h-3 bg-gray-200 rounded-full overflow-hidden">
-                                            <div className="h-full bg-green-500 rounded-full" style={{ width: `${data.balanceSheetScore || 78}%` }} />
+                            <h3 className="font-semibold text-gray-900 mb-4">Key Financial Ratios</h3>
+                            <div className="grid grid-cols-3 gap-4">
+                                {financialRatios.map((r, i) => (
+                                    <div key={i} className="p-4 bg-gray-50 rounded-xl">
+                                        <div className="flex items-center justify-between mb-2">
+                                            <span className="text-xs text-gray-500">{r.ratio}</span>
+                                            <span className={`text-xs font-medium px-2 py-0.5 rounded ${
+                                                r.status === 'Attractive' || r.status === 'Solid' ? 'bg-green-100 text-green-700' :
+                                                r.status === 'Moderate' || r.status === 'Reasonable' ? 'bg-yellow-100 text-yellow-700' : 'bg-orange-100 text-orange-700'
+                                            }`}>
+                                                {r.status}
+                                            </span>
                                         </div>
-                                        <span className="font-bold text-gray-900">{data.balanceSheetScore || 78}/100</span>
+                                        <p className="text-lg font-bold text-gray-900">{r.value}</p>
+                                        <p className="text-xs text-gray-500 mt-1">vs {r.benchmark}</p>
                                     </div>
-                                </div>
-                                <div>
-                                    <p className="text-sm text-gray-500 mb-2">Cash Flow Score</p>
-                                    <div className="flex items-center gap-3">
-                                        <div className="flex-1 h-3 bg-gray-200 rounded-full overflow-hidden">
-                                            <div className="h-full bg-blue-500 rounded-full" style={{ width: `${data.cashFlowScore || 85}%` }} />
-                                        </div>
-                                        <span className="font-bold text-gray-900">{data.cashFlowScore || 85}/100</span>
-                                    </div>
-                                </div>
+                                ))}
                             </div>
-                            <div className="grid grid-cols-4 gap-4">
-                                <div className="bg-purple-50 rounded-xl p-4 text-center">
-                                    <p className="text-xs text-gray-500">ROE</p>
-                                    <p className="text-lg font-bold text-purple-600">{stock.roe || 24}%</p>
+                        </div>
+                        
+                        <div className="bg-white rounded-2xl border border-gray-200 p-6">
+                            <h3 className="font-semibold text-gray-900 mb-4">Capital Structure</h3>
+                            <div className="grid grid-cols-3 gap-4">
+                                <div className="p-4 bg-gray-50 rounded-xl text-center">
+                                    <p className="text-sm text-gray-500">Debt to Equity</p>
+                                    <p className="text-2xl font-bold text-gray-900">{data.debtToEquity || 0.45}</p>
+                                    <p className="text-xs text-green-600 mt-1">Stable</p>
                                 </div>
-                                <div className="bg-blue-50 rounded-xl p-4 text-center">
-                                    <p className="text-xs text-gray-500">ROA</p>
-                                    <p className="text-lg font-bold text-blue-600">12%</p>
+                                <div className="p-4 bg-gray-50 rounded-xl text-center">
+                                    <p className="text-sm text-gray-500">Interest Coverage</p>
+                                    <p className="text-2xl font-bold text-gray-900">{data.interestCoverage || 12.5}x</p>
+                                    <p className="text-xs text-green-600 mt-1">Strong</p>
                                 </div>
-                                <div className="bg-green-50 rounded-xl p-4 text-center">
-                                    <p className="text-xs text-gray-500">ROIC</p>
-                                    <p className="text-lg font-bold text-green-600">18%</p>
-                                </div>
-                                <div className="bg-yellow-50 rounded-xl p-4 text-center">
-                                    <p className="text-xs text-gray-500">FCF Yield</p>
-                                    <p className="text-lg font-bold text-yellow-600">4.2%</p>
+                                <div className="p-4 bg-gray-50 rounded-xl text-center">
+                                    <p className="text-sm text-gray-500">Dividend Yield</p>
+                                    <p className="text-2xl font-bold text-gray-900">{stock.dividend || 2.4}%</p>
+                                    <p className="text-xs text-gray-500 mt-1">Sector Dependent</p>
                                 </div>
                             </div>
                         </div>

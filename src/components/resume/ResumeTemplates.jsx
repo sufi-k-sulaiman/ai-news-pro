@@ -1,7 +1,9 @@
 import React, { useState } from 'react';
-import { Check, Eye, X } from 'lucide-react';
+import { Check, Eye, X, Loader2 } from 'lucide-react';
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
+import ResumePreview from '@/components/resume/ResumePreview';
+import { base44 } from '@/api/base44Client';
 
 export const RESUME_TEMPLATES = [
     // Modern
@@ -117,6 +119,108 @@ export function TemplateThumbnail({ template, isLarge = false }) {
     );
 }
 
+function TemplatePreviewModal({ template, onClose, onSelect }) {
+    const [previewData, setPreviewData] = useState(null);
+    const [loading, setLoading] = useState(false);
+
+    React.useEffect(() => {
+        if (template) {
+            generatePreviewData(template);
+        }
+    }, [template?.id]);
+
+    const generatePreviewData = async (template) => {
+        setLoading(true);
+        try {
+            const response = await base44.integrations.Core.InvokeLLM({
+                prompt: `Generate realistic sample resume data for a ${template.category} style resume template called "${template.name}". 
+                Create data for a ${template.category === 'Technical' ? 'software engineer' : template.category === 'Creative' ? 'graphic designer' : template.category === 'Classic' ? 'business consultant' : 'product manager'}.
+                
+                Include realistic details with actual company names and quantified achievements.`,
+                response_json_schema: {
+                    type: "object",
+                    properties: {
+                        fullName: { type: "string" },
+                        title: { type: "string" },
+                        email: { type: "string" },
+                        phone: { type: "string" },
+                        location: { type: "string" },
+                        linkedin: { type: "string" },
+                        portfolio: { type: "string" },
+                        summary: { type: "string" },
+                        experience: {
+                            type: "array",
+                            items: {
+                                type: "object",
+                                properties: {
+                                    title: { type: "string" },
+                                    company: { type: "string" },
+                                    duration: { type: "string" },
+                                    achievements: { type: "array", items: { type: "string" } }
+                                }
+                            }
+                        },
+                        education: {
+                            type: "array",
+                            items: {
+                                type: "object",
+                                properties: {
+                                    degree: { type: "string" },
+                                    school: { type: "string" },
+                                    year: { type: "string" }
+                                }
+                            }
+                        },
+                        skills: { type: "array", items: { type: "string" } }
+                    }
+                }
+            });
+            setPreviewData(response);
+        } catch (error) {
+            console.error('Failed to generate preview data:', error);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    if (!template) return null;
+
+    return (
+        <Dialog open={!!template} onOpenChange={onClose}>
+            <DialogContent className="max-w-3xl max-h-[90vh] p-0 overflow-hidden">
+                <div className="sticky top-0 bg-white border-b border-gray-200 p-4 flex items-center justify-between z-10">
+                    <div>
+                        <h2 className="font-semibold text-gray-900">{template.name}</h2>
+                        <p className="text-sm text-gray-500">{template.category} Template</p>
+                    </div>
+                    <div className="flex gap-2">
+                        <Button onClick={() => onSelect(template.id)} className="bg-purple-600 hover:bg-purple-700">
+                            <Check className="w-4 h-4 mr-1" /> Use Template
+                        </Button>
+                        <Button variant="ghost" size="icon" onClick={onClose}>
+                            <X className="w-5 h-5" />
+                        </Button>
+                    </div>
+                </div>
+                <div className="p-6 overflow-y-auto" style={{ maxHeight: 'calc(90vh - 80px)' }}>
+                    {loading ? (
+                        <div className="flex flex-col items-center justify-center py-20">
+                            <Loader2 className="w-8 h-8 animate-spin text-purple-600 mb-3" />
+                            <p className="text-gray-600">Generating preview data...</p>
+                        </div>
+                    ) : previewData ? (
+                        <div className="max-w-2xl mx-auto">
+                            <ResumePreview data={previewData} templateId={template.id} />
+                        </div>
+                    ) : (
+                        <div className="text-center py-10 text-gray-500">Failed to load preview</div>
+                    )}
+                </div>
+            </DialogContent>
+        </Dialog>
+    );
+}
+
 export function TemplateSelector({ selectedTemplate, onSelect }) {
     const categories = ['Modern', 'Classic', 'Creative', 'Technical'];
     const [previewTemplate, setPreviewTemplate] = useState(null);
@@ -143,31 +247,11 @@ export function TemplateSelector({ selectedTemplate, onSelect }) {
             ))}
 
             {/* Preview Modal */}
-            <Dialog open={!!previewTemplate} onOpenChange={() => setPreviewTemplate(null)}>
-                <DialogContent className="max-w-2xl p-0">
-                    <div className="sticky top-0 bg-white border-b border-gray-200 p-4 flex items-center justify-between z-10">
-                        <div>
-                            <h2 className="font-semibold text-gray-900">{previewTemplate?.name}</h2>
-                            <p className="text-sm text-gray-500">{previewTemplate?.category} Template</p>
-                        </div>
-                        <div className="flex gap-2">
-                            <Button onClick={() => { onSelect(previewTemplate?.id); setPreviewTemplate(null); }} className="bg-purple-600 hover:bg-purple-700">
-                                <Check className="w-4 h-4 mr-1" /> Use Template
-                            </Button>
-                            <Button variant="ghost" size="icon" onClick={() => setPreviewTemplate(null)}>
-                                <X className="w-5 h-5" />
-                            </Button>
-                        </div>
-                    </div>
-                    <div className="p-6">
-                        {previewTemplate && (
-                            <div className="aspect-[3/4] rounded-xl overflow-hidden border border-gray-200 bg-gray-50 max-w-md mx-auto">
-                                <TemplateThumbnail template={previewTemplate} isLarge />
-                            </div>
-                        )}
-                    </div>
-                </DialogContent>
-            </Dialog>
+            <TemplatePreviewModal 
+                template={previewTemplate}
+                onClose={() => setPreviewTemplate(null)}
+                onSelect={(templateId) => { onSelect(templateId); setPreviewTemplate(null); }}
+            />
         </div>
     );
 }

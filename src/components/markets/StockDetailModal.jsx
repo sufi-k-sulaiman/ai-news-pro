@@ -13,6 +13,8 @@ import { Input } from "@/components/ui/input";
 import { Slider } from "@/components/ui/slider";
 import { AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer, BarChart, Bar, RadarChart, Radar, PolarGrid, PolarAngleAxis, PolarRadiusAxis, PieChart as RePieChart, Pie, Cell, LineChart as ReLineChart, Line } from 'recharts';
 
+import { Award } from 'lucide-react';
+
 const NAV_ITEMS = [
     { id: 'overview', label: 'Overview', icon: Eye },
     { id: 'moat', label: 'MOAT Analysis', icon: Shield },
@@ -28,6 +30,7 @@ const NAV_ITEMS = [
     { id: 'dividends', label: 'Dividends', icon: Percent },
     { id: 'peers', label: 'Peers', icon: Users },
     { id: 'reports', label: 'Reports', icon: FileText },
+    { id: 'legends', label: 'Legends', icon: Award },
 ];
 
 const CHART_COLORS = ['#8B5CF6', '#10B981', '#3B82F6', '#F59E0B', '#EF4444', '#EC4899'];

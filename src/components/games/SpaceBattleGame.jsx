@@ -45,6 +45,12 @@ export default function SpaceBattleGame({ onExit }) {
         { id: 'programming', label: 'Programming', color: 'from-blue-600 to-blue-700' },
         { id: 'science', label: 'Science', color: 'from-green-600 to-green-700' },
         { id: 'business', label: 'Business', color: 'from-amber-600 to-amber-700' },
+        { id: 'sports', label: 'Sports', color: 'from-orange-600 to-orange-700' },
+        { id: 'finance', label: 'Finance', color: 'from-emerald-600 to-emerald-700' },
+        { id: 'investment', label: 'Investment', color: 'from-purple-600 to-purple-700' },
+        { id: 'health', label: 'Health', color: 'from-rose-600 to-rose-700' },
+        { id: 'wellness', label: 'Wellness', color: 'from-teal-600 to-teal-700' },
+        { id: 'global', label: 'Global', color: 'from-indigo-600 to-indigo-700' },
     ];
 
     useEffect(() => {
@@ -56,10 +62,16 @@ export default function SpaceBattleGame({ onExit }) {
         const allTopics = {};
         
         const prompts = {
-            trending: 'Generate 6 trending tech and knowledge topics people should learn about right now. Include AI, cybersecurity, space, and emerging technologies.',
-            programming: 'Generate 6 programming and software development topics including languages, frameworks, algorithms, and development practices.',
-            science: 'Generate 6 science topics across physics, chemistry, biology, astronomy, and earth sciences.',
-            business: 'Generate 6 business and entrepreneurship topics including finance, marketing, strategy, and leadership.'
+            trending: 'Generate 9 trending tech and knowledge topics people should learn about right now. Include AI, cybersecurity, space, and emerging technologies.',
+            programming: 'Generate 9 programming and software development topics including languages, frameworks, algorithms, and development practices.',
+            science: 'Generate 9 science topics across physics, chemistry, biology, astronomy, and earth sciences.',
+            business: 'Generate 9 business and entrepreneurship topics including finance, marketing, strategy, and leadership.',
+            sports: 'Generate 9 sports topics including athletics, team sports, Olympics, fitness training, and sports science.',
+            finance: 'Generate 9 finance topics including banking, economics, monetary policy, financial markets, and personal finance.',
+            investment: 'Generate 9 investment topics including stocks, bonds, real estate, portfolio management, and investment strategies.',
+            health: 'Generate 9 health topics including medical science, diseases, treatments, nutrition, and public health.',
+            wellness: 'Generate 9 wellness topics including mental health, mindfulness, self-care, stress management, and holistic living.',
+            global: 'Generate 9 global affairs topics including geopolitics, international relations, world events, and global challenges.'
         };
 
         for (const tab of TABS) {
@@ -1043,8 +1055,8 @@ export default function SpaceBattleGame({ onExit }) {
                             <p className="text-gray-500">Generating topics with AI...</p>
                         </div>
                     ) : (
-                        <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
-                            {filteredTopics(generatedTopics[activeCategory] || []).slice(0, 6).map((topic, i) => {
+                        <div className="grid grid-cols-3 gap-3">
+                            {filteredTopics(generatedTopics[activeCategory] || []).slice(0, 9).map((topic, i) => {
                                 const icons = [Shield, Cpu, Globe, Atom, Code, TrendingUp, Brain, Lightbulb];
                                 const TopicIcon = icons[i % icons.length];
                                 return (

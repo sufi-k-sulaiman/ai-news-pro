@@ -24,7 +24,7 @@ export default function HomePage() {
         <div className="p-4 md:p-8">
             <div className="max-w-5xl mx-auto">
                 <h1 className="text-2xl md:text-3xl font-bold mb-2 text-gray-800">Welcome</h1>
-                <p className="mb-6 md:mb-8 text-gray-600">AI Powered Platform to boost productivity and make you smarter.</p>
+                <p className="mb-6 md:mb-8 text-gray-600">Ai Powered Platform to boost productivity and make you smarter.</p>
                 
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
                     {pages.map((page) => (

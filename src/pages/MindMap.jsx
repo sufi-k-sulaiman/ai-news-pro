@@ -2,8 +2,9 @@ import React, { useState, useRef, useEffect } from 'react';
 import { base44 } from '@/api/base44Client';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Maximize2, Minimize2, Loader2, Search, Compass, BookOpen, Network, Download } from 'lucide-react';
+import { Maximize2, Minimize2, Loader2, Search, Compass, BookOpen, Network, Download, Hand, Pencil, Type, Square, Circle, Eraser, Trash2 } from 'lucide-react';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import html2canvas from 'html2canvas';
 import { jsPDF } from 'jspdf';
 import LearnMoreModal from '../components/mindmap/LearnMoreModal';
@@ -161,6 +162,171 @@ export default function MindMapPage() {
     const [exporting, setExporting] = useState(false);
     const containerRef = useRef(null);
     const mindmapRef = useRef(null);
+    
+    // Pan and annotation state
+    const [isPanning, setIsPanning] = useState(false);
+    const [panOffset, setPanOffset] = useState({ x: 0, y: 0 });
+    const [isDragging, setIsDragging] = useState(false);
+    const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
+    const [spacePressed, setSpacePressed] = useState(false);
+    
+    // Annotation state
+    const [annotationMode, setAnnotationMode] = useState(null); // null, 'draw', 'text', 'rectangle', 'circle', 'eraser'
+    const [annotations, setAnnotations] = useState([]);
+    const [currentAnnotation, setCurrentAnnotation] = useState(null);
+    const [annotationColor, setAnnotationColor] = useState('#ef4444');
+    const canvasOverlayRef = useRef(null);
+    const [textInput, setTextInput] = useState({ visible: false, x: 0, y: 0, value: '' });
+
+    // Handle spacebar for panning
+    useEffect(() => {
+        const handleKeyDown = (e) => {
+            if (e.code === 'Space' && !e.target.matches('input, textarea')) {
+                e.preventDefault();
+                setSpacePressed(true);
+            }
+        };
+        const handleKeyUp = (e) => {
+            if (e.code === 'Space') {
+                setSpacePressed(false);
+                setIsDragging(false);
+            }
+        };
+        window.addEventListener('keydown', handleKeyDown);
+        window.addEventListener('keyup', handleKeyUp);
+        return () => {
+            window.removeEventListener('keydown', handleKeyDown);
+            window.removeEventListener('keyup', handleKeyUp);
+        };
+    }, []);
+
+    const handleCanvasMouseDown = (e) => {
+        if (spacePressed) {
+            setIsDragging(true);
+            setDragStart({ x: e.clientX - panOffset.x, y: e.clientY - panOffset.y });
+            return;
+        }
+        
+        if (!annotationMode) return;
+        
+        const rect = canvasOverlayRef.current.getBoundingClientRect();
+        const x = e.clientX - rect.left;
+        const y = e.clientY - rect.top;
+        
+        if (annotationMode === 'text') {
+            setTextInput({ visible: true, x, y, value: '' });
+            return;
+        }
+        
+        if (annotationMode === 'eraser') {
+            const threshold = 20;
+            setAnnotations(prev => prev.filter(ann => {
+                if (ann.type === 'draw') {
+                    return !ann.points.some(p => Math.abs(p.x - x) < threshold && Math.abs(p.y - y) < threshold);
+                }
+                if (ann.type === 'text') {
+                    return !(Math.abs(ann.x - x) < 50 && Math.abs(ann.y - y) < 20);
+                }
+                if (ann.type === 'rectangle' || ann.type === 'circle') {
+                    const centerX = ann.x + ann.width / 2;
+                    const centerY = ann.y + ann.height / 2;
+                    return !(Math.abs(centerX - x) < Math.max(ann.width / 2, threshold) && Math.abs(centerY - y) < Math.max(ann.height / 2, threshold));
+                }
+                return true;
+            }));
+            return;
+        }
+        
+        if (annotationMode === 'draw') {
+            setCurrentAnnotation({ type: 'draw', points: [{ x, y }], color: annotationColor });
+        } else if (annotationMode === 'rectangle' || annotationMode === 'circle') {
+            setCurrentAnnotation({ type: annotationMode, x, y, width: 0, height: 0, color: annotationColor });
+        }
+    };
+
+    const handleCanvasMouseMove = (e) => {
+        if (isDragging && spacePressed) {
+            setPanOffset({
+                x: e.clientX - dragStart.x,
+                y: e.clientY - dragStart.y
+            });
+            return;
+        }
+        
+        if (!currentAnnotation) return;
+        
+        const rect = canvasOverlayRef.current.getBoundingClientRect();
+        const x = e.clientX - rect.left;
+        const y = e.clientY - rect.top;
+        
+        if (currentAnnotation.type === 'draw') {
+            setCurrentAnnotation(prev => ({
+                ...prev,
+                points: [...prev.points, { x, y }]
+            }));
+        } else if (currentAnnotation.type === 'rectangle' || currentAnnotation.type === 'circle') {
+            setCurrentAnnotation(prev => ({
+                ...prev,
+                width: x - prev.x,
+                height: y - prev.y
+            }));
+        }
+    };
+
+    const handleCanvasMouseUp = () => {
+        setIsDragging(false);
+        if (currentAnnotation) {
+            setAnnotations(prev => [...prev, currentAnnotation]);
+            setCurrentAnnotation(null);
+        }
+    };
+
+    const handleTextSubmit = () => {
+        if (textInput.value.trim()) {
+            setAnnotations(prev => [...prev, {
+                type: 'text',
+                x: textInput.x,
+                y: textInput.y,
+                text: textInput.value,
+                color: annotationColor
+            }]);
+        }
+        setTextInput({ visible: false, x: 0, y: 0, value: '' });
+    };
+
+    const clearAnnotations = () => {
+        setAnnotations([]);
+    };
+
+    const renderAnnotations = () => {
+        const allAnnotations = [...annotations, currentAnnotation].filter(Boolean);
+        return (
+            <svg className="absolute inset-0 w-full h-full pointer-events-none" style={{ zIndex: 10 }}>
+                {allAnnotations.map((ann, i) => {
+                    if (ann.type === 'draw') {
+                        const pathData = ann.points.map((p, j) => `${j === 0 ? 'M' : 'L'} ${p.x} ${p.y}`).join(' ');
+                        return <path key={i} d={pathData} stroke={ann.color} strokeWidth="3" fill="none" strokeLinecap="round" />;
+                    }
+                    if (ann.type === 'text') {
+                        return <text key={i} x={ann.x} y={ann.y} fill={ann.color} fontSize="16" fontWeight="500">{ann.text}</text>;
+                    }
+                    if (ann.type === 'rectangle') {
+                        const x = ann.width < 0 ? ann.x + ann.width : ann.x;
+                        const y = ann.height < 0 ? ann.y + ann.height : ann.y;
+                        return <rect key={i} x={x} y={y} width={Math.abs(ann.width)} height={Math.abs(ann.height)} stroke={ann.color} strokeWidth="3" fill="none" />;
+                    }
+                    if (ann.type === 'circle') {
+                        const cx = ann.x + ann.width / 2;
+                        const cy = ann.y + ann.height / 2;
+                        const rx = Math.abs(ann.width / 2);
+                        const ry = Math.abs(ann.height / 2);
+                        return <ellipse key={i} cx={cx} cy={cy} rx={rx} ry={ry} stroke={ann.color} strokeWidth="3" fill="none" />;
+                    }
+                    return null;
+                })}
+            </svg>
+        );
+    };
 
     const exportMindMap = async (format) => {
         if (!mindmapRef.current) return;
@@ -314,7 +480,89 @@ export default function MindMapPage() {
                         <h1 className="text-xl font-bold text-gray-900">Neural MindMaps</h1>
                     </div>
 
-                    <div className="flex gap-2">
+                    <div className="flex gap-2 flex-wrap">
+                        {/* Annotation tools */}
+                        {treeData && (
+                            <div className="flex gap-1 bg-gray-100 rounded-lg p-1">
+                                <Button
+                                    variant={annotationMode === null ? "secondary" : "ghost"}
+                                    size="sm"
+                                    onClick={() => setAnnotationMode(null)}
+                                    title="Select (Hold Space to pan)"
+                                >
+                                    <Hand className="w-4 h-4" />
+                                </Button>
+                                <Button
+                                    variant={annotationMode === 'draw' ? "secondary" : "ghost"}
+                                    size="sm"
+                                    onClick={() => setAnnotationMode('draw')}
+                                    title="Draw"
+                                >
+                                    <Pencil className="w-4 h-4" />
+                                </Button>
+                                <Button
+                                    variant={annotationMode === 'text' ? "secondary" : "ghost"}
+                                    size="sm"
+                                    onClick={() => setAnnotationMode('text')}
+                                    title="Text"
+                                >
+                                    <Type className="w-4 h-4" />
+                                </Button>
+                                <Button
+                                    variant={annotationMode === 'rectangle' ? "secondary" : "ghost"}
+                                    size="sm"
+                                    onClick={() => setAnnotationMode('rectangle')}
+                                    title="Rectangle"
+                                >
+                                    <Square className="w-4 h-4" />
+                                </Button>
+                                <Button
+                                    variant={annotationMode === 'circle' ? "secondary" : "ghost"}
+                                    size="sm"
+                                    onClick={() => setAnnotationMode('circle')}
+                                    title="Circle"
+                                >
+                                    <Circle className="w-4 h-4" />
+                                </Button>
+                                <Button
+                                    variant={annotationMode === 'eraser' ? "secondary" : "ghost"}
+                                    size="sm"
+                                    onClick={() => setAnnotationMode('eraser')}
+                                    title="Eraser"
+                                >
+                                    <Eraser className="w-4 h-4" />
+                                </Button>
+                                <Popover>
+                                    <PopoverTrigger asChild>
+                                        <Button variant="ghost" size="sm" title="Color">
+                                            <div className="w-4 h-4 rounded-full border-2 border-gray-300" style={{ backgroundColor: annotationColor }} />
+                                        </Button>
+                                    </PopoverTrigger>
+                                    <PopoverContent className="w-auto p-2">
+                                        <div className="flex gap-1">
+                                            {['#ef4444', '#f97316', '#eab308', '#22c55e', '#3b82f6', '#8b5cf6', '#ec4899', '#000000'].map(color => (
+                                                <button
+                                                    key={color}
+                                                    className={`w-6 h-6 rounded-full border-2 ${annotationColor === color ? 'border-gray-800' : 'border-transparent'}`}
+                                                    style={{ backgroundColor: color }}
+                                                    onClick={() => setAnnotationColor(color)}
+                                                />
+                                            ))}
+                                        </div>
+                                    </PopoverContent>
+                                </Popover>
+                                <Button
+                                    variant="ghost"
+                                    size="sm"
+                                    onClick={clearAnnotations}
+                                    title="Clear all annotations"
+                                    className="text-red-500 hover:text-red-600 hover:bg-red-50"
+                                >
+                                    <Trash2 className="w-4 h-4" />
+                                </Button>
+                            </div>
+                        )}
+
                         {/* Export dropdown */}
                         {treeData && (
                             <DropdownMenu>
@@ -417,8 +665,32 @@ export default function MindMapPage() {
                             onRetry={() => handleSearch(searchTerm || 'Technology')}
                         />
                     ) : (
-                        <div className="flex justify-center overflow-x-auto pt-4" ref={mindmapRef}>
-                            <div className="min-w-max px-8">
+                        <div 
+                            className={`relative flex justify-center overflow-auto pt-4 ${spacePressed ? 'cursor-grab' : ''} ${isDragging ? 'cursor-grabbing' : ''} ${annotationMode === 'draw' || annotationMode === 'rectangle' || annotationMode === 'circle' ? 'cursor-crosshair' : ''} ${annotationMode === 'text' ? 'cursor-text' : ''} ${annotationMode === 'eraser' ? 'cursor-pointer' : ''}`}
+                            ref={canvasOverlayRef}
+                            onMouseDown={handleCanvasMouseDown}
+                            onMouseMove={handleCanvasMouseMove}
+                            onMouseUp={handleCanvasMouseUp}
+                            onMouseLeave={handleCanvasMouseUp}
+                        >
+                            {renderAnnotations()}
+                            {textInput.visible && (
+                                <input
+                                    autoFocus
+                                    type="text"
+                                    value={textInput.value}
+                                    onChange={(e) => setTextInput(prev => ({ ...prev, value: e.target.value }))}
+                                    onBlur={handleTextSubmit}
+                                    onKeyDown={(e) => { if (e.key === 'Enter') handleTextSubmit(); }}
+                                    className="absolute z-20 px-2 py-1 border border-gray-300 rounded text-sm outline-none focus:border-purple-500"
+                                    style={{ left: textInput.x, top: textInput.y, color: annotationColor }}
+                                />
+                            )}
+                            <div 
+                                className="min-w-max px-8 transition-transform duration-75"
+                                style={{ transform: `translate(${panOffset.x}px, ${panOffset.y}px)` }}
+                                ref={mindmapRef}
+                            >
                                 <TreeNode
                                     node={treeData}
                                     colorIndex={0}

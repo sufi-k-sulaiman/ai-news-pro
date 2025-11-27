@@ -1,5 +1,5 @@
 import React from 'react';
-import { Shield, Lock, Users, Database, Globe, Mail, AlertTriangle, FileText, Eye, Server, UserCheck, Brain, Baby, Fingerprint, Scale, ShieldCheck, BarChart3, LogOut, ClipboardCheck, Cloud, GraduationCap, Building2, Heart, DollarSign, Share2, HardDrive, Baby as Child, Key, Link2, RefreshCw } from 'lucide-react';
+import { Shield, Users, Database, Globe, Mail, AlertTriangle, FileText, Eye, Server, UserCheck, Brain, Baby, Fingerprint, Scale, ShieldCheck, BarChart3, LogOut, ClipboardCheck, Cloud, GraduationCap, Building2, Heart, DollarSign, Share2, HardDrive, Key, Link2, RefreshCw } from 'lucide-react';
 
 const Section = ({ number, title, icon: Icon, children }) => (
     <div className="mb-8">

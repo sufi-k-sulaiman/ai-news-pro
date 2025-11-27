@@ -6,9 +6,9 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import ReactMarkdown from 'react-markdown';
-import MetricCard from '../components/dashboard/MetricCard';
-import PieChartCard from '../components/dashboard/PieChartCard';
-import { LOGO_URL } from '../components/NavigationConfig';
+import MetricCard from '@/components/dashboard/MetricCard';
+import PieChartCard from '@/components/dashboard/PieChartCard';
+import { LOGO_URL } from '@/components/NavigationConfig';
 
 const AI_MODELS = [
     { id: 'qwirey', name: 'Qwirey', icon: null, isLogo: true, description: 'All-in-one AI assistant', color: '#6B4EE6' },

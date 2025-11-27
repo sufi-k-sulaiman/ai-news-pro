@@ -20,6 +20,7 @@ import ContactUs from './pages/ContactUs';
 import CookiePolicyPage from './pages/CookiePolicyPage';
 import PrivacyPolicy from './pages/PrivacyPolicy';
 import Search from './pages/Search';
+import Home from './pages/Home';
 import __Layout from './Layout.jsx';
 
 
@@ -46,6 +47,7 @@ export const PAGES = {
     "CookiePolicyPage": CookiePolicyPage,
     "PrivacyPolicy": PrivacyPolicy,
     "Search": Search,
+    "Home": Home,
 }
 
 export const pagesConfig = {

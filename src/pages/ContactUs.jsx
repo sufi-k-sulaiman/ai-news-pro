@@ -58,13 +58,13 @@ const ContactCard = ({ icon: Icon, title, description, email, buttonText, color,
             >
                 {/* Front of card */}
                 <div 
-                    className="absolute inset-0 bg-white rounded-2xl border border-gray-200 p-6 hover:shadow-lg transition-shadow"
+                    className="absolute inset-0 bg-white rounded-2xl border border-gray-200 p-6 hover:shadow-lg transition-shadow flex flex-col"
                     style={{ backfaceVisibility: 'hidden' }}
                 >
                     <div className={`w-14 h-14 rounded-xl flex items-center justify-center mb-4`} style={{ backgroundColor: `${color}20` }}>
                         <Icon className="w-7 h-7" style={{ color }} />
                     </div>
-                    <h3 className="text-xl font-bold text-gray-900 mb-2 min-h-[56px] flex items-center">{title}</h3>
+                    <h3 className="text-xl font-bold text-gray-900 mb-4 min-h-[56px] flex items-center">{title}</h3>
                     <a 
                         href={`mailto:${email}?subject=${encodeURIComponent(defaultSubject)}`}
                         className="text-lg font-semibold mb-3 block hover:underline transition-all"
@@ -73,16 +73,16 @@ const ContactCard = ({ icon: Icon, title, description, email, buttonText, color,
                     >
                         {email} <ExternalLink className="w-4 h-4 inline ml-1" />
                     </a>
-                    <p className="text-gray-600 mb-4">{description}</p>
+                    <p className="text-gray-600 flex-1">{description}</p>
                     <button 
                         onClick={() => setFlipped(true)}
-                        className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl text-white font-medium transition-all hover:opacity-90"
+                        className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl text-white font-medium transition-all hover:opacity-90 mt-4"
                         style={{ backgroundColor: color }}
                     >
                         <Send className="w-4 h-4" />
                         {buttonText}
                     </button>
-                    </div>
+                </div>
 
                 {/* Back of card */}
                 <div 

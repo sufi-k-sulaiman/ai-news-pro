@@ -60,11 +60,14 @@ export default function AnomalyDetection({ selectedCountries = [] }) {
         ? ANOMALY_METHODS 
         : ANOMALY_METHODS.filter(m => m.category === activeCategory);
 
+    const [showWarning, setShowWarning] = useState(false);
+
     const runAnomalyDetection = async (method) => {
         if (selectedCountries.length === 0) {
-            alert('Please select at least one country first');
+            setShowWarning(true);
             return;
         }
+        setShowWarning(false);
         
         setSelectedMethod(method);
         setLoading(true);
@@ -362,9 +365,11 @@ export default function AnomalyDetection({ selectedCountries = [] }) {
             )}
 
             {selectedCountries.length === 0 && (
-                <div className="bg-amber-50 rounded-xl border border-amber-200 p-6 text-center">
-                    <AlertTriangle className="w-10 h-10 text-amber-500 mx-auto mb-3" />
-                    <p className="text-amber-700">Please select countries from the header dropdown to run anomaly detection</p>
+                <div className={`rounded-xl border p-6 text-center ${showWarning ? 'bg-red-50 border-red-200' : 'bg-amber-50 border-amber-200'}`}>
+                    <AlertTriangle className={`w-10 h-10 mx-auto mb-3 ${showWarning ? 'text-red-500' : 'text-amber-500'}`} />
+                    <p className={showWarning ? 'text-red-700 font-medium' : 'text-amber-700'}>
+                        {showWarning ? 'Please select a country first to run detection' : 'Please select a country from the header dropdown to run anomaly detection'}
+                    </p>
                 </div>
             )}
         </div>

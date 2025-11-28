@@ -50,11 +50,14 @@ export default function GeographicalModels({ selectedCountries = [] }) {
         ? GEOGRAPHICAL_MODELS 
         : GEOGRAPHICAL_MODELS.filter(m => m.category === activeCategory);
 
+    const [showWarning, setShowWarning] = useState(false);
+
     const runModelAnalysis = async (model) => {
         if (selectedCountries.length === 0) {
-            alert('Please select at least one country first');
+            setShowWarning(true);
             return;
         }
+        setShowWarning(false);
         
         setSelectedModel(model);
         setLoading(true);
@@ -276,9 +279,11 @@ export default function GeographicalModels({ selectedCountries = [] }) {
             )}
 
             {selectedCountries.length === 0 && (
-                <div className="bg-amber-50 rounded-xl border border-amber-200 p-6 text-center">
-                    <Globe className="w-10 h-10 text-amber-500 mx-auto mb-3" />
-                    <p className="text-amber-700">Please select countries from the header dropdown to run model analysis</p>
+                <div className={`rounded-xl border p-6 text-center ${showWarning ? 'bg-red-50 border-red-200' : 'bg-amber-50 border-amber-200'}`}>
+                    <Globe className={`w-10 h-10 mx-auto mb-3 ${showWarning ? 'text-red-500' : 'text-amber-500'}`} />
+                    <p className={showWarning ? 'text-red-700 font-medium' : 'text-amber-700'}>
+                        {showWarning ? 'Please select a country first to run analysis' : 'Please select a country from the header dropdown to run model analysis'}
+                    </p>
                 </div>
             )}
         </div>

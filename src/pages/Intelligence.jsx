@@ -325,6 +325,38 @@ Provide:
     return (
         <div className="min-h-screen bg-gray-50 p-4 md:p-6">
             <div className="max-w-7xl mx-auto">
+                {/* Controls Row */}
+                <div className="flex flex-wrap gap-3 mb-6">
+                    <MultiSelectDropdown
+                        options={DOMAINS}
+                        selected={selectedDomains}
+                        onChange={setSelectedDomains}
+                        placeholder="Select Domains"
+                        icon={Building2}
+                    />
+                    <MultiSelectDropdown
+                        options={COUNTRIES}
+                        selected={selectedCountries}
+                        onChange={setSelectedCountries}
+                        placeholder="Select Countries"
+                        icon={Globe}
+                    />
+                    <MultiSelectDropdown
+                        options={TIME_HORIZONS}
+                        selected={selectedTimeHorizons}
+                        onChange={setSelectedTimeHorizons}
+                        placeholder="Time Horizons"
+                        icon={Clock}
+                    />
+                    <MultiSelectDropdown
+                        options={MODEL_TYPES}
+                        selected={selectedModels}
+                        onChange={setSelectedModels}
+                        placeholder="Models"
+                        icon={Cpu}
+                    />
+                </div>
+
                 {/* Header */}
                 <div className="bg-gradient-to-r from-purple-600 to-indigo-600 rounded-2xl p-6 mb-6 text-white">
                     <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">

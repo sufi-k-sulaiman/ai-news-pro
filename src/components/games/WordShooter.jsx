@@ -161,8 +161,9 @@ export default function WordShooter({ onExit }) {
 
   const handleLevelComplete = (score) => {
     setTotalScore(prev => prev + score);
-    if (!completedLevels.includes(currentLevel)) {
-      setCompletedLevels(prev => [...prev, currentLevel]);
+    const levelId = subLevels[currentLevel - 1]?.id;
+    if (levelId && !completedLevels.includes(levelId)) {
+      setCompletedLevels(prev => [...prev, levelId]);
     }
     setScreen('levels');
   };

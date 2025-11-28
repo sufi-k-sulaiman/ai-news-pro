@@ -1687,51 +1687,27 @@ export default function Geospatial() {
                     <GeographicalModels selectedCountries={selectedCountries} />
                 )}
 
-                {/* Country Data Tab - simplified version */}
-                {mainTab === 'geographical' && (
-                    <div className="bg-gray-50 border border-gray-200 rounded-xl p-8 text-center">
-                        <Globe className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-                        <h3 className="text-lg font-semibold text-gray-700 mb-2">Country Data Moved to Geomatics</h3>
-                        <p className="text-sm text-gray-500">The detailed country infrastructure and resource data is now available in the Geomatics tab. Click on Geomatics to access all country-specific data.</p>
-                    </div>
+                {/* Anomaly Detection Tab */}
+                {mainTab === 'anomaly' && (
+                    <AnomalyDetection selectedCountries={selectedCountries} />
                 )}
 
-
-                    <div className="bg-gradient-to-r from-purple-50 to-indigo-50 rounded-2xl p-6 border border-purple-100">
-                        <div className="flex items-center justify-center py-8">
-                            <Loader2 className="w-8 h-8 text-purple-600 animate-spin mr-3" />
-                            <span className="text-gray-600">Generating AI analysis...</span>
-                        </div>
-                    </div>
-                )}
-                {selectedCountries.length > 0 && !loadingSections.summary && analysisData && (
-                    <div className="bg-gradient-to-r from-purple-50 to-indigo-50 rounded-2xl p-6 border border-purple-100">
-                        <h3 className="font-bold text-gray-900 mb-3">AI Analysis Summary - {selectedCountries.join(', ')}</h3>
-                        <div className="text-gray-700 mb-4 prose prose-sm max-w-none">
-                            <ReactMarkdown>{analysisData.summary || ''}</ReactMarkdown>
-                        </div>
-                        {analysisData.keyInsights?.length > 0 && (
-                            <div className="bg-white rounded-xl p-4">
-                                <h4 className="font-semibold text-emerald-700 mb-2">Key Insights</h4>
-                                <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
-                                    {analysisData.keyInsights.map((item, i) => (
-                                        <div key={i} className="text-sm text-gray-600 flex items-start gap-2">
-                                            <ChevronRight className="w-4 h-4 text-emerald-500 mt-0.5 flex-shrink-0" />
-                                            <span>{item}</span>
-                                        </div>
-                                    ))}
-                                </div>
-                            </div>
-                        )}
-                    </div>
+                {/* Geographical Models Tab */}
+                {mainTab === 'models' && (
+                    <GeographicalModels selectedCountries={selectedCountries} />
                 )}
 
-
-
-
-
-                                    {/* CORE INFRASTRUCTURE */}
-                                    {selectedCountries.length > 0 && (activeCategory === 'all' || activeCategory === 'infrastructure') && (
+                <CountrySelectModal
+                    isOpen={showCountryModal}
+                    onClose={() => setShowCountryModal(false)}
+                    selectedCountry={selectedCountry}
+                    onSelect={setSelectedCountry}
+                    title="Select Country for Analysis"
+                />
+            </div>
+        </div>
+    );
+}
                     <CategorySection
                         title={`Core Infrastructure - ${selectedCountries.join(', ')}`}
                         description="Transportation, energy, water, telecommunications, and defense systems"

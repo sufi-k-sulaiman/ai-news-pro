@@ -584,14 +584,14 @@ export default function Geospatial() {
 
                 {/* Geographical Models Tab - Instruction or Selected Countries Display */}
                 {mainTab === 'geographical' && (
-                <>
-                {selectedCountries.length === 0 ? (
+                    selectedCountries.length === 0 ? (
                     <div className="bg-gray-50 border border-gray-200 rounded-xl p-8 text-center">
                         <Globe className="w-12 h-12 text-gray-400 mx-auto mb-4" />
                         <h3 className="text-lg font-semibold text-gray-700 mb-2">Select Countries to Begin</h3>
                         <p className="text-sm text-gray-500">Choose one or more countries from the dropdown above to view infrastructure and resource data</p>
                     </div>
-                ) : (
+                    ) : (
+                    <>
                     <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                         {CATEGORIES.map(cat => (
                             <button
@@ -608,7 +608,6 @@ export default function Geospatial() {
                             </button>
                         ))}
                     </div>
-                )}
 
                 {/* Analysis Results */}
                 {selectedCountries.length > 0 && loadingSections.summary && (

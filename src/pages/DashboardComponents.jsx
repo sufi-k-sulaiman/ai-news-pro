@@ -36,6 +36,7 @@ import ComparisonTable from '@/components/dashboard/ComparisonTable';
 import ProgressListCard from '@/components/dashboard/ProgressListCard';
 import NotificationList from '@/components/dashboard/NotificationList';
 import KPIGridCard from '@/components/dashboard/KPIGridCard';
+import { Island1, Island2, Island3, Island4, Island5, Island6, Island7, Island8, Island9 } from '@/components/islands/IslandSVGs';
 
 export default function DashboardComponents() {
     return (

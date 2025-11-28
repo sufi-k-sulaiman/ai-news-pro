@@ -477,13 +477,7 @@ Provide detailed JSON with:
                         placeholder="Time Horizons"
                         icon={Clock}
                     />
-                    <MultiSelectDropdown
-                        options={MODEL_TYPES}
-                        selected={selectedModels}
-                        onChange={setSelectedModels}
-                        placeholder="Models"
-                        icon={Cpu}
-                    />
+
                 </div>
 
                 {/* View Tabs */}

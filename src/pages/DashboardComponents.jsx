@@ -38,6 +38,7 @@ import NotificationList from '@/components/dashboard/NotificationList';
 import KPIGridCard from '@/components/dashboard/KPIGridCard';
 import { Island1, Island2, Island3, Island4, Island5, Island6, Island7, Island8, Island9 } from '@/components/islands/IslandSVGs';
 import { Island10, Island11, Island12, Island13, Island14, Island15, Island16, Island17, Island18 } from '@/components/islands/IslandSVGs2';
+import { Island19, Island20, Island21, Island22, Island23, Island24, Island25, Island26, Island27 } from '@/components/islands/IslandSVGs3';
 
 export default function DashboardComponents() {
     return (
@@ -210,6 +211,36 @@ export default function DashboardComponents() {
                             </div>
                             <div className="bg-white rounded-xl p-4 border border-gray-200 flex items-center justify-center">
                                 <Island9 className="w-20 h-20" color="#3B82F6" />
+                            </div>
+                        </div>
+                        <h3 className="text-lg font-medium text-gray-600 mt-6 mb-4">Extended Collection</h3>
+                        <div className="grid grid-cols-3 md:grid-cols-5 lg:grid-cols-9 gap-4">
+                            <div className="bg-white rounded-xl p-4 border border-gray-200 flex items-center justify-center">
+                                <Island10 className="w-20 h-20" color="#DC2626" />
+                            </div>
+                            <div className="bg-white rounded-xl p-4 border border-gray-200 flex items-center justify-center">
+                                <Island11 className="w-20 h-20" color="#059669" />
+                            </div>
+                            <div className="bg-white rounded-xl p-4 border border-gray-200 flex items-center justify-center">
+                                <Island12 className="w-20 h-20" color="#D97706" />
+                            </div>
+                            <div className="bg-white rounded-xl p-4 border border-gray-200 flex items-center justify-center">
+                                <Island13 className="w-20 h-20" color="#065F46" />
+                            </div>
+                            <div className="bg-white rounded-xl p-4 border border-gray-200 flex items-center justify-center">
+                                <Island14 className="w-20 h-20" color="#1D4ED8" />
+                            </div>
+                            <div className="bg-white rounded-xl p-4 border border-gray-200 flex items-center justify-center">
+                                <Island15 className="w-20 h-20" color="#B91C1C" />
+                            </div>
+                            <div className="bg-white rounded-xl p-4 border border-gray-200 flex items-center justify-center">
+                                <Island16 className="w-20 h-20" color="#7C3AED" />
+                            </div>
+                            <div className="bg-white rounded-xl p-4 border border-gray-200 flex items-center justify-center">
+                                <Island17 className="w-20 h-20" color="#0891B2" />
+                            </div>
+                            <div className="bg-white rounded-xl p-4 border border-gray-200 flex items-center justify-center">
+                                <Island18 className="w-20 h-20" color="#CA8A04" />
                             </div>
                         </div>
                     </section>

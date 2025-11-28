@@ -659,14 +659,19 @@ export default function Qwirey() {
                                         key={format.id}
                                         onClick={() => handleFormatChange(format.id)}
                                         disabled={formatLoading}
-                                        className={`px-3 h-10 rounded-lg text-xs font-medium transition-all ${
+                                        className={`px-3 h-10 rounded-lg text-xs font-medium transition-all flex items-center justify-center gap-1.5 ${
                                             responseFormat === format.id
                                                 ? 'bg-white text-purple-700 shadow-sm'
                                                 : 'text-gray-500 hover:text-gray-700'
                                         } ${formatLoading ? 'opacity-50 cursor-not-allowed' : ''}`}
                                     >
                                         {formatLoading && responseFormat === format.id ? (
-                                            <Loader2 className="w-3 h-3 animate-spin" />
+                                            <div className="flex items-center gap-1.5">
+                                                <div className="relative w-4 h-4">
+                                                    <div className="absolute inset-0 rounded-full border-2 border-purple-200 border-t-purple-600 animate-spin" />
+                                                </div>
+                                                <span>Loading</span>
+                                            </div>
                                         ) : format.label}
                                     </button>
                                 ))}

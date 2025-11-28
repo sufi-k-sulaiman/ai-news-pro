@@ -560,30 +560,24 @@ export default function Geospatial() {
                 </div>
 
                 {/* Main Tabs */}
-                <div className="flex gap-2 bg-white rounded-xl p-1.5 border border-gray-200 w-fit">
+                <div className="flex gap-1 bg-white rounded-xl p-1.5 border border-gray-200 w-fit">
                     <button
                         onClick={() => setMainTab('geomatics')}
-                        className={`px-5 py-2.5 rounded-lg font-medium transition-all ${mainTab === 'geomatics' ? 'bg-blue-600 text-white' : 'text-gray-600 hover:bg-gray-100'}`}
+                        className={`px-6 py-2.5 rounded-lg font-medium transition-all ${mainTab === 'geomatics' ? 'bg-purple-600 text-white' : 'text-gray-600 hover:bg-gray-100'}`}
                     >
                         Geomatics
                     </button>
                     <button
                         onClick={() => setMainTab('anomaly')}
-                        className={`px-5 py-2.5 rounded-lg font-medium transition-all ${mainTab === 'anomaly' ? 'bg-blue-600 text-white' : 'text-gray-600 hover:bg-gray-100'}`}
+                        className={`px-6 py-2.5 rounded-lg font-medium transition-all ${mainTab === 'anomaly' ? 'bg-purple-600 text-white' : 'text-gray-600 hover:bg-gray-100'}`}
                     >
                         Anomaly Detection
                     </button>
                     <button
                         onClick={() => setMainTab('models')}
-                        className={`px-5 py-2.5 rounded-lg font-medium transition-all ${mainTab === 'models' ? 'bg-blue-600 text-white' : 'text-gray-600 hover:bg-gray-100'}`}
+                        className={`px-6 py-2.5 rounded-lg font-medium transition-all ${mainTab === 'models' ? 'bg-purple-600 text-white' : 'text-gray-600 hover:bg-gray-100'}`}
                     >
                         Geographical Models
-                    </button>
-                    <button
-                        onClick={() => setMainTab('geographical')}
-                        className={`px-5 py-2.5 rounded-lg font-medium transition-all ${mainTab === 'geographical' ? 'bg-blue-600 text-white' : 'text-gray-600 hover:bg-gray-100'}`}
-                    >
-                        Country Data
                     </button>
                 </div>
 

@@ -2229,16 +2229,16 @@ export default function StockDetailModal({ stock, isOpen, onClose }) {
                                             { title: `Q2 2024 Earnings Release`, date: 'July 24, 2024' },
                                             { title: `Q1 2024 Earnings Release`, date: 'April 25, 2024' }
                                         ]).map((r, i) => (
-                                            <div key={i} className="flex items-center gap-3 p-4 bg-gray-50 rounded-xl hover:bg-gray-100 cursor-pointer transition-colors">
+                                            <a key={i} href={r.url || `https://www.sec.gov/cgi-bin/browse-edgar?action=getcompany&CIK=${stock.ticker}&type=8-K`} target="_blank" rel="noopener noreferrer" className="flex items-center gap-3 p-4 bg-gray-50 rounded-xl hover:bg-green-50 cursor-pointer transition-colors block">
                                                 <div className="w-9 h-9 rounded-lg bg-green-100 flex items-center justify-center flex-shrink-0">
                                                     <TrendingUp className="w-4 h-4 text-green-600" />
                                                 </div>
                                                 <div className="flex-1 min-w-0">
-                                                    <p className="font-medium text-gray-900">{r.title}</p>
+                                                    <p className="font-medium text-gray-900 hover:text-green-600">{r.title}</p>
                                                     <p className="text-sm text-gray-500">{r.date}</p>
                                                 </div>
-                                                <Download className="w-4 h-4 text-gray-400" />
-                                            </div>
+                                                <ExternalLink className="w-4 h-4 text-gray-400" />
+                                            </a>
                                         ))}
                                     </div>
                                 </>

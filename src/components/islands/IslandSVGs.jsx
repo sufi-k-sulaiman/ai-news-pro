@@ -1,153 +1,197 @@
 import React from 'react';
 
-// Island 1 - Two palm trees on round mound
+// Island 1 - Two palm trees on round mound (top-left)
 export const Island1 = ({ className = "", color = "currentColor" }) => (
-    <svg viewBox="0 0 120 100" className={className} fill={color}>
+    <svg viewBox="0 0 100 80" className={className} fill={color}>
         {/* Left palm tree */}
-        <path d="M35 45 Q30 30 20 25 Q28 28 32 35 Q30 22 18 18 Q28 22 35 32 Q38 20 30 12 Q38 18 40 30 Q45 18 55 15 Q45 22 42 32 Q55 22 62 18 Q52 28 43 35 L40 45" />
-        <rect x="37" y="45" width="6" height="25" />
+        <g transform="translate(25, 10)">
+            {/* Fronds */}
+            <path d="M12 30 Q8 20 -5 18 Q5 22 8 28 Q4 15 -8 12 Q5 18 10 26 Q8 12 -2 5 Q10 15 12 24 Q15 10 25 5 Q15 15 14 24 Q20 12 30 10 Q18 18 15 26 Q25 18 32 18 Q20 22 14 28 L12 30" />
+            {/* Trunk */}
+            <path d="M10 30 Q12 45 10 55" stroke={color} strokeWidth="4" fill="none" />
+        </g>
         {/* Right palm tree */}
-        <path d="M75 40 Q70 25 60 20 Q68 23 72 30 Q70 17 58 13 Q68 17 75 27 Q78 15 70 7 Q78 13 80 25 Q85 13 95 10 Q85 17 82 27 Q95 17 102 13 Q92 23 83 30 L80 40" />
-        <rect x="77" y="40" width="6" height="30" />
+        <g transform="translate(55, 5)">
+            {/* Fronds */}
+            <path d="M12 25 Q8 15 -5 13 Q5 17 8 23 Q4 10 -8 7 Q5 13 10 21 Q8 7 -2 0 Q10 10 12 19 Q15 5 25 0 Q15 10 14 19 Q20 7 30 5 Q18 13 15 21 Q25 13 32 13 Q20 17 14 23 L12 25" />
+            {/* Trunk */}
+            <path d="M10 25 Q12 40 10 55" stroke={color} strokeWidth="4" fill="none" />
+        </g>
         {/* Ground mound */}
-        <ellipse cx="60" cy="78" rx="50" ry="18" />
+        <ellipse cx="50" cy="68" rx="42" ry="12" />
     </svg>
 );
 
-// Island 2 - Two tall palms on flat island
+// Island 2 - Two tall palms on flat island (top-center)
 export const Island2 = ({ className = "", color = "currentColor" }) => (
-    <svg viewBox="0 0 120 100" className={className} fill={color}>
-        {/* Left palm */}
-        <path d="M40 35 Q32 20 22 18 Q32 22 38 30 Q35 15 22 10 Q35 15 42 28 Q48 15 58 12 Q48 20 44 30 Q58 20 68 18 Q55 25 45 32 L43 35" />
-        <rect x="40" y="35" width="5" height="35" />
-        {/* Right palm */}
-        <path d="M78 30 Q70 15 60 13 Q70 17 76 25 Q73 10 60 5 Q73 10 80 23 Q86 10 96 7 Q86 15 82 25 Q96 15 106 13 Q93 20 83 27 L81 30" />
-        <rect x="78" y="30" width="5" height="40" />
-        {/* Ground */}
-        <path d="M10 75 Q30 65 60 68 Q90 65 110 75 Q100 85 60 82 Q20 85 10 75 Z" />
+    <svg viewBox="0 0 100 80" className={className} fill={color}>
+        {/* Left palm tree */}
+        <g transform="translate(22, 5)">
+            <path d="M12 22 Q8 12 -5 10 Q5 14 8 20 Q4 7 -8 4 Q5 10 10 18 Q8 4 -2 -3 Q10 7 12 16 Q15 2 25 -3 Q15 7 14 16 Q20 4 30 2 Q18 10 15 18 Q25 10 32 10 Q20 14 14 20 L12 22" />
+            <path d="M10 22 Q12 40 10 58" stroke={color} strokeWidth="4" fill="none" />
+        </g>
+        {/* Right palm tree */}
+        <g transform="translate(58, 0)">
+            <path d="M12 22 Q8 12 -5 10 Q5 14 8 20 Q4 7 -8 4 Q5 10 10 18 Q8 4 -2 -3 Q10 7 12 16 Q15 2 25 -3 Q15 7 14 16 Q20 4 30 2 Q18 10 15 18 Q25 10 32 10 Q20 14 14 20 L12 22" />
+            <path d="M10 22 Q12 42 10 60" stroke={color} strokeWidth="4" fill="none" />
+        </g>
+        {/* Ground - irregular flat island */}
+        <path d="M5 68 Q15 60 35 62 Q50 58 70 62 Q90 60 95 68 Q80 75 50 73 Q20 75 5 68 Z" />
     </svg>
 );
 
-// Island 3 - Palm with sun, mountain, and birds
+// Island 3 - Palm with sun, mountain, and birds (top-right)
 export const Island3 = ({ className = "", color = "currentColor" }) => (
-    <svg viewBox="0 0 120 100" className={className} fill={color}>
+    <svg viewBox="0 0 100 80" className={className} fill={color}>
         {/* Sun */}
-        <circle cx="100" cy="20" r="12" />
+        <circle cx="85" cy="12" r="10" />
         {/* Birds */}
-        <path d="M65 35 Q68 32 71 35 M75 30 Q78 27 81 30 M58 40 Q61 37 64 40" fill="none" stroke={color} strokeWidth="2" />
+        <path d="M55 28 Q58 24 61 28" fill="none" stroke={color} strokeWidth="1.5" strokeLinecap="round" />
+        <path d="M65 35 Q68 31 71 35" fill="none" stroke={color} strokeWidth="1.5" strokeLinecap="round" />
+        <path d="M50 38 Q53 34 56 38" fill="none" stroke={color} strokeWidth="1.5" strokeLinecap="round" />
         {/* Mountain */}
-        <path d="M50 80 L75 45 L100 80 Z" />
+        <path d="M45 70 L70 30 L95 70 Z" />
         {/* Palm tree */}
-        <path d="M30 50 Q22 35 12 32 Q22 36 28 44 Q25 30 12 25 Q25 30 32 42 Q38 28 48 25 Q38 33 34 44 Q48 33 58 30 Q45 38 35 46 L33 50" />
-        <rect x="30" y="50" width="5" height="28" />
+        <g transform="translate(8, 15)">
+            <path d="M12 22 Q8 12 -5 10 Q5 14 8 20 Q4 7 -8 4 Q5 10 10 18 Q8 4 -2 -3 Q10 7 12 16 Q15 2 25 -3 Q15 7 14 16 Q20 4 30 2 Q18 10 15 18 Q25 10 32 10 Q20 14 14 20 L12 22" />
+            <path d="M10 22 Q12 38 10 52" stroke={color} strokeWidth="4" fill="none" />
+        </g>
         {/* Ground */}
-        <ellipse cx="50" cy="82" rx="45" ry="12" />
+        <ellipse cx="45" cy="72" rx="40" ry="8" />
     </svg>
 );
 
-// Island 4 - Two crossing palms
+// Island 4 - Two palms leaning on mound (middle-left)
 export const Island4 = ({ className = "", color = "currentColor" }) => (
-    <svg viewBox="0 0 120 100" className={className} fill={color}>
-        {/* Left palm leaning right */}
-        <path d="M45 40 Q35 25 25 22 Q35 26 42 34 Q38 18 25 12 Q38 18 47 32 Q55 18 65 15 Q55 23 50 34 Q65 23 75 20 Q62 28 52 36 L50 40" />
-        <path d="M30 75 Q35 55 48 42" fill="none" stroke={color} strokeWidth="5" />
-        {/* Right palm leaning left */}
-        <path d="M72 35 Q62 20 52 17 Q62 21 69 29 Q65 13 52 7 Q65 13 74 27 Q82 13 92 10 Q82 18 77 29 Q92 18 102 15 Q89 23 79 31 L77 35" />
-        <path d="M90 75 Q85 50 75 37" fill="none" stroke={color} strokeWidth="5" />
-        {/* Ground */}
-        <ellipse cx="60" cy="78" rx="45" ry="15" />
+    <svg viewBox="0 0 100 80" className={className} fill={color}>
+        {/* Left palm tree */}
+        <g transform="translate(20, 8)">
+            <path d="M12 22 Q8 12 -5 10 Q5 14 8 20 Q4 7 -8 4 Q5 10 10 18 Q8 4 -2 -3 Q10 7 12 16 Q15 2 25 -3 Q15 7 14 16 Q20 4 30 2 Q18 10 15 18 Q25 10 32 10 Q20 14 14 20 L12 22" />
+            <path d="M10 22 Q12 38 10 52" stroke={color} strokeWidth="4" fill="none" />
+        </g>
+        {/* Right palm tree */}
+        <g transform="translate(52, 5)">
+            <path d="M12 22 Q8 12 -5 10 Q5 14 8 20 Q4 7 -8 4 Q5 10 10 18 Q8 4 -2 -3 Q10 7 12 16 Q15 2 25 -3 Q15 7 14 16 Q20 4 30 2 Q18 10 15 18 Q25 10 32 10 Q20 14 14 20 L12 22" />
+            <path d="M10 22 Q12 40 10 55" stroke={color} strokeWidth="4" fill="none" />
+        </g>
+        {/* Ground mound */}
+        <ellipse cx="50" cy="68" rx="38" ry="12" />
     </svg>
 );
 
-// Island 5 - Two palms different heights
+// Island 5 - Two palms different heights (middle-center)
 export const Island5 = ({ className = "", color = "currentColor" }) => (
-    <svg viewBox="0 0 120 100" className={className} fill={color}>
-        {/* Tall left palm */}
-        <path d="M42 30 Q32 15 22 12 Q32 16 40 25 Q36 8 22 2 Q36 8 45 22 Q53 8 63 5 Q53 13 48 25 Q63 13 73 10 Q60 18 50 27 L48 30" />
-        <rect x="43" y="30" width="5" height="40" />
-        {/* Shorter right palm */}
-        <path d="M80 45 Q72 32 62 30 Q72 33 78 40 Q75 25 62 20 Q75 25 82 37 Q88 25 98 22 Q88 30 84 40 Q98 30 108 28 Q95 35 85 42 L83 45" />
-        <rect x="80" y="45" width="5" height="25" />
-        {/* Ground */}
-        <path d="M15 78 Q40 68 60 70 Q80 68 105 78 Q90 88 60 85 Q30 88 15 78 Z" />
+    <svg viewBox="0 0 100 80" className={className} fill={color}>
+        {/* Left taller palm tree */}
+        <g transform="translate(22, 2)">
+            <path d="M12 22 Q8 12 -5 10 Q5 14 8 20 Q4 7 -8 4 Q5 10 10 18 Q8 4 -2 -3 Q10 7 12 16 Q15 2 25 -3 Q15 7 14 16 Q20 4 30 2 Q18 10 15 18 Q25 10 32 10 Q20 14 14 20 L12 22" />
+            <path d="M10 22 Q12 42 10 58" stroke={color} strokeWidth="4" fill="none" />
+        </g>
+        {/* Right shorter palm tree */}
+        <g transform="translate(55, 12)">
+            <path d="M10 18 Q7 10 -3 8 Q4 11 7 16 Q4 6 -5 3 Q4 8 8 15 Q7 4 0 -1 Q8 6 10 13 Q12 2 20 -1 Q13 6 11 13 Q17 4 24 3 Q15 9 12 15 Q20 9 26 9 Q17 12 11 17 L10 18" />
+            <path d="M8 18 Q10 35 8 48" stroke={color} strokeWidth="3.5" fill="none" />
+        </g>
+        {/* Ground - flat irregular */}
+        <path d="M8 68 Q20 60 40 63 Q55 58 75 63 Q92 60 95 68 Q80 75 50 73 Q20 75 8 68 Z" />
     </svg>
 );
 
-// Island 6 - Mountain with palm and sun
+// Island 6 - Mountain with palm and sun (middle-right)
 export const Island6 = ({ className = "", color = "currentColor" }) => (
-    <svg viewBox="0 0 120 100" className={className} fill={color}>
+    <svg viewBox="0 0 100 80" className={className} fill={color}>
         {/* Sun */}
-        <circle cx="100" cy="18" r="10" />
+        <circle cx="88" cy="12" r="8" />
         {/* Bird */}
-        <path d="M75 28 Q78 25 81 28" fill="none" stroke={color} strokeWidth="2" />
-        {/* Mountain */}
-        <path d="M25 82 L55 35 L85 82 Z" />
-        {/* Small palm */}
-        <path d="M95 55 Q88 45 80 43 Q88 46 93 52 Q90 40 80 36 Q90 40 96 50 Q100 40 108 38 Q100 44 97 52 Q108 44 115 42 Q105 48 98 54 L96 55" />
-        <rect x="94" y="55" width="4" height="20" />
+        <path d="M70 25 Q73 21 76 25" fill="none" stroke={color} strokeWidth="1.5" strokeLinecap="round" />
+        {/* Large mountain */}
+        <path d="M15 72 L50 15 L85 72 Z" />
+        {/* Small palm tree on right */}
+        <g transform="translate(75, 30)">
+            <path d="M8 15 Q5 8 -2 6 Q4 9 6 13 Q4 5 -3 2 Q4 6 7 12 Q6 3 1 -1 Q7 5 8 11 Q10 2 16 -1 Q11 5 9 11 Q14 4 19 3 Q13 8 10 13 Q16 8 20 8 Q14 10 9 14 L8 15" />
+            <path d="M7 15 Q8 28 7 38" stroke={color} strokeWidth="3" fill="none" />
+        </g>
         {/* Ground */}
-        <ellipse cx="60" cy="82" rx="50" ry="12" />
+        <ellipse cx="50" cy="74" rx="45" ry="6" />
     </svg>
 );
 
-// Island 7 - Three palms with signposts
+// Island 7 - Three palms with signposts (bottom-left)
 export const Island7 = ({ className = "", color = "currentColor" }) => (
-    <svg viewBox="0 0 120 100" className={className} fill={color}>
-        {/* Left palm */}
-        <path d="M25 45 Q18 32 10 30 Q18 33 23 40 Q20 25 10 20 Q20 25 27 37 Q33 25 42 22 Q33 30 28 40 Q42 30 50 28 Q40 35 30 42 L28 45" />
-        <rect x="25" y="45" width="4" height="25" />
+    <svg viewBox="0 0 100 80" className={className} fill={color}>
+        {/* Left small palm */}
+        <g transform="translate(12, 20)">
+            <path d="M8 15 Q5 8 -2 6 Q4 9 6 13 Q4 5 -3 2 Q4 6 7 12 Q6 3 1 -1 Q7 5 8 11 Q10 2 16 -1 Q11 5 9 11 Q14 4 19 3 Q13 8 10 13 Q16 8 20 8 Q14 10 9 14 L8 15" />
+            <path d="M7 15 Q8 30 7 40" stroke={color} strokeWidth="3" fill="none" />
+        </g>
         {/* Center tall palm */}
-        <path d="M58 35 Q50 20 40 18 Q50 22 56 30 Q53 12 40 6 Q53 12 60 27 Q68 12 78 9 Q68 17 63 30 Q78 17 88 14 Q75 22 65 32 L63 35" />
-        <rect x="58" y="35" width="5" height="35" />
+        <g transform="translate(38, 5)">
+            <path d="M12 22 Q8 12 -5 10 Q5 14 8 20 Q4 7 -8 4 Q5 10 10 18 Q8 4 -2 -3 Q10 7 12 16 Q15 2 25 -3 Q15 7 14 16 Q20 4 30 2 Q18 10 15 18 Q25 10 32 10 Q20 14 14 20 L12 22" />
+            <path d="M10 22 Q12 40 10 55" stroke={color} strokeWidth="4" fill="none" />
+        </g>
         {/* Right small palm */}
-        <path d="M92 50 Q86 40 78 38 Q86 41 90 47 Q88 35 78 30 Q88 35 94 45 Q98 35 106 33 Q98 40 95 48 Q106 40 112 38 Q102 44 96 50 L94 50" />
-        <rect x="92" y="50" width="4" height="20" />
-        {/* Signposts */}
-        <rect x="35" y="60" width="2" height="15" />
-        <rect x="32" y="62" width="8" height="4" />
-        <rect x="80" y="58" width="2" height="17" />
-        <rect x="77" y="60" width="8" height="4" />
-        {/* Ground */}
-        <ellipse cx="60" cy="78" rx="50" ry="15" />
+        <g transform="translate(70, 25)">
+            <path d="M8 15 Q5 8 -2 6 Q4 9 6 13 Q4 5 -3 2 Q4 6 7 12 Q6 3 1 -1 Q7 5 8 11 Q10 2 16 -1 Q11 5 9 11 Q14 4 19 3 Q13 8 10 13 Q16 8 20 8 Q14 10 9 14 L8 15" />
+            <path d="M7 15 Q8 28 7 35" stroke={color} strokeWidth="3" fill="none" />
+        </g>
+        {/* Signpost left */}
+        <rect x="28" y="52" width="2" height="16" />
+        <path d="M22 54 L30 54 L30 58 L22 58 Z" />
+        {/* Signpost right */}
+        <rect x="62" y="50" width="2" height="18" />
+        <path d="M56 52 L64 52 L64 56 L56 56 Z" />
+        {/* Ground mound */}
+        <ellipse cx="50" cy="70" rx="42" ry="10" />
     </svg>
 );
 
-// Island 8 - Palm with rock/mountain and birds
+// Island 8 - Palm with rock/mountain and birds (bottom-center)
 export const Island8 = ({ className = "", color = "currentColor" }) => (
-    <svg viewBox="0 0 120 100" className={className} fill={color}>
+    <svg viewBox="0 0 100 80" className={className} fill={color}>
         {/* Birds */}
-        <path d="M55 25 Q58 22 61 25 M65 30 Q68 27 71 30" fill="none" stroke={color} strokeWidth="2" />
-        {/* Left palm */}
-        <path d="M30 50 Q22 35 12 32 Q22 36 28 44 Q25 28 12 22 Q25 28 32 42 Q40 28 50 25 Q40 33 35 44 Q50 33 60 30 Q47 38 37 46 L35 50" />
-        <rect x="32" y="50" width="5" height="25" />
-        {/* Rock/Mountain */}
-        <path d="M55 78 Q60 55 75 50 Q90 55 95 78 Z" />
-        {/* Right palm */}
-        <path d="M100 55 Q93 42 85 40 Q93 43 98 50 Q95 35 85 30 Q95 35 102 48 Q108 35 116 33 Q108 41 104 50 Q116 41 122 39 Q110 46 105 53 L103 55" />
-        <rect x="100" y="55" width="4" height="20" />
+        <path d="M45 20 Q48 16 51 20" fill="none" stroke={color} strokeWidth="1.5" strokeLinecap="round" />
+        <path d="M55 25 Q58 21 61 25" fill="none" stroke={color} strokeWidth="1.5" strokeLinecap="round" />
+        {/* Left palm tree */}
+        <g transform="translate(10, 15)">
+            <path d="M12 22 Q8 12 -5 10 Q5 14 8 20 Q4 7 -8 4 Q5 10 10 18 Q8 4 -2 -3 Q10 7 12 16 Q15 2 25 -3 Q15 7 14 16 Q20 4 30 2 Q18 10 15 18 Q25 10 32 10 Q20 14 14 20 L12 22" />
+            <path d="M10 22 Q12 38 10 48" stroke={color} strokeWidth="4" fill="none" />
+        </g>
+        {/* Rock/Mountain in center */}
+        <path d="M40 70 Q45 45 60 40 Q75 45 80 70 Z" />
+        {/* Right small palm */}
+        <g transform="translate(72, 25)">
+            <path d="M8 15 Q5 8 -2 6 Q4 9 6 13 Q4 5 -3 2 Q4 6 7 12 Q6 3 1 -1 Q7 5 8 11 Q10 2 16 -1 Q11 5 9 11 Q14 4 19 3 Q13 8 10 13 Q16 8 20 8 Q14 10 9 14 L8 15" />
+            <path d="M7 15 Q8 30 7 42" stroke={color} strokeWidth="3" fill="none" />
+        </g>
         {/* Ground */}
-        <ellipse cx="65" cy="80" rx="48" ry="12" />
+        <ellipse cx="50" cy="72" rx="45" ry="8" />
     </svg>
 );
 
-// Island 9 - Three palms with sun
+// Island 9 - Three palms with sun (bottom-right)
 export const Island9 = ({ className = "", color = "currentColor" }) => (
-    <svg viewBox="0 0 120 100" className={className} fill={color}>
+    <svg viewBox="0 0 100 80" className={className} fill={color}>
         {/* Sun */}
-        <circle cx="105" cy="18" r="10" />
-        {/* Left palm */}
-        <path d="M22 50 Q15 38 7 36 Q15 39 20 46 Q17 32 7 27 Q17 32 24 44 Q30 32 38 30 Q30 37 26 46 Q38 37 46 35 Q36 42 27 48 L25 50" />
-        <rect x="22" y="50" width="4" height="22" />
-        {/* Center palm */}
-        <path d="M55 40 Q47 25 37 22 Q47 26 53 35 Q50 18 37 12 Q50 18 58 32 Q65 18 75 15 Q65 23 60 35 Q75 23 85 20 Q72 28 62 37 L60 40" />
-        <rect x="55" y="40" width="5" height="32" />
-        {/* Right palm */}
-        <path d="M88 48 Q82 36 74 34 Q82 37 86 44 Q84 30 74 25 Q84 30 90 42 Q95 30 103 28 Q95 35 91 44 Q103 35 110 33 Q100 40 92 46 L90 48" />
-        <rect x="88" y="48" width="4" height="24" />
+        <circle cx="88" cy="12" r="8" />
+        {/* Left palm tree */}
+        <g transform="translate(5, 15)">
+            <path d="M10 18 Q7 10 -3 8 Q4 11 7 16 Q4 6 -5 3 Q4 8 8 15 Q7 4 0 -1 Q8 6 10 13 Q12 2 20 -1 Q13 6 11 13 Q17 4 24 3 Q15 9 12 15 Q20 9 26 9 Q17 12 11 17 L10 18" />
+            <path d="M8 18 Q10 35 8 48" stroke={color} strokeWidth="3.5" fill="none" />
+        </g>
+        {/* Center taller palm */}
+        <g transform="translate(32, 5)">
+            <path d="M12 22 Q8 12 -5 10 Q5 14 8 20 Q4 7 -8 4 Q5 10 10 18 Q8 4 -2 -3 Q10 7 12 16 Q15 2 25 -3 Q15 7 14 16 Q20 4 30 2 Q18 10 15 18 Q25 10 32 10 Q20 14 14 20 L12 22" />
+            <path d="M10 22 Q12 42 10 58" stroke={color} strokeWidth="4" fill="none" />
+        </g>
+        {/* Right palm tree */}
+        <g transform="translate(62, 10)">
+            <path d="M10 18 Q7 10 -3 8 Q4 11 7 16 Q4 6 -5 3 Q4 8 8 15 Q7 4 0 -1 Q8 6 10 13 Q12 2 20 -1 Q13 6 11 13 Q17 4 24 3 Q15 9 12 15 Q20 9 26 9 Q17 12 11 17 L10 18" />
+            <path d="M8 18 Q10 38 8 52" stroke={color} strokeWidth="3.5" fill="none" />
+        </g>
         {/* Ground with grass texture */}
-        <ellipse cx="60" cy="78" rx="50" ry="14" />
-        {/* Small grass details */}
-        <path d="M30 75 L32 70 L34 75 M45 73 L47 68 L49 73 M75 74 L77 69 L79 74 M90 75 L92 70 L94 75" />
+        <ellipse cx="50" cy="70" rx="45" ry="10" />
+        {/* Small grass tufts */}
+        <path d="M25 67 L27 62 L29 67 M40 66 L42 61 L44 66 M60 66 L62 61 L64 66 M75 67 L77 62 L79 67" />
     </svg>
 );
 

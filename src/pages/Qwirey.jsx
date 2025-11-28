@@ -452,7 +452,7 @@ export default function Qwirey() {
                         }}
                     />
                     
-                    <div className="flex items-center justify-between pt-4 border-t border-gray-100">
+                    <div className="flex items-center justify-end pt-4 border-t border-gray-100">
                         <div className="flex items-center gap-1">
                         <button
                             onClick={() => setShowUrlDialog(true)}

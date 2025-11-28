@@ -2201,16 +2201,16 @@ export default function StockDetailModal({ stock, isOpen, onClose }) {
                                             { title: `Capital Markets Day`, date: 'September 2024' },
                                             { title: `Technology Summit Presentation`, date: 'June 2024' }
                                         ]).map((r, i) => (
-                                            <div key={i} className="flex items-center gap-3 p-4 bg-gray-50 rounded-xl hover:bg-gray-100 cursor-pointer transition-colors">
+                                            <a key={i} href={r.url || `https://www.google.com/search?q=${encodeURIComponent(stock.name + ' ' + r.title + ' investor presentation')}`} target="_blank" rel="noopener noreferrer" className="flex items-center gap-3 p-4 bg-gray-50 rounded-xl hover:bg-cyan-50 cursor-pointer transition-colors block">
                                                 <div className="w-9 h-9 rounded-lg bg-cyan-100 flex items-center justify-center flex-shrink-0">
                                                     <Play className="w-4 h-4 text-cyan-600" />
                                                 </div>
                                                 <div className="flex-1 min-w-0">
-                                                    <p className="font-medium text-gray-900">{r.title}</p>
+                                                    <p className="font-medium text-gray-900 hover:text-cyan-600">{r.title}</p>
                                                     <p className="text-sm text-gray-500">{r.date}</p>
                                                 </div>
                                                 <ExternalLink className="w-4 h-4 text-gray-400" />
-                                            </div>
+                                            </a>
                                         ))}
                                     </div>
                                 </>

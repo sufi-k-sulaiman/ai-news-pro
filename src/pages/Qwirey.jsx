@@ -494,7 +494,7 @@ export default function Qwirey() {
                         {/* Right side - Format buttons + Send */}
                         <div className="flex items-center gap-2">
                             {selectedModel === 'qwirey' && (
-                                <div className="flex items-center gap-1 bg-gray-100 rounded-lg p-1">
+                                <div className="flex items-center gap-1 bg-gray-100 rounded-xl p-1 h-12">
                                     {[
                                         { id: 'dynamic', label: 'Dynamic' },
                                         { id: 'short', label: 'Short' },
@@ -505,7 +505,7 @@ export default function Qwirey() {
                                         <button
                                             key={format.id}
                                             onClick={() => setResponseFormat(format.id)}
-                                            className={`px-3 py-1.5 rounded-md text-xs font-medium transition-all ${
+                                            className={`px-3 h-10 rounded-lg text-xs font-medium transition-all ${
                                                 responseFormat === format.id
                                                     ? 'bg-white text-purple-700 shadow-sm'
                                                     : 'text-gray-500 hover:text-gray-700'

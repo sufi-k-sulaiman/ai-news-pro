@@ -138,6 +138,9 @@ export default function SearchPods() {
     const isPlayingRef = useRef(false);
     const utteranceRef = useRef(null);
     const timerRef = useRef(null);
+    const audioRef = useRef(null);
+    const [useElevenLabs, setUseElevenLabs] = useState(true);
+    const [audioLoading, setAudioLoading] = useState(false);
 
     // Load voices
     useEffect(() => {
@@ -267,10 +270,77 @@ Use short sentences for better pacing. Do NOT use any markdown formatting.`,
             setIsGenerating(false);
             setCurrentCaption(sentences[0] || 'Ready to play');
             
-            // Auto-start playback after a brief delay
-            setTimeout(() => {
-                startSpeaking();
-            }, 500);
+            // If using ElevenLabs, generate audio
+            if (useElevenLabs) {
+                setAudioLoading(true);
+                setGenerationStep('Generating natural voice...');
+                try {
+                    const fullText = sentences.join(' ');
+                    const response = await base44.functions.invoke('elevenlabsTTS', { 
+                        text: fullText,
+                        voice_id: 'EXAVITQu4vr4xnSDxMaL' // Sarah - natural female voice
+                    });
+                    
+                    const blob = new Blob([response.data], { type: 'audio/mpeg' });
+                    const audioUrl = URL.createObjectURL(blob);
+                    
+                    if (audioRef.current) {
+                        audioRef.current.pause();
+                        URL.revokeObjectURL(audioRef.current.src);
+                    }
+                    
+                    const audio = new Audio(audioUrl);
+                    audioRef.current = audio;
+                    
+                    audio.onloadedmetadata = () => {
+                        setDuration(Math.floor(audio.duration));
+                    };
+                    
+                    audio.ontimeupdate = () => {
+                        setCurrentTime(Math.floor(audio.currentTime));
+                        // Update caption based on time
+                        const progress = audio.currentTime / audio.duration;
+                        const sentenceIndex = Math.floor(progress * sentences.length);
+                        if (sentenceIndex !== currentIndexRef.current && sentenceIndex < sentences.length) {
+                            currentIndexRef.current = sentenceIndex;
+                            const text = sentences[sentenceIndex];
+                            setCurrentCaption(text);
+                            setCaptionWords(text.split(/\s+/));
+                            // Estimate word progress within sentence
+                            const sentenceProgress = (progress * sentences.length) % 1;
+                            const words = text.split(/\s+/);
+                            setCurrentWordIndex(Math.floor(sentenceProgress * words.length));
+                        }
+                    };
+                    
+                    audio.onended = () => {
+                        setIsPlaying(false);
+                        isPlayingRef.current = false;
+                        setCurrentWordIndex(-1);
+                    };
+                    
+                    setAudioLoading(false);
+                    
+                    // Auto-start playback
+                    setTimeout(() => {
+                        audio.play();
+                        setIsPlaying(true);
+                        isPlayingRef.current = true;
+                    }, 300);
+                    
+                } catch (error) {
+                    console.error('ElevenLabs error:', error);
+                    setAudioLoading(false);
+                    // Fallback to browser TTS
+                    setUseElevenLabs(false);
+                    setTimeout(() => startSpeaking(), 500);
+                }
+            } else {
+                // Auto-start playback with browser TTS
+                setTimeout(() => {
+                    startSpeaking();
+                }, 500);
+            }
             
         } catch (error) {
             console.error('Script generation error:', error);
@@ -385,16 +455,33 @@ Use short sentences for better pacing. Do NOT use any markdown formatting.`,
 
     // Toggle play/pause
     const togglePlay = useCallback(() => {
-        if (isPlaying) {
-            stopPlayback();
+        if (useElevenLabs && audioRef.current) {
+            if (isPlaying) {
+                audioRef.current.pause();
+                setIsPlaying(false);
+                isPlayingRef.current = false;
+            } else {
+                audioRef.current.play();
+                setIsPlaying(true);
+                isPlayingRef.current = true;
+            }
         } else {
-            startSpeaking();
+            if (isPlaying) {
+                stopPlayback();
+            } else {
+                startSpeaking();
+            }
         }
-    }, [isPlaying, stopPlayback, startSpeaking]);
+    }, [isPlaying, stopPlayback, startSpeaking, useElevenLabs]);
 
     // Close player
     const closePlayer = useCallback(() => {
         stopPlayback();
+        if (audioRef.current) {
+            audioRef.current.pause();
+            URL.revokeObjectURL(audioRef.current.src);
+            audioRef.current = null;
+        }
         setShowPlayer(false);
         setCurrentEpisode(null);
     }, [stopPlayback]);
@@ -605,10 +692,10 @@ Use short sentences for better pacing. Do NOT use any markdown formatting.`,
                                             Retry
                                         </Button>
                                     </div>
-                                ) : isGenerating ? (
+                                ) : isGenerating || audioLoading ? (
                                     <div className="flex flex-col items-center gap-3">
                                         <Loader2 className="w-12 h-12 text-white/80 animate-spin" />
-                                        <span className="text-white/80 text-sm">{generationStep}</span>
+                                        <span className="text-white/80 text-sm">{audioLoading ? 'Generating natural voice...' : generationStep}</span>
                                     </div>
                                 ) : (
                                     <>
@@ -664,20 +751,25 @@ Use short sentences for better pacing. Do NOT use any markdown formatting.`,
                                     const rect = e.currentTarget.getBoundingClientRect();
                                     const percent = (e.clientX - rect.left) / rect.width;
                                     const newTime = Math.floor(percent * duration);
-                                    const newIndex = Math.floor(percent * sentencesRef.current.length);
                                     
-                                    // Stop current speech and jump to new position
-                                    window.speechSynthesis?.cancel();
-                                    currentIndexRef.current = Math.max(0, Math.min(newIndex, sentencesRef.current.length - 1));
-                                    setCurrentTime(newTime);
-                                    
-                                    if (isPlayingRef.current) {
-                                        setTimeout(() => speakNextSentence(), 100);
+                                    if (useElevenLabs && audioRef.current) {
+                                        audioRef.current.currentTime = percent * audioRef.current.duration;
+                                        setCurrentTime(newTime);
                                     } else {
-                                        const text = sentencesRef.current[currentIndexRef.current] || '';
-                                        setCurrentCaption(text);
-                                        setCaptionWords(text.split(/\s+/));
-                                        setCurrentWordIndex(-1);
+                                        const newIndex = Math.floor(percent * sentencesRef.current.length);
+                                        // Stop current speech and jump to new position
+                                        window.speechSynthesis?.cancel();
+                                        currentIndexRef.current = Math.max(0, Math.min(newIndex, sentencesRef.current.length - 1));
+                                        setCurrentTime(newTime);
+                                        
+                                        if (isPlayingRef.current) {
+                                            setTimeout(() => speakNextSentence(), 100);
+                                        } else {
+                                            const text = sentencesRef.current[currentIndexRef.current] || '';
+                                            setCurrentCaption(text);
+                                            setCaptionWords(text.split(/\s+/));
+                                            setCurrentWordIndex(-1);
+                                        }
                                     }
                                 }}
                             >
@@ -747,25 +839,29 @@ Use short sentences for better pacing. Do NOT use any markdown formatting.`,
                             </div>
                         </div>
 
-                        {/* Voice Selection */}
-                        {voices.length > 1 && (
-                            <div className="mt-4 flex justify-center">
-                                <select
-                                    value={selectedVoice?.name || ''}
-                                    onChange={(e) => {
-                                        const voice = voices.find(v => v.name === e.target.value);
-                                        setSelectedVoice(voice);
-                                    }}
-                                    className="bg-gray-50 border border-gray-200 rounded-lg px-3 py-1 text-sm text-gray-700"
-                                >
-                                    {voices.map((voice) => (
-                                        <option key={voice.name} value={voice.name}>
-                                            {voice.name}
-                                        </option>
-                                    ))}
-                                </select>
-                            </div>
-                        )}
+                        {/* Voice Toggle */}
+                        <div className="mt-4 flex justify-center gap-2">
+                            <button
+                                onClick={() => setUseElevenLabs(true)}
+                                className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${
+                                    useElevenLabs 
+                                        ? 'bg-purple-600 text-white' 
+                                        : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                                }`}
+                            >
+                                🎙️ Natural Voice
+                            </button>
+                            <button
+                                onClick={() => setUseElevenLabs(false)}
+                                className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${
+                                    !useElevenLabs 
+                                        ? 'bg-purple-600 text-white' 
+                                        : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                                }`}
+                            >
+                                🤖 Browser Voice
+                            </button>
+                        </div>
                     </div>
                 </DialogContent>
             </Dialog>

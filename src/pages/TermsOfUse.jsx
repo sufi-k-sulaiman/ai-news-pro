@@ -27,7 +27,7 @@ export default function TermsOfUse() {
                             <FileText className="w-7 h-7" />
                         </div>
                         <div>
-                            <h1 className="text-3xl font-bold">1cPublishing Terms of Use</h1>
+                            <h1 className="text-3xl font-bold">Terms of Use</h1>
                             <p className="text-white/80">Last updated: November 2025</p>
                         </div>
                     </div>

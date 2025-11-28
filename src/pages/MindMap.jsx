@@ -683,7 +683,7 @@ export default function MindMapPage() {
                 {/* Mind Map Content */}
                 <div className={`bg-white rounded-2xl border border-gray-200 ${isFullscreen ? 'h-[calc(100vh-100px)]' : 'h-[calc(100vh-160px)]'} overflow-hidden p-8`}>
                     {!treeData && !loading ? (
-                        <div className="h-full flex flex-col items-center justify-center py-20">
+                        <div className="h-full flex flex-col items-center pt-8">
                             <div className="w-20 h-20 rounded-2xl bg-purple-100 flex items-center justify-center mb-4">
                                 <Network className="w-10 h-10 text-purple-600" />
                             </div>

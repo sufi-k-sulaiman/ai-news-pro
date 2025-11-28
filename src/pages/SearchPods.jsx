@@ -236,7 +236,7 @@ export default function SearchPods() {
         
         // Generate image in parallel
         base44.integrations.Core.GenerateImage({
-            prompt: `Professional podcast cover art for topic: "${episode.title}". Modern, vibrant, abstract representation with microphone or audio wave elements. High quality digital art style.`
+            prompt: `Beautiful lifestyle photography for "${episode.title}". Authentic, natural scene with real people or calming environment. Warm lighting, editorial style, no text or graphics.`
         }).then(result => {
             setPodImage(result.url);
             setImageLoading(false);

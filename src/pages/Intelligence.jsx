@@ -854,6 +854,7 @@ Provide:
                             )}
 
                             {/* Query Input */}
+                            {/* Query Input */}
                             <div className="bg-white rounded-xl border border-gray-200 p-5">
                                 <div className="flex items-center gap-2 mb-3">
                                     <Sparkles className="w-5 h-5 text-purple-600" />

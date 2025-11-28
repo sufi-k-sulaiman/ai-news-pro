@@ -232,7 +232,7 @@ export default function Qwirey() {
 
         try {
             if (selectedModel === 'qwirey') {
-                const [textResponse, imagesResponse, webDataResponse] = await Promise.all([
+                const [textResponse, imagesResponse, webDataResponse, dashboardDataResponse] = await Promise.all([
                     base44.integrations.Core.InvokeLLM({
                         prompt: `You are Qwirey, an advanced AI assistant by 1cPublishing. Provide a comprehensive, helpful response.\n\n${webUrl ? `Reference URL: ${webUrl}\n` : ''}User query: ${fullPrompt}\n\nAlso suggest 3 follow-up questions the user might want to ask.`,
                         add_context_from_internet: true,
@@ -267,7 +267,22 @@ export default function Qwirey() {
                                 chartDescription: { type: "string" }
                             }
                         }
-                    })
+                    }),
+                    // Generate dynamic dashboard data based on query
+                    responseFormat === 'dynamic' ? base44.integrations.Core.InvokeLLM({
+                        prompt: `For the topic "${currentPrompt}", generate realistic dashboard visualization data. Create data that represents key metrics, rankings, timeline events, goals, and notifications relevant to this topic.`,
+                        add_context_from_internet: true,
+                        response_json_schema: {
+                            type: "object",
+                            properties: {
+                                infoCards: { type: "array", items: { type: "object", properties: { content: { type: "string" }, color: { type: "string" } } } },
+                                rankings: { type: "array", items: { type: "object", properties: { name: { type: "string" }, value: { type: "number" } } } },
+                                timeline: { type: "array", items: { type: "object", properties: { time: { type: "string" }, title: { type: "string" }, description: { type: "string" }, status: { type: "string" } } } },
+                                goals: { type: "array", items: { type: "object", properties: { label: { type: "string" }, current: { type: "number" }, target: { type: "number" } } } },
+                                notifications: { type: "array", items: { type: "object", properties: { title: { type: "string" }, description: { type: "string" }, time: { type: "string" }, type: { type: "string" } } } }
+                            }
+                        }
+                    }) : Promise.resolve(null)
                 ]);
 
                 const imagePrompts = imagesResponse?.imagePrompts?.slice(0, 4) || [];
@@ -289,7 +304,8 @@ export default function Qwirey() {
                     followUpQuestions: textResponse?.followUpQuestions || [],
                     sources: textResponse?.sources || [],
                     images: generatedImages.filter(Boolean),
-                    chartData: webDataResponse?.hasChartData ? webDataResponse : null
+                    chartData: webDataResponse?.hasChartData ? webDataResponse : null,
+                    dashboardData: dashboardDataResponse
                 });
 
             } else {
@@ -518,34 +534,67 @@ export default function Qwirey() {
                                         <ReactMarkdown>{result.text}</ReactMarkdown>
                                     </div>
                                     
-                                    {/* Dynamic format: Show dashboard components */}
-                                    {responseFormat === 'dynamic' && result.type === 'qwirey' && (
+                                    {/* Dynamic format: Show dashboard components with AI-generated data */}
+                                    {responseFormat === 'dynamic' && result.type === 'qwirey' && result.dashboardData && (
                                         <div className="mt-6 space-y-6">
-                                            {/* Info Cards Row */}
-                                            <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-                                                <InfoCard content="AI-powered insights" bgColor="#8b5cf6" />
-                                                <InfoCard content="Real-time web data" bgColor="#6366f1" />
-                                                <InfoCard content="Multi-source analysis" bgColor="#3b82f6" />
-                                            </div>
+                                            {/* Dynamic Info Cards */}
+                                            {result.dashboardData.infoCards?.length > 0 && (
+                                                <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                                                    {result.dashboardData.infoCards.slice(0, 3).map((card, i) => (
+                                                        <InfoCard key={i} content={card.content} bgColor={card.color || ['#8b5cf6', '#6366f1', '#3b82f6'][i]} />
+                                                    ))}
+                                                </div>
+                                            )}
                                             
-                                            {/* Visitors & Social Row */}
-                                            <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
-                                                <BrowserVisitorsCard />
-                                                <CountryVisitorsCard />
-                                                <SocialMediaCard />
-                                            </div>
+                                            {/* Dynamic Rankings */}
+                                            {result.dashboardData.rankings?.length >= 3 && (
+                                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                                    <RankingPodium 
+                                                        title="Top Rankings" 
+                                                        data={result.dashboardData.rankings.slice(0, 3).map((r, i) => ({ 
+                                                            name: r.name, 
+                                                            value: r.value, 
+                                                            position: i + 1 
+                                                        }))} 
+                                                    />
+                                                </div>
+                                            )}
                                             
-                                            {/* Rankings Row */}
-                                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                                <RankingPodium title="Top Results" data={[{ name: '1ST', value: 15420, position: 1 }, { name: '2ND', value: 12350, position: 2 }, { name: '3RD', value: 9800, position: 3 }]} />
-                                                <RankingPodium title="Key Metrics" data={[{ name: '1ST', value: 8500, position: 1 }, { name: '2ND', value: 6200, position: 2 }, { name: '3RD', value: 4100, position: 3 }]} colors={['#50C8E8', '#8BC34A', '#F59E0B']} />
-                                            </div>
-                                            
-                                            {/* Activity & Progress Row */}
+                                            {/* Dynamic Activity & Progress Row */}
                                             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                                                <TimelineCard />
-                                                <ProgressListCard />
-                                                <NotificationList />
+                                                {result.dashboardData.timeline?.length > 0 && (
+                                                    <TimelineCard 
+                                                        title="Activity Timeline"
+                                                        events={result.dashboardData.timeline.slice(0, 4).map(e => ({
+                                                            time: e.time,
+                                                            title: e.title,
+                                                            description: e.description,
+                                                            status: e.status || 'completed'
+                                                        }))}
+                                                    />
+                                                )}
+                                                {result.dashboardData.goals?.length > 0 && (
+                                                    <ProgressListCard 
+                                                        title="Goals Progress"
+                                                        items={result.dashboardData.goals.slice(0, 4).map(g => ({
+                                                            label: g.label,
+                                                            current: g.current,
+                                                            target: g.target,
+                                                            percentage: Math.round((g.current / g.target) * 100)
+                                                        }))}
+                                                    />
+                                                )}
+                                                {result.dashboardData.notifications?.length > 0 && (
+                                                    <NotificationList 
+                                                        title="Notifications"
+                                                        notifications={result.dashboardData.notifications.slice(0, 4).map(n => ({
+                                                            title: n.title,
+                                                            description: n.description,
+                                                            time: n.time,
+                                                            type: n.type || 'info'
+                                                        }))}
+                                                    />
+                                                )}
                                             </div>
                                         </div>
                                     )}

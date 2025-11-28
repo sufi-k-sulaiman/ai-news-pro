@@ -456,13 +456,7 @@ Provide detailed JSON with:
 
                 {/* Controls Row */}
                 <div className="flex flex-wrap gap-3 mb-6">
-                    <MultiSelectDropdown
-                        options={DOMAINS}
-                        selected={selectedDomains}
-                        onChange={setSelectedDomains}
-                        placeholder="Select Domains"
-                        icon={Building2}
-                    />
+
                     <MultiSelectDropdown
                         options={COUNTRIES}
                         selected={selectedCountries}

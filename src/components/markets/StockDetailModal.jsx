@@ -395,6 +395,31 @@ export default function StockDetailModal({ stock, isOpen, onClose }) {
                     };
                     break;
 
+                case 'investor-relations':
+                    prompt = `Investor relations information for ${stock.ticker}:
+                    - Fiscal year end month
+                    - Next earnings date
+                    - Latest 3 annual reports (10-K) with title, date, and description
+                    - Latest 4 quarterly reports (10-Q) with title, date, and description
+                    - Latest 3 investor presentations with title and date
+                    - Latest 4 earnings releases with title and date
+                    - Latest 3 P&L statements
+                    - Latest 3 fiscal year data summaries`;
+                    schema = {
+                        type: "object",
+                        properties: {
+                            fiscalYearEnd: { type: "string" },
+                            nextEarnings: { type: "string" },
+                            annualReports: { type: "array", items: { type: "object", properties: { title: { type: "string" }, date: { type: "string" }, description: { type: "string" }, size: { type: "string" } } } },
+                            quarterlyReports: { type: "array", items: { type: "object", properties: { title: { type: "string" }, date: { type: "string" }, description: { type: "string" } } } },
+                            investorPresentations: { type: "array", items: { type: "object", properties: { title: { type: "string" }, date: { type: "string" } } } },
+                            earningsReleases: { type: "array", items: { type: "object", properties: { title: { type: "string" }, date: { type: "string" } } } },
+                            plStatements: { type: "array", items: { type: "object", properties: { year: { type: "string" }, revenue: { type: "string" }, netIncome: { type: "string" } } } },
+                            fiscalYearData: { type: "array", items: { type: "object", properties: { year: { type: "string" }, revenue: { type: "string" }, earnings: { type: "string" }, assets: { type: "string" } } } }
+                        }
+                    };
+                    break;
+
                 case 'reports':
                     prompt = `Company reports and filings for ${stock.ticker}:
                     - Latest 3 annual reports with titles and dates

@@ -231,6 +231,19 @@ export default function SearchPods() {
         setGenerationError(null);
         setGenerationStep('Researching topic...');
         currentIndexRef.current = 0;
+        setPodImage(null);
+        setImageLoading(true);
+        
+        // Generate image in parallel
+        base44.integrations.Core.GenerateImage({
+            prompt: `Professional podcast cover art for topic: "${episode.title}". Modern, vibrant, abstract representation with microphone or audio wave elements. High quality digital art style.`
+        }).then(result => {
+            setPodImage(result.url);
+            setImageLoading(false);
+        }).catch(err => {
+            console.error('Image generation error:', err);
+            setImageLoading(false);
+        });
         
         try {
             setGenerationStep('Writing script...');
@@ -686,30 +699,47 @@ Use short sentences for better pacing. Do NOT use any markdown formatting.`,
                         {/* Album Art */}
                         <div className="flex justify-center mb-6">
                             <div className="relative w-56 h-56 rounded-2xl bg-gradient-to-br from-purple-500 to-indigo-600 flex items-center justify-center shadow-2xl shadow-purple-500/30 overflow-hidden">
+                                {/* Generated Image Background */}
+                                {podImage && (
+                                    <img 
+                                        src={podImage} 
+                                        alt="Podcast cover" 
+                                        className="absolute inset-0 w-full h-full object-cover"
+                                    />
+                                )}
+                                
+                                {/* Image Loading Overlay */}
+                                {imageLoading && (
+                                    <div className="absolute inset-0 bg-gradient-to-br from-purple-500/90 to-indigo-600/90 flex flex-col items-center justify-center gap-2">
+                                        <Loader2 className="w-8 h-8 text-white/80 animate-spin" />
+                                        <span className="text-white/70 text-xs">Creating artwork...</span>
+                                    </div>
+                                )}
+                                
                                 {generationError ? (
-                                    <div className="flex flex-col items-center gap-3 p-4">
+                                    <div className="absolute inset-0 bg-black/60 flex flex-col items-center justify-center gap-3 p-4">
                                         <AlertTriangle className="w-12 h-12 text-white/80" />
                                         <span className="text-white/80 text-xs text-center">{generationError.title}</span>
                                         <Button size="sm" variant="ghost" className="text-white/80 hover:text-white" onClick={() => { setGenerationError(null); playEpisode(currentEpisode); }}>
                                             Retry
                                         </Button>
                                     </div>
-                                ) : isGenerating || audioLoading ? (
-                                    <div className="flex flex-col items-center gap-3">
+                                ) : (isGenerating || audioLoading) && !imageLoading ? (
+                                    <div className={`${podImage ? 'absolute inset-0 bg-black/50' : ''} flex flex-col items-center justify-center gap-3`}>
                                         <Loader2 className="w-12 h-12 text-white/80 animate-spin" />
                                         <span className="text-white/80 text-sm">{audioLoading ? 'Generating natural voice...' : generationStep}</span>
                                     </div>
-                                ) : (
+                                ) : !isGenerating && !audioLoading && !imageLoading ? (
                                     <>
-                                        <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent" />
-                                        <Radio className="w-16 h-16 text-white/80" />
+                                        {!podImage && <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent" />}
+                                        {!podImage && <Radio className="w-16 h-16 text-white/80" />}
                                         {isPlaying && (
-                                            <div className="absolute bottom-4 left-1/2 -translate-x-1/2">
+                                            <div className={`${podImage ? 'absolute inset-0 bg-black/30 flex items-end justify-center pb-4' : 'absolute bottom-4 left-1/2 -translate-x-1/2'}`}>
                                                 <AnimatedBars isPlaying={true} color="#ffffff" />
                                             </div>
                                         )}
                                     </>
-                                )}
+                                ) : null}
                             </div>
                         </div>
 

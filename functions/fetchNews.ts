@@ -197,23 +197,20 @@ function generateImagePrompt(title) {
 
 // Fetch from Google News RSS
 async function fetchGoogleNewsRSS(queryOrCategory, isCategory = false) {
-    try {
-        const url = isCategory 
-            ? getGoogleNewsCategoryURL(queryOrCategory)
-            : getGoogleNewsURL(queryOrCategory);
-            
-        const response = await fetch(url, {
-            headers: { 'User-Agent': 'Mozilla/5.0 (compatible; NewsBot/1.0)' },
-        });
+    const url = isCategory 
+        ? getGoogleNewsCategoryURL(queryOrCategory)
+        : getGoogleNewsURL(queryOrCategory);
         
-        if (!response.ok) return [];
-        
-        const xml = await response.text();
-        return await parseRSS(xml, 'Google News');
-    } catch (error) {
-        console.error('Google News RSS fetch failed:', error.message);
-        return [];
+    const response = await fetch(url, {
+        headers: { 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36' },
+    });
+    
+    if (!response.ok) {
+        throw new Error(`Google News returned ${response.status}`);
     }
+    
+    const xml = await response.text();
+    return await parseRSS(xml, 'Google News');
 }
 
 // Deduplicate articles by URL and title similarity

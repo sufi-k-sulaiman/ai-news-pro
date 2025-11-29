@@ -318,7 +318,9 @@ const generateDataPoints = (useCase, count = 25, isWorldMap = false) => {
         lng: loc.lng,
         value: loc.value,
         name: loc.name,
-        type: useCase
+        type: useCase,
+        isHigh: loc.value >= 70,
+        isLow: loc.value <= 30
     }));
 };
 
@@ -388,14 +390,14 @@ export default function GeospatialMap({
     const activeTileStyle = selectedStyle || mapType;
     const tileUrl = MAP_TILES[activeTileStyle] || MAP_TILES.default;
 
-    const getColor = (value) => {
-        if (mapType === 'heatmap') {
-            if (value >= 70) return '#EF4444';
-            if (value >= 50) return '#F97316';
-            if (value >= 30) return '#FBBF24';
-            return '#22C55E';
-        }
-        return color;
+    const getColor = (value, point) => {
+        // High values = red (hotspots/worst), Low values = green (best/cleanest)
+        if (value >= 80) return '#DC2626'; // Dark red - critical
+        if (value >= 70) return '#EF4444'; // Red - high
+        if (value >= 50) return '#F97316'; // Orange - medium-high
+        if (value >= 30) return '#FBBF24'; // Yellow - medium
+        if (value >= 20) return '#84CC16'; // Light green - low
+        return '#22C55E'; // Green - very low/best
     };
 
     const getRadius = (value) => {
@@ -460,20 +462,25 @@ export default function GeospatialMap({
                         center={[point.lat, point.lng]}
                         radius={getRadius(point.value)}
                         pathOptions={{
-                            fillColor: getColor(point.value),
-                            fillOpacity: mapType === 'heatmap' ? 0.6 : 0.7,
-                            color: '#fff',
-                            weight: mini ? 1 : 2
+                            fillColor: getColor(point.value, point),
+                            fillOpacity: point.value >= 70 ? 0.85 : point.value <= 30 ? 0.9 : 0.7,
+                            color: point.value >= 80 ? '#991B1B' : point.value <= 20 ? '#166534' : '#fff',
+                            weight: mini ? 1 : (point.value >= 80 || point.value <= 20 ? 3 : 2)
                         }}
                     >
                         {!mini && (
                             <Popup>
-                                <div className="p-2 min-w-[140px]">
+                                <div className="p-2 min-w-[160px]">
                                     <h4 className="font-bold text-gray-900">{point.name}</h4>
-                                    <p className="text-xs text-gray-500 capitalize">{point.type}</p>
+                                    <p className="text-xs text-gray-500 capitalize">{point.type.replace(/pollution/g, ' pollution')}</p>
                                     <div className="mt-2 flex items-center justify-between">
-                                        <span className="text-sm text-gray-600">Value:</span>
-                                        <span className="font-bold" style={{ color: getColor(point.value) }}>{point.value}</span>
+                                        <span className="text-sm text-gray-600">Impact:</span>
+                                        <span className="font-bold" style={{ color: getColor(point.value, point) }}>
+                                            {point.value >= 80 ? 'Critical' : point.value >= 70 ? 'High' : point.value >= 50 ? 'Moderate' : point.value >= 30 ? 'Low' : 'Minimal'}
+                                        </span>
+                                    </div>
+                                    <div className="mt-1 h-1.5 bg-gray-200 rounded-full overflow-hidden">
+                                        <div className="h-full rounded-full" style={{ width: `${point.value}%`, backgroundColor: getColor(point.value, point) }} />
                                     </div>
                                 </div>
                             </Popup>
@@ -483,19 +490,21 @@ export default function GeospatialMap({
             </MapContainer>
 
             {/* Legend - only on main maps */}
-            {!mini && mapType === 'heatmap' && (
+            {!mini && (
                 <div className="absolute bottom-4 left-4 z-[1000] bg-white rounded-lg shadow-lg p-3">
-                    <div className="text-xs font-medium text-gray-600 mb-2">Intensity</div>
+                    <div className="text-xs font-medium text-gray-600 mb-2">Impact Level</div>
                     <div className="flex gap-1">
                         {[
-                            { color: '#22C55E', label: 'Low' },
-                            { color: '#FBBF24', label: 'Med' },
+                            { color: '#22C55E', label: 'Best' },
+                            { color: '#84CC16', label: 'Good' },
+                            { color: '#FBBF24', label: 'Mod' },
                             { color: '#F97316', label: 'High' },
-                            { color: '#EF4444', label: 'Max' },
+                            { color: '#EF4444', label: 'Severe' },
+                            { color: '#DC2626', label: 'Critical' },
                         ].map(item => (
                             <div key={item.label} className="flex flex-col items-center">
-                                <div className="w-6 h-4 rounded" style={{ backgroundColor: item.color }} />
-                                <span className="text-[10px] text-gray-500 mt-1">{item.label}</span>
+                                <div className="w-5 h-3 rounded" style={{ backgroundColor: item.color }} />
+                                <span className="text-[9px] text-gray-500 mt-1">{item.label}</span>
                             </div>
                         ))}
                     </div>

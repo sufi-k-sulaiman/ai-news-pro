@@ -1,23 +1,115 @@
-import React from 'react';
-import { TrendingUp, TrendingDown, Award, AlertTriangle } from 'lucide-react';
+import React, { useState, useEffect, useRef } from 'react';
+import { TrendingUp, TrendingDown, Award, AlertTriangle, Loader2 } from 'lucide-react';
+import { base44 } from '@/api/base44Client';
 
-const TOP_COUNTRIES = [
-    { name: 'Sweden', score: 94, reason: 'World leader in renewable energy with 60% from renewables, strong carbon tax policies' },
-    { name: 'Norway', score: 92, reason: '98% electricity from hydropower, aggressive EV adoption, sovereign wealth fund divesting from fossil fuels' },
-    { name: 'Denmark', score: 90, reason: 'Pioneer in wind energy, targeting carbon neutrality by 2025, circular economy leader' },
-    { name: 'Finland', score: 88, reason: 'Committed to carbon neutrality by 2035, extensive forest coverage, nuclear + renewables mix' },
-    { name: 'Iceland', score: 87, reason: '100% renewable electricity from geothermal and hydro, hydrogen economy investments' },
-];
-
-const BOTTOM_COUNTRIES = [
-    { name: 'Saudi Arabia', score: 28, reason: 'Heavy fossil fuel dependence, limited renewable infrastructure despite solar potential' },
-    { name: 'Russia', score: 31, reason: 'Major oil & gas exporter, slow renewable transition, permafrost methane concerns' },
-    { name: 'Iran', score: 33, reason: 'Fossil fuel subsidies, air quality issues, limited clean energy investment' },
-    { name: 'Australia', score: 38, reason: 'Coal export economy, recent bushfire impacts, slow policy progress despite solar potential' },
-    { name: 'USA', score: 45, reason: 'Mixed progress - state-level leadership but federal policy inconsistency, high per-capita emissions' },
-];
+const CATEGORY_LABELS = {
+    carbon: 'Carbon & Climate',
+    airwater: 'Air & Water Quality',
+    forests: 'Forests & Biodiversity',
+    resources: 'Natural Resources',
+    sustainability: 'Sustainability',
+    health: 'Environmental Health',
+    treasures: 'National Treasures & Protected Areas',
+};
 
 export default function CountryComparison({ selectedCategories = [] }) {
+    const [topCountries, setTopCountries] = useState([]);
+    const [bottomCountries, setBottomCountries] = useState([]);
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState(null);
+    const lastFetchRef = useRef('');
+
+    useEffect(() => {
+        const categoriesKey = selectedCategories.sort().join(',');
+        if (categoriesKey === lastFetchRef.current) return;
+        if (selectedCategories.length === 0) return;
+        
+        lastFetchRef.current = categoriesKey;
+        fetchCountryData();
+    }, [selectedCategories]);
+
+    const fetchCountryData = async () => {
+        setLoading(true);
+        setError(null);
+        
+        try {
+            const categoryNames = selectedCategories
+                .map(c => CATEGORY_LABELS[c] || c)
+                .join(', ');
+
+            const response = await base44.integrations.Core.InvokeLLM({
+                prompt: `Analyze countries based on these environmental categories: ${categoryNames}.
+
+Provide the top 5 best-performing countries and bottom 5 worst-performing countries with current 2024 data.
+
+For each country include:
+- Country name
+- Score (0-100 based on performance in these categories)
+- Brief reason explaining their ranking with specific facts/statistics
+
+Consider factors like: emissions data, renewable energy %, forest coverage, air quality index, water quality, protected areas, environmental policies, and sustainability initiatives.`,
+                add_context_from_internet: true,
+                response_json_schema: {
+                    type: "object",
+                    properties: {
+                        top_performers: {
+                            type: "array",
+                            items: {
+                                type: "object",
+                                properties: {
+                                    name: { type: "string" },
+                                    score: { type: "number" },
+                                    reason: { type: "string" }
+                                }
+                            }
+                        },
+                        needs_improvement: {
+                            type: "array",
+                            items: {
+                                type: "object",
+                                properties: {
+                                    name: { type: "string" },
+                                    score: { type: "number" },
+                                    reason: { type: "string" }
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+
+            setTopCountries(response?.top_performers || []);
+            setBottomCountries(response?.needs_improvement || []);
+        } catch (err) {
+            console.error('Error fetching country data:', err);
+            setError('Failed to load country data');
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    if (loading) {
+        return (
+            <div className="flex items-center justify-center py-12 my-6 bg-gray-50 rounded-xl border border-gray-200">
+                <Loader2 className="w-6 h-6 text-purple-600 animate-spin mr-3" />
+                <span className="text-gray-600">Analyzing country performance...</span>
+            </div>
+        );
+    }
+
+    if (error) {
+        return (
+            <div className="flex items-center justify-center py-12 my-6 bg-red-50 rounded-xl border border-red-200">
+                <AlertTriangle className="w-5 h-5 text-red-500 mr-2" />
+                <span className="text-red-600">{error}</span>
+            </div>
+        );
+    }
+
+    if (topCountries.length === 0 && bottomCountries.length === 0) {
+        return null;
+    }
+
     return (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 my-6">
             {/* Top Performers */}

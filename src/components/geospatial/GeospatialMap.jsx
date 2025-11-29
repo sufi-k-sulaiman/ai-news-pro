@@ -81,6 +81,42 @@ const USE_CASE_RATIONALE = {
 const DEFAULT_CENTER = { center: [20, 0], zoom: 3 };
 
 const REAL_LOCATIONS = {
+    coastal: [
+        { lat: -18.2871, lng: 147.6992, name: 'Great Barrier Reef, Australia - Coral Bleaching', value: 92 },
+        { lat: 9.5, lng: 79.8, name: 'Maldives - Rising Sea Levels', value: 95 },
+        { lat: 21.4, lng: -157.8, name: 'Hawaii - Coral Degradation', value: 78 },
+        { lat: -8.5, lng: 115.1, name: 'Bali, Indonesia - Reef Damage', value: 85 },
+        { lat: 16.8, lng: -88.1, name: 'Belize Barrier Reef - At Risk', value: 75 },
+        { lat: -4.0, lng: 55.5, name: 'Seychelles - Marine Protection', value: 25 },
+        { lat: 26.5, lng: -77.0, name: 'Bahamas - Healthy Reefs', value: 30 },
+        { lat: -17.8, lng: -149.5, name: 'French Polynesia - Protected', value: 22 },
+        { lat: 7.5, lng: 134.5, name: 'Palau - Marine Sanctuary', value: 15 },
+        { lat: -13.8, lng: -171.8, name: 'Samoa - Pristine Coast', value: 18 },
+    ],
+    ocean: [
+        { lat: 25.0, lng: 140.0, name: 'Pacific Garbage Patch - Critical', value: 98 },
+        { lat: -6.0, lng: 106.8, name: 'Java Sea - Plastic Pollution', value: 92 },
+        { lat: 22.0, lng: 88.0, name: 'Bay of Bengal - Marine Debris', value: 88 },
+        { lat: 35.0, lng: 140.0, name: 'Sea of Japan - Overfishing', value: 82 },
+        { lat: 0.0, lng: -90.0, name: 'Galapagos - Under Pressure', value: 65 },
+        { lat: -54.0, lng: -38.0, name: 'South Georgia - Pristine', value: 12 },
+        { lat: -77.0, lng: 166.0, name: 'Ross Sea, Antarctica - Protected', value: 8 },
+        { lat: 78.0, lng: 16.0, name: 'Svalbard Arctic - Clean', value: 15 },
+        { lat: -52.0, lng: -59.0, name: 'Falklands - Healthy Ocean', value: 18 },
+        { lat: 64.0, lng: -20.0, name: 'Iceland Waters - Sustainable', value: 20 },
+    ],
+    wildlife: [
+        { lat: -2.5, lng: 34.5, name: 'Serengeti, Tanzania - Poaching', value: 75 },
+        { lat: -1.9, lng: 29.9, name: 'Virunga, DRC - Gorilla Habitat', value: 88 },
+        { lat: 27.5, lng: 85.0, name: 'Nepal - Tiger Conservation', value: 65 },
+        { lat: 2.5, lng: 112.5, name: 'Borneo - Orangutan Crisis', value: 92 },
+        { lat: -19.0, lng: 46.0, name: 'Madagascar - Lemur Extinction', value: 95 },
+        { lat: -33.9, lng: 25.6, name: 'South Africa - Rhino Success', value: 35 },
+        { lat: 9.9, lng: -84.1, name: 'Costa Rica - Wildlife Haven', value: 18 },
+        { lat: -4.3, lng: -69.9, name: 'Amazon - Biodiversity Hub', value: 25 },
+        { lat: -25.0, lng: 135.0, name: 'Australia - Conservation Efforts', value: 40 },
+        { lat: -41.0, lng: 174.0, name: 'New Zealand - Kiwi Protection', value: 22 },
+    ],
     carbon: [
         { lat: 39.9042, lng: 116.4074, name: 'Beijing, China - Highest Emitter', value: 98 },
         { lat: 28.6139, lng: 77.2090, name: 'Delhi, India', value: 95 },

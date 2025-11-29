@@ -145,6 +145,11 @@ export default function SearchPods() {
     const [selectedVoice, setSelectedVoice] = useState(null);
     const [showVoiceMenu, setShowVoiceMenu] = useState(false);
     const [isDownloadingMp3, setIsDownloadingMp3] = useState(false);
+    const [showRecommendations, setShowRecommendations] = useState(false);
+    const [showEqualizer, setShowEqualizer] = useState(false);
+    const [showBraille, setShowBraille] = useState(false);
+    const [isExtending, setIsExtending] = useState(false);
+    const [recommendations, setRecommendations] = useState([]);
     
     // Refs for speech synthesis
     const sentencesRef = useRef([]);

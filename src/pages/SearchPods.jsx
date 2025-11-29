@@ -164,14 +164,52 @@ export default function SearchPods() {
         return () => clearInterval(interval);
     }, []);
 
-    // Load voices
+    // Load voices - filter for quality voices only
     useEffect(() => {
         const loadVoices = () => {
             const availableVoices = window.speechSynthesis?.getVoices() || [];
-            const englishVoices = availableVoices.filter(v => v.lang.startsWith('en'));
-            setVoices(englishVoices);
-            if (englishVoices.length > 0 && !selectedVoice) {
-                setSelectedVoice(englishVoices[0]);
+            // Filter for quality English voices - exclude novelty/effect voices
+            const qualityVoices = availableVoices.filter(v => {
+                const isEnglish = v.lang.startsWith('en');
+                const name = v.name.toLowerCase();
+                // Exclude non-standard voices
+                const isNovelty = name.includes('whisper') || 
+                                  name.includes('wobble') || 
+                                  name.includes('zarvox') || 
+                                  name.includes('boing') ||
+                                  name.includes('bells') ||
+                                  name.includes('bad news') ||
+                                  name.includes('good news') ||
+                                  name.includes('bubbles') ||
+                                  name.includes('cellos') ||
+                                  name.includes('deranged') ||
+                                  name.includes('hysterical') ||
+                                  name.includes('organ') ||
+                                  name.includes('trinoids') ||
+                                  name.includes('princess') ||
+                                  name.includes('pipe') ||
+                                  name.includes('ralph') ||
+                                  name.includes('superstar') ||
+                                  name.includes('junior');
+                return isEnglish && !isNovelty;
+            });
+            
+            // Deduplicate by name (some appear multiple times)
+            const uniqueVoices = [];
+            const seenNames = new Set();
+            for (const voice of qualityVoices) {
+                const simpleName = voice.name.split('(')[0].trim();
+                if (!seenNames.has(simpleName)) {
+                    seenNames.add(simpleName);
+                    uniqueVoices.push(voice);
+                }
+            }
+            
+            setVoices(uniqueVoices);
+            if (uniqueVoices.length > 0 && !selectedVoice) {
+                // Prefer Samantha or similar quality voice
+                const preferred = uniqueVoices.find(v => v.name.toLowerCase().includes('samantha')) || uniqueVoices[0];
+                setSelectedVoice(preferred);
             }
         };
         
@@ -457,19 +495,16 @@ Do NOT mention any websites, URLs, or external references in the audio script.`
                 voice_id: 'EXAVITQu4vr4xnSDxMaL' // Sarah voice
             });
             
-            if (response.data?.audio_base64) {
-                const byteCharacters = atob(response.data.audio_base64);
-                const byteNumbers = new Array(byteCharacters.length);
-                for (let i = 0; i < byteCharacters.length; i++) {
-                    byteNumbers[i] = byteCharacters.charCodeAt(i);
-                }
-                const byteArray = new Uint8Array(byteNumbers);
-                const blob = new Blob([byteArray], { type: 'audio/mpeg' });
+            // Response is raw audio buffer
+            if (response.data) {
+                const blob = new Blob([response.data], { type: 'audio/mpeg' });
                 const url = URL.createObjectURL(blob);
                 const a = document.createElement('a');
                 a.href = url;
                 a.download = `${currentEpisode.title.replace(/[^a-z0-9]/gi, '_')}.mp3`;
+                document.body.appendChild(a);
                 a.click();
+                document.body.removeChild(a);
                 URL.revokeObjectURL(url);
             }
         } catch (err) {

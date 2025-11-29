@@ -781,7 +781,7 @@ export default function Qwirey() {
                         {/* Right side - Format buttons + Send */}
                         <div className="flex items-center gap-2">
                             {selectedModel === 'qwirey' && (
-                            <div className="flex items-center gap-1 bg-gray-100 rounded-xl p-1 h-12">
+                            <div className="flex items-center gap-0.5 md:gap-1 bg-gray-100 rounded-xl p-1 h-10 md:h-12 overflow-x-auto max-w-[calc(100vw-180px)] md:max-w-none">
                                 {[
                                     { id: 'short', label: 'Short' },
                                     { id: 'long', label: 'Long' },
@@ -794,7 +794,7 @@ export default function Qwirey() {
                                         key={format.id}
                                         onClick={() => handleFormatChange(format.id)}
                                         disabled={formatLoading}
-                                        className={`px-3 h-10 rounded-lg text-xs font-medium transition-all ${
+                                        className={`px-2 md:px-3 h-8 md:h-10 rounded-lg text-[10px] md:text-xs font-medium transition-all whitespace-nowrap flex-shrink-0 ${
                                             responseFormat === format.id
                                                 ? 'bg-white text-purple-700 shadow-sm'
                                                 : 'text-gray-500 hover:text-gray-700'
@@ -809,11 +809,11 @@ export default function Qwirey() {
                             <button
                                 onClick={() => handleSubmit()}
                                 disabled={loading || (!prompt.trim() && !fileContent)}
-                                className="p-3 rounded-xl bg-purple-600 text-white hover:bg-purple-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
+                                className="p-2.5 md:p-3 rounded-xl bg-purple-600 text-white hover:bg-purple-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all flex-shrink-0"
                                 title="Send"
                             >
                                 {loading ? (
-                                    <Loader2 className="w-5 h-5 animate-spin" />
+                                    <Loader2 className="w-4 h-4 md:w-5 md:h-5 animate-spin" />
                                 ) : (
                                     <SendArrowIcon />
                                 )}

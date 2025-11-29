@@ -357,6 +357,18 @@ export default function Qwirey() {
                             }
                         })
                     );
+                } else if (responseFormat === 'images') {
+                    apiCalls.push(
+                        base44.integrations.Core.InvokeLLM({
+                            prompt: `Generate 8 detailed, creative image prompts related to: "${currentPrompt}". Each should be suitable for AI image generation and visually distinct.`,
+                            response_json_schema: {
+                                type: "object",
+                                properties: {
+                                    imagePrompts: { type: "array", items: { type: "string" } }
+                                }
+                            }
+                        })
+                    );
                 }
 
                 const responses = await Promise.all(apiCalls);

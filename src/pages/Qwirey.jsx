@@ -688,9 +688,9 @@ export default function Qwirey() {
                 </div>
 
                 {/* Results */}
-                {result && (
-                    <div className="space-y-6">
-                        {result.type === 'error' ? (
+                {result && !formatLoading && (
+                                          <div className="space-y-6">
+                                              {result.type === 'error' ? (
                             <div className="bg-white rounded-2xl border border-red-200 p-6 shadow-sm">
                                 <div className="flex items-center gap-3 mb-4">
                                     <div className="w-10 h-10 rounded-lg bg-red-100 flex items-center justify-center">

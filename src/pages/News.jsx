@@ -7,7 +7,8 @@ const pulseAnimation = `
 }
 `;
 import { base44 } from '@/api/base44Client';
-import { Newspaper, Search, Loader2, ExternalLink, RefreshCw, TrendingUp, Clock, Globe, Image as ImageIcon } from 'lucide-react';
+import { Newspaper, Search, Loader2, ExternalLink, RefreshCw, TrendingUp, Clock, Globe, Image as ImageIcon, Database } from 'lucide-react';
+import { toast } from 'sonner';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import ErrorDisplay, { LoadingState, getErrorCode } from '@/components/ErrorDisplay';
@@ -364,6 +365,22 @@ export default function News() {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [lastUpdated, setLastUpdated] = useState(null);
+    const [populatingCache, setPopulatingCache] = useState(false);
+    
+    const isDev = window.location.hostname === 'localhost' || window.location.hostname.includes('preview');
+
+    const handlePopulateCache = async () => {
+        setPopulatingCache(true);
+        try {
+            const response = await base44.functions.invoke('populateNewsCache', {});
+            toast.success(response.data?.message || 'Cache populated successfully!');
+            fetchNews(activeCategory);
+        } catch (err) {
+            toast.error('Failed to populate cache: ' + (err?.message || 'Unknown error'));
+        } finally {
+            setPopulatingCache(false);
+        }
+    };
 
     const fetchNews = async (keyword) => {
         setLoading(true);
@@ -499,7 +516,19 @@ export default function News() {
                 {!expandedCategory && <div className="mb-4" />}
 
                 {/* Refresh Button */}
-                <div className="flex justify-end mb-4">
+                <div className="flex justify-end gap-2 mb-4">
+                    {isDev && (
+                        <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={handlePopulateCache}
+                            disabled={populatingCache}
+                            className="gap-2 border-orange-300 text-orange-700 hover:bg-orange-50"
+                        >
+                            <Database className={`w-4 h-4 ${populatingCache ? 'animate-pulse' : ''}`} />
+                            {populatingCache ? 'Populating...' : 'Populate Cache'}
+                        </Button>
+                    )}
                     <Button
                         variant="outline"
                         size="sm"

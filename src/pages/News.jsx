@@ -134,23 +134,22 @@ const NewsCard = ({ article, index }) => {
 
 import { Monitor, TrendingUp as BusinessIcon, FlaskConical, HeartPulse, Landmark, Trophy, Clapperboard, Globe2, ChevronDown, ChevronUp } from 'lucide-react';
 
+const ARTICLES_PER_CATEGORY = 12;
+
 const NewsGrid = ({ news }) => {
     const [validArticles, setValidArticles] = useState([]);
     const [checking, setChecking] = useState(true);
-    const [checkedCount, setCheckedCount] = useState(0);
 
     useEffect(() => {
         const validateArticles = async () => {
             setValidArticles([]);
             setChecking(true);
-            setCheckedCount(0);
             
             const valid = [];
             for (const article of news) {
-                if (valid.length >= 12) break; // Stop once we have 12 valid articles
+                if (valid.length >= ARTICLES_PER_CATEGORY) break;
                 
                 if (!article.url || !article.url.startsWith('http')) {
-                    setCheckedCount(prev => prev + 1);
                     continue;
                 }
                 
@@ -163,7 +162,6 @@ const NewsGrid = ({ news }) => {
                 } catch {
                     // Skip invalid
                 }
-                setCheckedCount(prev => prev + 1);
             }
             setChecking(false);
         };
@@ -175,9 +173,9 @@ const NewsGrid = ({ news }) => {
 
     return (
         <div>
-            {checking && validArticles.length < 12 && (
+            {checking && validArticles.length < ARTICLES_PER_CATEGORY && (
                 <div className="text-center text-sm text-gray-500 mb-4">
-                    Validating articles... ({validArticles.length}/12 found)
+                    Validating articles... ({validArticles.length}/{ARTICLES_PER_CATEGORY} found)
                 </div>
             )}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">

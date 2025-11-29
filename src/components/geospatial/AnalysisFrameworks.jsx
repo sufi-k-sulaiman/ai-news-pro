@@ -496,65 +496,101 @@ const ParetoDisplay = ({ data }) => {
         name: a.action?.substring(0, 15), 
         fullName: a.action,
         impact: a.impact, 
-        cumulative: a.cumulative 
+        cumulative: a.cumulative,
+        explanation: a.explanation || ''
     })) || [];
+
+    // Find the 80% threshold point
+    const threshold80 = chartData.findIndex(d => d.cumulative >= 80);
+    const topActions = chartData.slice(0, threshold80 + 1 || 2);
 
     return (
         <div className="space-y-4">
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
                 <div className="bg-gray-50 rounded-xl p-4 border">
-                    <h4 className="font-semibold text-gray-700 mb-2">Impact Distribution</h4>
+                    <h4 className="font-semibold text-gray-700 mb-2">Impact Distribution by Factor</h4>
                     <div className="h-56">
                         <ResponsiveContainer width="100%" height="100%">
                             <BarChart data={chartData}>
                                 <CartesianGrid strokeDasharray="3 3" />
                                 <XAxis dataKey="name" tick={{ fontSize: 9 }} angle={-15} />
-                                <YAxis domain={[0, 40]} />
+                                <YAxis domain={[0, 'auto']} unit="%" />
                                 <Tooltip content={({ payload }) => payload?.[0] && (
-                                    <div className="bg-white p-2 rounded shadow border text-xs">
+                                    <div className="bg-white p-2 rounded shadow border text-xs max-w-[200px]">
                                         <p className="font-semibold">{payload[0].payload.fullName}</p>
-                                        <p>Impact: {payload[0].payload.impact}%</p>
+                                        <p className="text-purple-600 font-bold">Impact: {payload[0].payload.impact}%</p>
                                     </div>
                                 )} />
-                                <Bar dataKey="impact" fill="#8B5CF6" radius={[4, 4, 0, 0]} />
+                                <Bar dataKey="impact" radius={[4, 4, 0, 0]}>
+                                    {chartData.map((_, i) => (
+                                        <Cell key={i} fill={i <= threshold80 ? '#8B5CF6' : '#D1D5DB'} />
+                                    ))}
+                                </Bar>
                             </BarChart>
                         </ResponsiveContainer>
                     </div>
                 </div>
                 <div className="bg-gray-50 rounded-xl p-4 border">
-                    <h4 className="font-semibold text-gray-700 mb-2">Cumulative Impact (80/20)</h4>
+                    <h4 className="font-semibold text-gray-700 mb-2">Cumulative Impact (80/20 Rule)</h4>
                     <div className="h-56">
                         <ResponsiveContainer width="100%" height="100%">
                             <ComposedChart data={chartData}>
                                 <CartesianGrid strokeDasharray="3 3" />
                                 <XAxis dataKey="name" tick={{ fontSize: 9 }} angle={-15} />
-                                <YAxis yAxisId="left" domain={[0, 40]} />
-                                <YAxis yAxisId="right" orientation="right" domain={[0, 100]} />
+                                <YAxis yAxisId="left" domain={[0, 'auto']} unit="%" />
+                                <YAxis yAxisId="right" orientation="right" domain={[0, 100]} unit="%" />
                                 <Tooltip />
-                                <Bar yAxisId="left" dataKey="impact" fill="#3B82F6" opacity={0.7} />
-                                <Line yAxisId="right" type="monotone" dataKey="cumulative" stroke="#EF4444" strokeWidth={3} dot />
+                                <Bar yAxisId="left" dataKey="impact" fill="#3B82F6" opacity={0.7} name="Individual %" />
+                                <Line yAxisId="right" type="monotone" dataKey="cumulative" stroke="#EF4444" strokeWidth={3} dot name="Cumulative %" />
                             </ComposedChart>
                         </ResponsiveContainer>
                     </div>
                 </div>
             </div>
+
+            {/* Detailed Action Breakdown */}
+            <div className="bg-white rounded-xl p-4 border border-gray-200">
+                <h4 className="font-semibold text-gray-800 mb-3">Factor Analysis (Ranked by Impact)</h4>
+                <div className="space-y-2">
+                    {chartData.map((item, i) => (
+                        <div key={i} className={`rounded-lg p-3 border ${i <= threshold80 ? 'bg-purple-50 border-purple-200' : 'bg-gray-50 border-gray-200'}`}>
+                            <div className="flex items-center justify-between mb-1">
+                                <div className="flex items-center gap-2">
+                                    <span className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold ${i <= threshold80 ? 'bg-purple-600 text-white' : 'bg-gray-300 text-gray-600'}`}>
+                                        {i + 1}
+                                    </span>
+                                    <span className="font-medium text-gray-800 text-sm">{item.fullName}</span>
+                                </div>
+                                <div className="flex items-center gap-3">
+                                    <span className="text-sm font-bold text-purple-600">{item.impact}%</span>
+                                    <span className="text-xs text-gray-500">→ {item.cumulative}% cumulative</span>
+                                </div>
+                            </div>
+                            {item.explanation && (
+                                <p className="text-xs text-gray-600 ml-8">{item.explanation}</p>
+                            )}
+                        </div>
+                    ))}
+                </div>
+            </div>
+
             <div className="bg-purple-50 rounded-xl p-4 border border-purple-200">
-                <h4 className="font-semibold text-purple-800 mb-2">Pareto Analysis</h4>
-                <p className="text-gray-700">{data.insight}</p>
-                <div className="mt-3 flex items-center gap-4">
-                    <div className="bg-white rounded-lg p-3 border">
+                <div className="flex items-center gap-4 mb-3">
+                    <div className="bg-white rounded-lg px-4 py-2 border border-purple-200">
                         <span className="text-2xl font-bold text-purple-600">80%</span>
-                        <p className="text-xs text-gray-500">of results from</p>
+                        <p className="text-xs text-gray-500">of impact from</p>
                     </div>
-                    <div className="bg-white rounded-lg p-3 border">
-                        <span className="text-2xl font-bold text-green-600">20%</span>
-                        <p className="text-xs text-gray-500">of actions</p>
+                    <div className="bg-white rounded-lg px-4 py-2 border border-purple-200">
+                        <span className="text-2xl font-bold text-green-600">{topActions.length}</span>
+                        <p className="text-xs text-gray-500">key factors</p>
                     </div>
-                    <div className="flex-1 bg-white rounded-lg p-3 border">
-                        <span className="text-sm font-medium text-gray-800">Top Actions:</span>
-                        <p className="text-xs text-gray-600">{chartData.slice(0, 2).map(c => c.fullName).join(', ')}</p>
+                    <div className="flex-1 bg-white rounded-lg px-4 py-2 border border-purple-200">
+                        <span className="text-xs font-medium text-gray-700">Priority Focus:</span>
+                        <p className="text-sm text-purple-700 font-medium">{topActions.map(c => c.fullName).join(', ')}</p>
                     </div>
                 </div>
+                <h4 className="font-semibold text-purple-800 mb-2">Strategic Recommendations</h4>
+                <p className="text-gray-700 text-sm leading-relaxed">{data.insight}</p>
             </div>
         </div>
     );

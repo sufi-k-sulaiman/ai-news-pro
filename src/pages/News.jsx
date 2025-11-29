@@ -195,13 +195,18 @@ const NewsCardSimple = ({ article, index }) => {
                     setImageUrl(result.url);
                 }
             } catch (error) {
-                console.error('Image generation error:', error);
+                // Silently fail - show placeholder instead
+                console.log('Image generation skipped');
             } finally {
                 setImageLoading(false);
             }
         };
-        generateImage();
-    }, [cleanTitle, cleanSummary]);
+        
+        // Stagger image generation to avoid rate limits
+        const delay = index * 500;
+        const timer = setTimeout(generateImage, delay);
+        return () => clearTimeout(timer);
+    }, [cleanTitle, cleanSummary, index]);
 
     return (
         <a 

@@ -13,8 +13,6 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import ErrorDisplay, { LoadingState, getErrorCode } from '@/components/ErrorDisplay';
 
-// NewsCard component removed - using NewsCardSimple instead
-
 import { Monitor, TrendingUp as BusinessIcon, FlaskConical, HeartPulse, Landmark, Trophy, Clapperboard, Globe2, ChevronDown, ChevronUp } from 'lucide-react';
 
 const ARTICLES_PER_CATEGORY = 12;

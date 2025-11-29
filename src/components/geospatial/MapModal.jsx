@@ -1,8 +1,20 @@
 import React, { useState, useEffect } from 'react';
 import { Dialog, DialogContent } from "@/components/ui/dialog";
-import { X, Loader2, TrendingUp, TrendingDown, AlertTriangle, CheckCircle, MapPin } from 'lucide-react';
+import { X, Loader2, TrendingUp, TrendingDown, AlertTriangle, CheckCircle, MapPin, ExternalLink } from 'lucide-react';
 import GeospatialMap from './GeospatialMap';
 import { base44 } from '@/api/base44Client';
+
+// Helper to clean any URLs from text
+const cleanText = (text) => {
+    if (!text) return '';
+    // Remove markdown links [text](url)
+    let cleaned = text.replace(/\[([^\]]+)\]\([^)]+\)/g, '$1');
+    // Remove standalone URLs
+    cleaned = cleaned.replace(/\(?https?:\/\/[^\s)]+\)?/g, '');
+    // Clean up extra spaces and parentheses
+    cleaned = cleaned.replace(/\(\s*\)/g, '').replace(/\s+/g, ' ').trim();
+    return cleaned;
+};
 
 const USE_CASE_CONFIG = {
     carbon: {
@@ -202,16 +214,20 @@ export default function MapModal({ isOpen, onClose, title, icon: Icon, iconColor
                 prompt: `Provide a detailed 2024 analysis for ${config.title} (${config.description}).
 
 Include:
-1. Current Status: What's happening globally right now with specific numbers
-2. Key Impacts: 3 major environmental/economic impacts with real data
+1. Current Status: 2-3 sentences about what's happening globally with specific numbers. DO NOT include any URLs or markdown links in the text.
+2. Key Impacts: 3 major environmental/economic impacts. Keep each to 1 sentence. NO URLs in text.
 
 3. ${config.highLabel} (5 locations): Places with the HIGHEST levels/worst performance
    - Include specific location names, countries, and exact data values for ${config.highMetric}
+   - Keep detail to 1 short sentence. NO URLs.
 
 4. ${config.lowLabel} (5 locations): Places with the LOWEST levels/best performance  
    - Include specific location names, countries, and exact data values for ${config.lowMetric}
+   - Keep detail to 1 short sentence. NO URLs.
 
-Use real 2024 data. Be specific with numbers, locations, and measurable metrics.`,
+5. Sources: 3 reputable data sources with name and URL separately.
+
+CRITICAL: Do NOT embed URLs or markdown links like [text](url) in any text fields. Keep all URLs only in the sources array.`,
                 add_context_from_internet: true,
                 response_json_schema: {
                     type: "object",
@@ -241,6 +257,16 @@ Use real 2024 data. Be specific with numbers, locations, and measurable metrics.
                                     detail: { type: "string" }
                                 }
                             }
+                        },
+                        sources: {
+                            type: "array",
+                            items: {
+                                type: "object",
+                                properties: {
+                                    name: { type: "string" },
+                                    url: { type: "string" }
+                                }
+                            }
                         }
                     }
                 }
@@ -255,7 +281,7 @@ Use real 2024 data. Be specific with numbers, locations, and measurable metrics.
 
     return (
         <Dialog open={isOpen} onOpenChange={onClose}>
-            <DialogContent className="max-w-6xl max-h-[90vh] overflow-y-auto p-0" style={{ zIndex: 9999 }}>
+            <DialogContent className="max-w-4xl max-h-[85vh] overflow-y-auto p-0 z-[10000]">
                 <div className="p-4 border-b border-gray-100 flex items-center justify-between sticky top-0 bg-white z-10">
                     <div className="flex items-center gap-3">
                         {Icon && (
@@ -301,20 +327,20 @@ Use real 2024 data. Be specific with numbers, locations, and measurable metrics.
                             {/* Current Status */}
                             <div className="bg-gray-50 rounded-xl p-4 border border-gray-200">
                                 <h3 className="font-semibold text-gray-900 mb-2 flex items-center gap-2">
-                                    <AlertTriangle className="w-5 h-5" style={{ color: iconColor }} />
+                                    <AlertTriangle className="w-4 h-4" style={{ color: iconColor }} />
                                     Current Status
                                 </h3>
-                                <p className="text-gray-700">{analysis.current_status}</p>
+                                <p className="text-sm text-gray-700 leading-relaxed">{cleanText(analysis.current_status)}</p>
                             </div>
 
                             {/* Key Impacts */}
                             <div className="bg-amber-50 rounded-xl p-4 border border-amber-200">
-                                <h3 className="font-semibold text-amber-800 mb-2">Key Impacts</h3>
-                                <ul className="space-y-1">
+                                <h3 className="font-semibold text-amber-800 mb-2 text-sm">Key Impacts</h3>
+                                <ul className="space-y-1.5">
                                     {analysis.key_impacts?.map((impact, i) => (
-                                        <li key={i} className="text-amber-900 flex items-start gap-2">
-                                            <span className="text-amber-500 mt-1">•</span>
-                                            {impact}
+                                        <li key={i} className="text-sm text-amber-900 flex items-start gap-2">
+                                            <span className="text-amber-500 mt-0.5 flex-shrink-0">•</span>
+                                            <span>{cleanText(impact)}</span>
                                         </li>
                                     ))}
                                 </ul>
@@ -324,23 +350,22 @@ Use real 2024 data. Be specific with numbers, locations, and measurable metrics.
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 {/* High Locations (Hotspots/Worst) */}
                                 <div className="bg-red-50 rounded-xl p-4 border border-red-200">
-                                    <h3 className="font-semibold text-red-800 mb-3 flex items-center gap-2">
-                                        <TrendingUp className="w-5 h-5" />
-                                        {config.highLabel}
+                                    <h3 className="font-semibold text-red-800 mb-1 flex items-center gap-2 text-sm">
+                                        <TrendingUp className="w-4 h-4 flex-shrink-0" />
+                                        <span className="truncate">{config.highLabel}</span>
                                     </h3>
                                     <p className="text-xs text-red-600 mb-3">{config.highMetric}</p>
                                     <div className="space-y-2">
                                         {analysis.high_locations?.map((loc, i) => (
-                                            <div key={i} className="bg-white rounded-lg p-3 border border-red-100">
-                                                <div className="flex items-center gap-2 mb-1">
-                                                    <MapPin className="w-4 h-4 text-red-500" />
-                                                    <span className="font-medium text-red-900">{loc.name}</span>
-                                                    <span className="text-xs text-red-600">({loc.country})</span>
+                                            <div key={i} className="bg-white rounded-lg p-2.5 border border-red-100">
+                                                <div className="flex items-center justify-between mb-1">
+                                                    <div className="flex items-center gap-1.5 min-w-0">
+                                                        <MapPin className="w-3.5 h-3.5 text-red-500 flex-shrink-0" />
+                                                        <span className="font-medium text-red-900 text-sm truncate">{loc.name}</span>
+                                                    </div>
+                                                    <span className="text-xs font-bold text-red-600 flex-shrink-0 ml-2">{loc.value}</span>
                                                 </div>
-                                                <div className="flex items-center justify-between">
-                                                    <span className="text-sm text-red-800">{loc.detail}</span>
-                                                    <span className="text-sm font-bold text-red-600">{loc.value}</span>
-                                                </div>
+                                                <p className="text-xs text-red-700 line-clamp-2">{cleanText(loc.detail)}</p>
                                             </div>
                                         ))}
                                     </div>
@@ -348,28 +373,51 @@ Use real 2024 data. Be specific with numbers, locations, and measurable metrics.
 
                                 {/* Low Locations (Best/Leaders) */}
                                 <div className="bg-green-50 rounded-xl p-4 border border-green-200">
-                                    <h3 className="font-semibold text-green-800 mb-3 flex items-center gap-2">
-                                        <TrendingDown className="w-5 h-5" />
-                                        {config.lowLabel}
+                                    <h3 className="font-semibold text-green-800 mb-1 flex items-center gap-2 text-sm">
+                                        <TrendingDown className="w-4 h-4 flex-shrink-0" />
+                                        <span className="truncate">{config.lowLabel}</span>
                                     </h3>
                                     <p className="text-xs text-green-600 mb-3">{config.lowMetric}</p>
                                     <div className="space-y-2">
                                         {analysis.low_locations?.map((loc, i) => (
-                                            <div key={i} className="bg-white rounded-lg p-3 border border-green-100">
-                                                <div className="flex items-center gap-2 mb-1">
-                                                    <CheckCircle className="w-4 h-4 text-green-500" />
-                                                    <span className="font-medium text-green-900">{loc.name}</span>
-                                                    <span className="text-xs text-green-600">({loc.country})</span>
+                                            <div key={i} className="bg-white rounded-lg p-2.5 border border-green-100">
+                                                <div className="flex items-center justify-between mb-1">
+                                                    <div className="flex items-center gap-1.5 min-w-0">
+                                                        <CheckCircle className="w-3.5 h-3.5 text-green-500 flex-shrink-0" />
+                                                        <span className="font-medium text-green-900 text-sm truncate">{loc.name}</span>
+                                                    </div>
+                                                    <span className="text-xs font-bold text-green-600 flex-shrink-0 ml-2">{loc.value}</span>
                                                 </div>
-                                                <div className="flex items-center justify-between">
-                                                    <span className="text-sm text-green-800">{loc.detail}</span>
-                                                    <span className="text-sm font-bold text-green-600">{loc.value}</span>
-                                                </div>
+                                                <p className="text-xs text-green-700 line-clamp-2">{cleanText(loc.detail)}</p>
                                             </div>
                                         ))}
                                     </div>
                                 </div>
                             </div>
+
+                            {/* Sources */}
+                            {analysis.sources && analysis.sources.length > 0 && (
+                                <div className="bg-slate-50 rounded-xl p-4 border border-slate-200">
+                                    <h3 className="font-semibold text-slate-800 mb-3 flex items-center gap-2 text-sm">
+                                        <ExternalLink className="w-4 h-4" />
+                                        Data Sources
+                                    </h3>
+                                    <div className="flex flex-wrap gap-2">
+                                        {analysis.sources.map((source, i) => (
+                                            <a 
+                                                key={i}
+                                                href={source.url}
+                                                target="_blank"
+                                                rel="noopener noreferrer"
+                                                className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-white rounded-lg border border-slate-200 hover:border-blue-300 hover:bg-blue-50 text-xs text-slate-700 hover:text-blue-600 transition-colors"
+                                            >
+                                                <ExternalLink className="w-3 h-3" />
+                                                {source.name}
+                                            </a>
+                                        ))}
+                                    </div>
+                                </div>
+                            )}
                         </div>
                     ) : null}
                 </div>

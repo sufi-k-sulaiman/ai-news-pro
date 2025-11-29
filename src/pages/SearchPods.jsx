@@ -883,42 +883,33 @@ Do NOT mention any websites, URLs, or external references in the audio script.`
                             </div>
                         </div>
 
-                        {/* Voice Selection & Download */}
-                        <div className="mt-4 flex items-center justify-center gap-3 flex-wrap">
-                            {/* Voice Selector */}
-                            <div className="relative">
-                                <button
-                                    onClick={() => setShowVoiceMenu(!showVoiceMenu)}
-                                    className="flex items-center gap-2 px-3 py-1.5 bg-gray-50 border border-gray-200 rounded-lg hover:bg-gray-100 transition-colors"
-                                >
-                                    <Mic className="w-4 h-4 text-purple-600" />
-                                    <span className="text-sm text-gray-700">{selectedVoice?.name?.split(' ')[0] || 'Voice'}</span>
-                                    <ChevronDown className="w-3 h-3 text-gray-400" />
-                                </button>
-                                {showVoiceMenu && voices.length > 0 && (
-                                    <div className="absolute bottom-full left-0 mb-2 w-48 max-h-48 overflow-y-auto bg-white border border-gray-200 rounded-lg shadow-lg z-50">
-                                        {voices.map((voice, i) => (
-                                            <button
-                                                key={i}
-                                                onClick={() => { 
-                                                    setSelectedVoice(voice); 
-                                                    setShowVoiceMenu(false);
-                                                    // If currently playing, restart with new voice from current sentence
-                                                    if (isPlayingRef.current) {
-                                                        window.speechSynthesis?.cancel();
-                                                        setTimeout(() => speakNextSentence(), 100);
-                                                    }
-                                                }}
-                                                className={`w-full text-left px-3 py-2 text-sm hover:bg-purple-50 transition-colors ${selectedVoice?.name === voice.name ? 'bg-purple-100 text-purple-700' : 'text-gray-700'}`}
-                                            >
-                                                {voice.name.split('(')[0].trim()}
-                                            </button>
-                                        ))}
-                                    </div>
-                                )}
+                        {/* Voice Selection */}
+                        {voices.length > 0 && (
+                            <div className="mt-4 flex items-center justify-center gap-1 flex-wrap">
+                                {voices.map((voice, i) => (
+                                    <button
+                                        key={i}
+                                        onClick={() => { 
+                                            setSelectedVoice(voice); 
+                                            if (isPlayingRef.current) {
+                                                window.speechSynthesis?.cancel();
+                                                setTimeout(() => speakNextSentence(), 100);
+                                            }
+                                        }}
+                                        className={`px-3 py-1.5 rounded-full text-xs font-medium transition-all ${
+                                            selectedVoice?.name === voice.name 
+                                                ? 'bg-purple-600 text-white' 
+                                                : 'bg-gray-100 text-gray-600 hover:bg-purple-100 hover:text-purple-600'
+                                        }`}
+                                    >
+                                        {voice.name.replace('Google ', '').replace(' English', '')}
+                                    </button>
+                                ))}
                             </div>
-                            
-                            {/* Text Download */}
+                        )}
+
+                        {/* Text Download */}
+                        <div className="mt-3 flex justify-center">
                             <button 
                                 onClick={downloadText}
                                 disabled={isGenerating}
@@ -928,8 +919,6 @@ Do NOT mention any websites, URLs, or external references in the audio script.`
                                 <FileText className="w-4 h-4" />
                                 <span className="text-sm">Text</span>
                             </button>
-                            
-
                         </div>
                     </div>
                 </DialogContent>

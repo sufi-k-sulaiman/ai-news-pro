@@ -741,7 +741,7 @@ export default function Qwirey() {
                     (responseFormat === 'tabled' && result.tabledData) ||
                     (responseFormat === 'reviews' && result.reviewsData) ||
                     (responseFormat === 'dynamic' && result.dashboardData)
-                ) && (
+                ) ? (
                                           <div className="space-y-6">
                                               {result.type === 'error' ? (
                             <div className="bg-white rounded-2xl border border-red-200 p-6 shadow-sm">

@@ -223,7 +223,7 @@ export default function Qwirey() {
         // Build format instruction based on selected format
         const formatInstructions = {
             dynamic: 'Provide a helpful, informative response about the topic. Be clear and concise.',
-            short: 'CRITICAL: Your response MUST be under 280 characters maximum. Then add exactly 5 bullet points with key facts (each bullet under 60 chars). Format: First a short blurb, then 5 bullets starting with •',
+            short: 'CRITICAL: Your response MUST be between 160 and 280 characters. Then add exactly 5 bullet points with key facts (each bullet under 60 chars). Format: First a short blurb (160-280 chars), then 5 bullets starting with •',
             long: 'IMPORTANT: Provide a detailed response with 6-8 well-spaced paragraphs. Add TWO line breaks between each paragraph for clear separation. Include thorough explanations and examples.',
             tabled: 'Provide a 2 sentence summary. Then provide structured data for a comparison with 4-5 items. Each item needs: name, pros (2-3 points), cons (2-3 points), and a rating out of 10.',
             reviews: 'Provide a brief intro sentence. Then provide 5 realistic user reviews with: reviewer name, rating (1-10), review text (2-3 sentences), and date.'
@@ -257,7 +257,7 @@ export default function Qwirey() {
                 if (responseFormat === 'short') {
                     apiCalls.push(
                         base44.integrations.Core.InvokeLLM({
-                            prompt: `For "${currentPrompt}", provide a SHORT response: a brief blurb (under 280 characters) and exactly 5 key bullet points (each under 60 chars).`,
+                            prompt: `For "${currentPrompt}", provide a SHORT response: a brief blurb (between 160 and 280 characters) and exactly 5 key bullet points (each under 60 chars).`,
                             add_context_from_internet: true,
                             response_json_schema: {
                                 type: "object",
@@ -343,7 +343,7 @@ export default function Qwirey() {
                 } else if (responseFormat === 'reviews') {
                     apiCalls.push(
                         base44.integrations.Core.InvokeLLM({
-                            prompt: `For "${currentPrompt}", generate exactly 5 realistic user reviews. Provide: a title for the reviews section, a brief intro (max 400 chars), and 5 reviews each with: reviewer name, rating 1-10, review text (2-3 sentences), and a realistic date from last 6 months.`,
+                            prompt: `For "${currentPrompt}", generate exactly 5 realistic user reviews. Provide: a title for the reviews section, a brief intro (max 400 chars), and 5 reviews each with: reviewer name, rating 1-10, review text (2-3 sentences), a realistic date from last 6 months, and if available a source URL where the review was found.`,
                             add_context_from_internet: true,
                             response_json_schema: {
                                 type: "object",
@@ -354,7 +354,8 @@ export default function Qwirey() {
                                         name: { type: "string" }, 
                                         rating: { type: "number" }, 
                                         text: { type: "string" }, 
-                                        date: { type: "string" }
+                                        date: { type: "string" },
+                                        source_url: { type: "string" }
                                     } } }
                                 }
                             }
@@ -584,7 +585,7 @@ export default function Qwirey() {
                 setResult(prev => ({ ...prev, tabledData: tabledResponse }));
             } else if (newFormat === 'reviews' && !result.reviewsData) {
                 const reviewsResponse = await base44.integrations.Core.InvokeLLM({
-                    prompt: `For "${currentPrompt}", generate exactly 5 realistic user reviews. Provide: a title, a brief intro (max 400 chars), and 5 reviews each with: reviewer name, rating 1-10, review text (2-3 sentences), and date.`,
+                    prompt: `For "${currentPrompt}", generate exactly 5 realistic user reviews. Provide: a title, a brief intro (max 400 chars), and 5 reviews each with: reviewer name, rating 1-10, review text (2-3 sentences), date, and if available a source URL.`,
                     add_context_from_internet: true,
                     response_json_schema: {
                         type: "object",
@@ -595,7 +596,8 @@ export default function Qwirey() {
                                 name: { type: "string" }, 
                                 rating: { type: "number" }, 
                                 text: { type: "string" }, 
-                                date: { type: "string" }
+                                date: { type: "string" },
+                                source_url: { type: "string" }
                             } } }
                         }
                     }
@@ -603,7 +605,7 @@ export default function Qwirey() {
                 setResult(prev => ({ ...prev, reviewsData: reviewsResponse }));
             } else if (newFormat === 'short' && !result.shortData) {
                 const shortResponse = await base44.integrations.Core.InvokeLLM({
-                    prompt: `For "${currentPrompt}", provide a SHORT response: a brief blurb (under 280 characters) and exactly 5 key bullet points (each under 60 chars).`,
+                    prompt: `For "${currentPrompt}", provide a SHORT response: a brief blurb (between 160 and 280 characters) and exactly 5 key bullet points (each under 60 chars).`,
                     add_context_from_internet: true,
                     response_json_schema: {
                         type: "object",
@@ -827,24 +829,29 @@ export default function Qwirey() {
                             <>
                                 <div className="bg-white rounded-2xl border border-gray-200 p-6 shadow-sm">
                                     <div className="flex items-center justify-between mb-4">
-                                        <div className="flex items-center gap-3">
-                                            {result.type === 'qwirey' ? (
-                                                <img src={LOGO_URL} alt="Qwirey" className="w-10 h-10 rounded-lg" />
-                                            ) : (
-                                                <div className="w-10 h-10 rounded-lg bg-gray-100 flex items-center justify-center">
-                                                    {AI_MODELS.find(m => m.id === result.model)?.icon && 
-                                                        React.createElement(AI_MODELS.find(m => m.id === result.model).icon)
-                                                    }
-                                                </div>
-                                            )}
-                                            <span className="font-bold text-gray-900 text-lg">
-                                                {result.type === 'qwirey' ? 'Qwirey' : AI_MODELS.find(m => m.id === result.model)?.name}
-                                            </span>
-                                        </div>
-                                        <Button variant="ghost" size="sm" onClick={handleCopy} className="text-purple-600">
-                                            {copied ? <Check className="w-4 h-4 text-green-500" /> : <Copy className="w-4 h-4" />}
-                                        </Button>
-                                    </div>
+                                          <div className="flex items-center gap-3">
+                                              {result.type === 'qwirey' ? (
+                                                  <img src={LOGO_URL} alt="Qwirey" className="w-10 h-10 rounded-lg" />
+                                              ) : (
+                                                  <div className="w-10 h-10 rounded-lg bg-gray-100 flex items-center justify-center">
+                                                      {AI_MODELS.find(m => m.id === result.model)?.icon && 
+                                                          React.createElement(AI_MODELS.find(m => m.id === result.model).icon)
+                                                      }
+                                                  </div>
+                                              )}
+                                              <div>
+                                                  <span className="font-bold text-gray-900 text-lg block">
+                                                      {result.type === 'qwirey' ? 'Qwirey' : AI_MODELS.find(m => m.id === result.model)?.name}
+                                                  </span>
+                                                  <span className="text-xs text-gray-400">
+                                                      {new Date().toLocaleDateString('en-US', { weekday: 'short', year: 'numeric', month: 'short', day: 'numeric' })} at {new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })}
+                                                  </span>
+                                              </div>
+                                          </div>
+                                          <Button variant="ghost" size="sm" onClick={handleCopy} className="text-purple-600">
+                                              {copied ? <Check className="w-4 h-4 text-green-500" /> : <Copy className="w-4 h-4" />}
+                                          </Button>
+                                      </div>
                                     
                                     {/* SHORT FORMAT */}
                                     {responseFormat === 'short' && result.shortData && (
@@ -948,6 +955,17 @@ export default function Qwirey() {
                                                             </div>
                                                         </div>
                                                         <p className="text-gray-700 leading-relaxed">{review.text}</p>
+                                                        {review.source_url && (
+                                                            <a 
+                                                                href={review.source_url} 
+                                                                target="_blank" 
+                                                                rel="noopener noreferrer"
+                                                                className="inline-flex items-center gap-1 text-sm text-purple-600 hover:text-purple-800 mt-2"
+                                                            >
+                                                                <ExternalLink className="w-3 h-3" />
+                                                                View Source
+                                                            </a>
+                                                        )}
                                                     </div>
                                                 ))}
                                             </div>
@@ -1215,9 +1233,9 @@ export default function Qwirey() {
                                               </div>
                                               <p className="text-gray-600 font-medium">
                                                   {formatLoading 
-                                                      ? 'Qwirey is thinking, generating images, and searching the web...'
+                                                      ? 'Generating your Qwirey...'
                                                       : selectedModel === 'qwirey' 
-                                                          ? 'Qwirey is thinking, generating images, and searching the web...'
+                                                          ? 'Generating your Qwirey...'
                                                           : `${AI_MODELS.find(m => m.id === selectedModel)?.name} is thinking...`
                                                   }
                                               </p>

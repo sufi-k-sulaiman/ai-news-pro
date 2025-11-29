@@ -1,9 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { 
-    Globe, MapPin, Layers, Navigation, Satellite, Map, 
-    Search, Filter, ZoomIn, Compass, Target, Route,
-    Building2, TreePine, Waves, Mountain, Cloud, Activity,
-    BarChart3, TrendingUp, Users, Truck, Loader2, RefreshCw, Sparkles
+    Globe, Layers, Satellite, Map, Search, Compass,
+    TreePine, Mountain, Cloud, Activity, TrendingUp, 
+    Loader2, RefreshCw, Sparkles
 } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";

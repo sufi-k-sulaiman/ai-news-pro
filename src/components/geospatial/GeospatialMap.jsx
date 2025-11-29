@@ -91,12 +91,13 @@ export default function GeospatialMap({
     searchQuery = '',
     height = '500px',
     mini = false,
-    color = '#6366F1'
+    color = '#6366F1',
+    isWorldMap = false
 }) {
     const [selectedStyle, setSelectedStyle] = useState(mapType);
     
-    const config = USE_CASE_CENTERS[useCase] || USE_CASE_CENTERS.urban;
-    const dataPoints = useMemo(() => generateDataPoints(useCase, mini ? 10 : 25), [useCase, mini]);
+    const config = isWorldMap ? { center: [20, 0], zoom: 2 } : (USE_CASE_CENTERS[useCase] || USE_CASE_CENTERS.greenhouse);
+    const dataPoints = useMemo(() => generateDataPoints(useCase, mini ? 10 : isWorldMap ? 50 : 25), [useCase, mini, isWorldMap]);
     const routes = useMemo(() => generateRoutes(useCase), [useCase]);
     
     const tileUrl = MAP_TILES[mapType] || MAP_TILES.default;

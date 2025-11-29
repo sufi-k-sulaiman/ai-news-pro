@@ -369,7 +369,7 @@ export default function News() {
         setLoading(true);
         setError(null);
         try {
-            // Use backend function with NewsAPI
+            // Use backend function with LLM
             const response = await base44.functions.invoke('fetchNews', {
                 query: keyword,
                 category: CATEGORIES.find(c => c.id === keyword)?.id || null,
@@ -380,12 +380,17 @@ export default function News() {
 
             // Handle both response.data and direct response
             const data = response.data || response;
-            const articles = data?.articles || [];
 
-            if (articles.length === 0) {
-                console.log('No articles returned, data:', data);
+            // Check if backend returned an error
+            if (data?.success === false) {
+                console.error('Backend error:', data?.error);
+                setError(null); // Don't show error, just show empty state
+                setNews([]);
+                setLastUpdated(new Date());
+                return;
             }
 
+            const articles = data?.articles || [];
             setNews(articles);
             setLastUpdated(new Date());
         } catch (err) {

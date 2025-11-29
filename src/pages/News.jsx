@@ -369,19 +369,27 @@ export default function News() {
         setLoading(true);
         setError(null);
         try {
-            // Use backend function with LLM + NewsAPI fallback
+            // Use backend function with NewsAPI
             const response = await base44.functions.invoke('fetchNews', {
                 query: keyword,
                 category: CATEGORIES.find(c => c.id === keyword)?.id || null,
                 limit: 30
             });
 
-            console.log('News response:', response.data);
-            const articles = response.data?.articles || [];
+            console.log('News response:', response);
+
+            // Handle both response.data and direct response
+            const data = response.data || response;
+            const articles = data?.articles || [];
+
+            if (articles.length === 0) {
+                console.log('No articles returned, data:', data);
+            }
+
             setNews(articles);
             setLastUpdated(new Date());
         } catch (err) {
-            console.error('Error fetching news:', err);
+            console.error('Error fetching news:', err, err?.response);
             setError('E200');
             setNews([]);
         } finally {

@@ -713,56 +713,98 @@ const AnsoffDisplay = ({ data }) => {
 
 // PESTLE: Radar + Bar with Trends
 const PESTLEDisplay = ({ data }) => {
+    const factorColors = {
+        'Political': '#EF4444',
+        'Economic': '#22C55E', 
+        'Social': '#3B82F6',
+        'Technological': '#8B5CF6',
+        'Legal': '#F59E0B',
+        'Environmental': '#14B8A6'
+    };
+
     const radarData = data.factors?.map(f => ({ name: f.factor, score: f.score })) || [];
-    const barData = data.factors?.map(f => ({ name: f.factor, current: f.score, trend: f.trend || f.score * 1.1 })) || [];
+    const barData = data.factors?.map(f => ({ 
+        name: f.factor?.substring(0, 4), 
+        fullName: f.factor,
+        current: f.score, 
+        trend: f.trend > 0 ? f.score + f.trend : f.score + (f.trend || 5)
+    })) || [];
 
     return (
         <div className="space-y-4">
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
                 <div className="bg-gray-50 rounded-xl p-4 border">
-                    <h4 className="font-semibold text-gray-700 mb-2">Factor Impact Radar</h4>
+                    <h4 className="font-semibold text-gray-700 mb-2">PESTLE Factor Impact</h4>
                     <div className="h-56">
                         <ResponsiveContainer width="100%" height="100%">
                             <RadarChart data={radarData}>
                                 <PolarGrid />
                                 <PolarAngleAxis dataKey="name" tick={{ fontSize: 10 }} />
-                                <PolarRadiusAxis angle={30} domain={[0, 100]} />
-                                <Radar name="Impact" dataKey="score" stroke="#8B5CF6" fill="#8B5CF6" fillOpacity={0.5} />
+                                <PolarRadiusAxis angle={30} domain={[0, 100]} tick={{ fontSize: 9 }} />
+                                <Radar name="Impact Score" dataKey="score" stroke="#8B5CF6" fill="#8B5CF6" fillOpacity={0.4} />
                             </RadarChart>
                         </ResponsiveContainer>
                     </div>
                 </div>
                 <div className="bg-gray-50 rounded-xl p-4 border">
-                    <h4 className="font-semibold text-gray-700 mb-2">Current vs Projected</h4>
+                    <h4 className="font-semibold text-gray-700 mb-2">Current Score vs Projected Trend</h4>
                     <div className="h-56">
                         <ResponsiveContainer width="100%" height="100%">
                             <BarChart data={barData}>
                                 <CartesianGrid strokeDasharray="3 3" />
-                                <XAxis dataKey="name" tick={{ fontSize: 9 }} />
+                                <XAxis dataKey="name" tick={{ fontSize: 10 }} />
                                 <YAxis domain={[0, 100]} />
-                                <Tooltip />
+                                <Tooltip content={({ payload }) => payload?.[0] && (
+                                    <div className="bg-white p-2 rounded shadow border text-xs">
+                                        <p className="font-semibold">{payload[0].payload.fullName}</p>
+                                        <p className="text-blue-600">Current: {payload[0].payload.current}</p>
+                                        <p className="text-green-600">Projected: {payload[0].payload.trend}</p>
+                                    </div>
+                                )} />
                                 <Legend />
-                                <Bar dataKey="current" fill="#3B82F6" name="Current" />
+                                <Bar dataKey="current" fill="#3B82F6" name="Current Score" />
                                 <Bar dataKey="trend" fill="#22C55E" name="Projected" />
                             </BarChart>
                         </ResponsiveContainer>
                     </div>
                 </div>
             </div>
-            <div className="bg-purple-50 rounded-xl p-4 border border-purple-200">
-                <h4 className="font-semibold text-purple-800 mb-2">PESTLE Summary</h4>
-                <p className="text-gray-700">{data.insight}</p>
-                <div className="mt-3 grid grid-cols-2 md:grid-cols-3 gap-2">
-                    {data.factors?.map((f, i) => (
-                        <div key={i} className="bg-white rounded-lg p-2 border">
-                            <div className="flex justify-between items-center">
-                                <span className="text-xs font-medium text-gray-800">{f.factor}</span>
-                                <span className="text-xs font-bold" style={{ color: COLORS[i] }}>{f.score}</span>
+
+            {/* Factor Details */}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+                {data.factors?.map((f, i) => (
+                    <div key={i} className="bg-white rounded-xl p-4 border" style={{ borderLeftWidth: 4, borderLeftColor: factorColors[f.factor] || COLORS[i] }}>
+                        <div className="flex items-center justify-between mb-2">
+                            <h5 className="font-semibold text-gray-800">{f.factor}</h5>
+                            <div className="flex items-center gap-2">
+                                <span className="text-sm font-bold" style={{ color: factorColors[f.factor] || COLORS[i] }}>{f.score}</span>
+                                {f.trend !== undefined && (
+                                    <span className={`text-xs px-1.5 py-0.5 rounded ${f.trend > 0 ? 'bg-green-100 text-green-700' : f.trend < 0 ? 'bg-red-100 text-red-700' : 'bg-gray-100 text-gray-600'}`}>
+                                        {f.trend > 0 ? '↑' : f.trend < 0 ? '↓' : '→'} {Math.abs(f.trend || 0)}
+                                    </span>
+                                )}
                             </div>
-                            <p className="text-xs text-gray-500 truncate">{f.points?.[0]}</p>
                         </div>
-                    ))}
-                </div>
+                        <div className="h-1.5 bg-gray-200 rounded-full mb-3">
+                            <div className="h-full rounded-full" style={{ width: `${f.score}%`, backgroundColor: factorColors[f.factor] || COLORS[i] }} />
+                        </div>
+                        {f.points && f.points.length > 0 && (
+                            <ul className="space-y-1">
+                                {f.points.slice(0, 3).map((point, j) => (
+                                    <li key={j} className="text-xs text-gray-600 flex items-start gap-1.5">
+                                        <span className="mt-0.5" style={{ color: factorColors[f.factor] || COLORS[i] }}>•</span>
+                                        <span>{point}</span>
+                                    </li>
+                                ))}
+                            </ul>
+                        )}
+                    </div>
+                ))}
+            </div>
+
+            <div className="bg-purple-50 rounded-xl p-4 border border-purple-200">
+                <h4 className="font-semibold text-purple-800 mb-2">PESTLE Strategic Analysis</h4>
+                <p className="text-gray-700 text-sm leading-relaxed">{data.insight}</p>
             </div>
         </div>
     );

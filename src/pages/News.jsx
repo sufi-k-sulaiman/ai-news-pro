@@ -392,25 +392,33 @@ export default function News() {
         setLoading(true);
         setError(null);
         try {
-            // Use backend function with RSS + NewsAPI
+            // Use backend function with RSS
             const response = await base44.functions.invoke('fetchNews', {
                 query: keyword,
                 category: CATEGORIES.find(c => c.id === keyword)?.id || null,
                 limit: 30
             });
 
-            setNews(response.data?.articles || []);
+            const articles = response.data?.articles || [];
+            console.log('Fetched articles:', articles.length, 'Source:', response.data?.source);
+
+            if (articles.length === 0 && response.data?.error) {
+                console.error('Backend error:', response.data.error);
+                setError('E200');
+            } else {
+                setNews(articles);
+                setError(null);
+            }
             setLastUpdated(new Date());
         } catch (err) {
             console.error('Error fetching news:', err);
-            // Check if it's actually an AI error or a network/backend error
             const errorMessage = err?.message?.toLowerCase() || '';
             if (errorMessage.includes('network') || errorMessage.includes('fetch') || errorMessage.includes('timeout')) {
-                setError('E100'); // Network error
+                setError('E100');
             } else if (err?.response?.status === 401) {
-                setError('E400'); // Auth error
+                setError('E400');
             } else {
-                setError('E200'); // Data load failed (more accurate for backend function errors)
+                setError('E200');
             }
             setNews([]);
         } finally {

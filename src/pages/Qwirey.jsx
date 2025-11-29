@@ -538,6 +538,31 @@ export default function Qwirey() {
                     }
                 });
                 setResult(prev => ({ ...prev, reviewsData: reviewsResponse }));
+            } else if (newFormat === 'short' && !result.shortData) {
+                const shortResponse = await base44.integrations.Core.InvokeLLM({
+                    prompt: `For "${currentPrompt}", provide a SHORT response: a brief blurb (under 280 characters) and exactly 5 key bullet points (each under 60 chars).`,
+                    add_context_from_internet: true,
+                    response_json_schema: {
+                        type: "object",
+                        properties: {
+                            blurb: { type: "string" },
+                            bullets: { type: "array", items: { type: "string" } }
+                        }
+                    }
+                });
+                setResult(prev => ({ ...prev, shortData: shortResponse }));
+            } else if (newFormat === 'long' && !result.longData) {
+                const longResponse = await base44.integrations.Core.InvokeLLM({
+                    prompt: `For "${currentPrompt}", provide a DETAILED response with 6-8 well-developed paragraphs. Include thorough explanations and examples.`,
+                    add_context_from_internet: true,
+                    response_json_schema: {
+                        type: "object",
+                        properties: {
+                            paragraphs: { type: "array", items: { type: "string" } }
+                        }
+                    }
+                });
+                setResult(prev => ({ ...prev, longData: longResponse }));
             }
         } catch (error) {
             console.error('Format generation error:', error);

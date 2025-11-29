@@ -312,78 +312,57 @@ Deno.serve(async (req) => {
             return Response.json({ error: 'Unauthorized' }, { status: 401 });
         }
 
-        const { query, category, limit = 30, scraperUrl, useCache = true } = await req.json();
+        const { query, category, limit = 30 } = await req.json();
         
-        // Try to serve from cache first (production mode)
-        if (useCache) {
-            const cacheKey = query?.toLowerCase() || category || 'general';
-            const cached = await base44.entities.NewsCache.filter({ category: cacheKey });
+        // Always serve from database cache
+        const cacheKey = query?.toLowerCase() || category || 'technology';
+        const cached = await base44.entities.NewsCache.filter({ category: cacheKey });
+        
+        if (cached.length > 0 && cached[0].articles?.length > 0) {
+            const articles = cached[0].articles.map(art => ({
+                ...art,
+                time: formatTimeFromDate(art.publishedAt),
+            }));
             
-            if (cached.length > 0) {
-                const cacheEntry = cached[0];
-                const isExpired = new Date(cacheEntry.expires_at) < new Date();
-                
-                if (!isExpired && cacheEntry.articles?.length > 0) {
-                    return Response.json({
-                        success: true,
-                        count: cacheEntry.articles.length,
-                        query: query || null,
-                        category: category || null,
-                        articles: cacheEntry.articles.slice(0, limit),
-                        cached: true,
-                    });
-                }
-            }
+            return Response.json({
+                success: true,
+                count: articles.length,
+                query: query || null,
+                category: category || null,
+                articles: articles.slice(0, limit),
+            });
         }
         
-        // Fallback to live fetch if no cache or cache expired
-        const allArticles = [];
-        const fetchPromises = [];
-        
-        // 1. RSS Feeds - always fetch these (free & reliable)
-        if (query) {
-            // Search query: use Google News RSS search
-            fetchPromises.push(fetchRSS('google', query));
-        } else if (category && CATEGORY_FEEDS[category]) {
-            // Category-specific feeds
-            for (const feedKey of CATEGORY_FEEDS[category]) {
-                fetchPromises.push(fetchRSS(feedKey));
-            }
-        } else {
-            // General: fetch from multiple sources
-            fetchPromises.push(fetchRSS('google_top'));
-            fetchPromises.push(fetchRSS('bbc_world'));
-            fetchPromises.push(fetchRSS('npr'));
-        }
-        
-        // 2. NewsAPI (if key exists)
-        fetchPromises.push(fetchNewsAPI(query, category));
-        
-        // 3. External Scraper (if URL provided)
-        if (scraperUrl) {
-            fetchPromises.push(fetchExternalScraper(query, scraperUrl));
-        }
-        
-        // Fetch all in parallel
-        const results = await Promise.all(fetchPromises);
-        
-        for (const articles of results) {
-            allArticles.push(...articles);
-        }
-        
-        // Deduplicate and limit
-        const uniqueArticles = deduplicateArticles(allArticles).slice(0, limit);
-        
+        // If no cache found, return empty with message
         return Response.json({
             success: true,
-            count: uniqueArticles.length,
+            count: 0,
             query: query || null,
             category: category || null,
-            articles: uniqueArticles,
-            cached: false,
+            articles: [],
+            message: 'No cached data available. Admin needs to run populateNewsCache.',
         });
         
     } catch (error) {
         return Response.json({ error: error.message }, { status: 500 });
     }
 });
+
+function formatTimeFromDate(dateStr) {
+    if (!dateStr) return 'Recently';
+    try {
+        const date = new Date(dateStr);
+        const now = new Date();
+        const diffMs = now - date;
+        const diffMins = Math.floor(diffMs / 60000);
+        const diffHours = Math.floor(diffMins / 60);
+        const diffDays = Math.floor(diffHours / 24);
+        
+        if (diffMins < 60) return `${diffMins}m ago`;
+        if (diffHours < 24) return `${diffHours}h ago`;
+        if (diffDays < 7) return `${diffDays}d ago`;
+        return date.toLocaleDateString();
+    } catch {
+        return 'Recently';
+    }
+}

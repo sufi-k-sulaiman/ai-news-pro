@@ -23,30 +23,119 @@ const USE_CASE_CENTERS = {
     treasures: { center: [37.8651, -119.5383], zoom: 8 }, // Yosemite - national treasures
 };
 
-// Generate sample data points for each use case
-const generateDataPoints = (useCase, count = 25) => {
-    // For world map, generate points across the globe
-    if (count >= 50) {
-        return Array.from({ length: count }, (_, i) => ({
-            id: i,
-            lat: (Math.random() - 0.5) * 140, // -70 to 70
-            lng: (Math.random() - 0.5) * 340, // -170 to 170
-            value: Math.round(20 + Math.random() * 80),
-            name: `Location ${i + 1}`,
-            type: useCase
-        }));
-    }
+// Real-world location data for each use case
+const REAL_LOCATIONS = {
+    carbon: [
+        { lat: 39.9042, lng: 116.4074, name: 'Beijing, China', value: 95 },
+        { lat: 28.6139, lng: 77.2090, name: 'Delhi, India', value: 92 },
+        { lat: 31.2304, lng: 121.4737, name: 'Shanghai, China', value: 88 },
+        { lat: 40.7128, lng: -74.0060, name: 'New York, USA', value: 75 },
+        { lat: 51.5074, lng: -0.1278, name: 'London, UK', value: 68 },
+        { lat: 35.6762, lng: 139.6503, name: 'Tokyo, Japan', value: 72 },
+        { lat: 55.7558, lng: 37.6173, name: 'Moscow, Russia', value: 80 },
+        { lat: -23.5505, lng: -46.6333, name: 'São Paulo, Brazil', value: 65 },
+        { lat: 19.4326, lng: -99.1332, name: 'Mexico City, Mexico', value: 70 },
+        { lat: 30.0444, lng: 31.2357, name: 'Cairo, Egypt', value: 67 },
+        { lat: 52.5200, lng: 13.4050, name: 'Berlin, Germany', value: 55 },
+        { lat: 34.0522, lng: -118.2437, name: 'Los Angeles, USA', value: 73 },
+        { lat: 1.3521, lng: 103.8198, name: 'Singapore', value: 60 },
+        { lat: 25.2048, lng: 55.2708, name: 'Dubai, UAE', value: 78 },
+        { lat: 41.9028, lng: 12.4964, name: 'Rome, Italy', value: 52 },
+    ],
+    airwater: [
+        { lat: 28.6139, lng: 77.2090, name: 'Delhi - Severe Air Pollution', value: 98 },
+        { lat: 31.5497, lng: 74.3436, name: 'Lahore, Pakistan', value: 95 },
+        { lat: 23.8103, lng: 90.4125, name: 'Dhaka, Bangladesh', value: 92 },
+        { lat: 27.7172, lng: 85.3240, name: 'Kathmandu, Nepal', value: 88 },
+        { lat: 39.9042, lng: 116.4074, name: 'Beijing, China', value: 85 },
+        { lat: 6.5244, lng: 3.3792, name: 'Lagos, Nigeria', value: 80 },
+        { lat: 30.0444, lng: 31.2357, name: 'Cairo, Egypt', value: 78 },
+        { lat: -6.2088, lng: 106.8456, name: 'Jakarta, Indonesia', value: 82 },
+        { lat: 19.0760, lng: 72.8777, name: 'Mumbai, India', value: 86 },
+        { lat: 14.5995, lng: 120.9842, name: 'Manila, Philippines', value: 75 },
+        { lat: 33.6844, lng: 73.0479, name: 'Islamabad, Pakistan', value: 77 },
+        { lat: -4.4419, lng: 15.2663, name: 'Kinshasa, DRC', value: 70 },
+    ],
+    forests: [
+        { lat: -3.4653, lng: -62.2159, name: 'Amazon Rainforest, Brazil', value: 95 },
+        { lat: 1.6508, lng: 10.2679, name: 'Congo Rainforest', value: 90 },
+        { lat: 2.5, lng: 112.5, name: 'Borneo Rainforest', value: 85 },
+        { lat: -2.5, lng: 140.7, name: 'Papua New Guinea Forests', value: 88 },
+        { lat: 60.0, lng: 90.0, name: 'Siberian Taiga, Russia', value: 92 },
+        { lat: 55.0, lng: -120.0, name: 'Canadian Boreal Forest', value: 90 },
+        { lat: 47.5, lng: -123.5, name: 'Pacific Northwest, USA', value: 82 },
+        { lat: -42.0, lng: 172.0, name: 'New Zealand Forests', value: 78 },
+        { lat: 61.0, lng: 25.0, name: 'Finnish Forests', value: 85 },
+        { lat: 60.0, lng: 15.0, name: 'Swedish Forests', value: 87 },
+        { lat: -19.0, lng: 46.0, name: 'Madagascar Forests', value: 65 },
+        { lat: 8.0, lng: -2.0, name: 'West African Forests', value: 60 },
+    ],
+    resources: [
+        { lat: -29.0, lng: 24.0, name: 'South Africa - Minerals', value: 90 },
+        { lat: -20.0, lng: 118.8, name: 'Western Australia - Iron Ore', value: 95 },
+        { lat: 62.0, lng: -110.0, name: 'Canada - Oil Sands', value: 88 },
+        { lat: 25.0, lng: 51.0, name: 'Qatar - Natural Gas', value: 92 },
+        { lat: 24.0, lng: 45.0, name: 'Saudi Arabia - Oil', value: 98 },
+        { lat: -15.0, lng: 28.0, name: 'Zambia - Copper', value: 82 },
+        { lat: -10.0, lng: -65.0, name: 'Bolivia - Lithium', value: 85 },
+        { lat: 36.0, lng: 138.0, name: 'Japan - Rare Earths', value: 70 },
+        { lat: 40.0, lng: 116.0, name: 'China - Rare Earths', value: 95 },
+        { lat: -22.0, lng: -43.0, name: 'Brazil - Iron Ore', value: 88 },
+        { lat: 61.5, lng: 105.0, name: 'Russia - Natural Gas', value: 90 },
+        { lat: 31.0, lng: -103.0, name: 'Texas, USA - Oil', value: 85 },
+    ],
+    sustainability: [
+        { lat: 55.6761, lng: 12.5683, name: 'Copenhagen, Denmark', value: 95 },
+        { lat: 59.3293, lng: 18.0686, name: 'Stockholm, Sweden', value: 93 },
+        { lat: 59.9139, lng: 10.7522, name: 'Oslo, Norway', value: 94 },
+        { lat: 60.1699, lng: 24.9384, name: 'Helsinki, Finland', value: 91 },
+        { lat: 64.1466, lng: -21.9426, name: 'Reykjavik, Iceland', value: 96 },
+        { lat: 52.3676, lng: 4.9041, name: 'Amsterdam, Netherlands', value: 88 },
+        { lat: 47.3769, lng: 8.5417, name: 'Zurich, Switzerland', value: 90 },
+        { lat: 48.2082, lng: 16.3738, name: 'Vienna, Austria', value: 87 },
+        { lat: -33.8688, lng: 151.2093, name: 'Sydney, Australia', value: 75 },
+        { lat: 49.2827, lng: -123.1207, name: 'Vancouver, Canada', value: 82 },
+        { lat: 35.6762, lng: 139.6503, name: 'Tokyo, Japan', value: 78 },
+        { lat: 1.3521, lng: 103.8198, name: 'Singapore', value: 80 },
+    ],
+    health: [
+        { lat: 28.6139, lng: 77.2090, name: 'Delhi - Health Impact Zone', value: 95 },
+        { lat: 39.9042, lng: 116.4074, name: 'Beijing - Respiratory Issues', value: 90 },
+        { lat: 6.5244, lng: 3.3792, name: 'Lagos - Water Quality', value: 85 },
+        { lat: -6.2088, lng: 106.8456, name: 'Jakarta - Flooding Risk', value: 82 },
+        { lat: 23.8103, lng: 90.4125, name: 'Dhaka - Environmental Health', value: 88 },
+        { lat: 30.0444, lng: 31.2357, name: 'Cairo - Air Quality', value: 78 },
+        { lat: 19.4326, lng: -99.1332, name: 'Mexico City - Smog', value: 75 },
+        { lat: -23.5505, lng: -46.6333, name: 'São Paulo - Urban Health', value: 70 },
+        { lat: 14.5995, lng: 120.9842, name: 'Manila - Water Sanitation', value: 77 },
+        { lat: 13.7563, lng: 100.5018, name: 'Bangkok - Flooding', value: 73 },
+    ],
+    treasures: [
+        { lat: 37.8651, lng: -119.5383, name: 'Yosemite National Park, USA', value: 95 },
+        { lat: -13.1631, lng: -72.5450, name: 'Machu Picchu, Peru', value: 98 },
+        { lat: -25.3444, lng: 131.0369, name: 'Uluru, Australia', value: 90 },
+        { lat: 27.1751, lng: 78.0421, name: 'Taj Mahal, India', value: 92 },
+        { lat: 29.9792, lng: 31.1342, name: 'Pyramids of Giza, Egypt', value: 96 },
+        { lat: -22.9519, lng: -43.2105, name: 'Christ the Redeemer, Brazil', value: 88 },
+        { lat: 40.4319, lng: 116.5704, name: 'Great Wall of China', value: 94 },
+        { lat: -3.0674, lng: 37.3556, name: 'Mount Kilimanjaro, Tanzania', value: 85 },
+        { lat: 64.0, lng: -17.0, name: 'Iceland Geysers', value: 82 },
+        { lat: -17.9243, lng: 25.8572, name: 'Victoria Falls, Zimbabwe', value: 90 },
+        { lat: 36.1069, lng: -112.1129, name: 'Grand Canyon, USA', value: 93 },
+        { lat: -8.4095, lng: 115.1889, name: 'Bali Temples, Indonesia', value: 80 },
+    ],
+};
+
+// Generate data points for each use case using real locations
+const generateDataPoints = (useCase, count = 25, isWorldMap = false) => {
+    const locations = REAL_LOCATIONS[useCase] || REAL_LOCATIONS.carbon;
     
-    const config = USE_CASE_CENTERS[useCase] || USE_CASE_CENTERS.greenhouse;
-    const [lat, lng] = config.center;
-    const spread = useCase === 'environmental' ? 5 : 0.3;
-    
-    return Array.from({ length: count }, (_, i) => ({
+    return locations.map((loc, i) => ({
         id: i,
-        lat: lat + (Math.random() - 0.5) * spread,
-        lng: lng + (Math.random() - 0.5) * spread,
-        value: Math.round(20 + Math.random() * 80),
-        name: `Location ${i + 1}`,
+        lat: loc.lat,
+        lng: loc.lng,
+        value: loc.value,
+        name: loc.name,
         type: useCase
     }));
 };

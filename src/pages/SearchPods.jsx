@@ -1,8 +1,8 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { base44 } from '@/api/base44Client';
 import { 
-    Play, Pause, SkipBack, SkipForward, Volume2, VolumeX, Download,
-    Sparkles, Radio, Loader2, TrendingUp, Users, Mic,
+    Play, Pause, SkipBack, SkipForward, Volume2, VolumeX, Download, FileText, Music,
+    Sparkles, Radio, Loader2, TrendingUp, Users, Mic, ChevronDown,
     ChevronRight, X, Clock, Search, Plus, AlertTriangle
 } from 'lucide-react';
 import { Button } from "@/components/ui/button";
@@ -142,6 +142,8 @@ export default function SearchPods() {
     const [playbackSpeed, setPlaybackSpeed] = useState(1);
     const [voices, setVoices] = useState([]);
     const [selectedVoice, setSelectedVoice] = useState(null);
+    const [showVoiceMenu, setShowVoiceMenu] = useState(false);
+    const [isDownloadingMp3, setIsDownloadingMp3] = useState(false);
     
     // Refs for speech synthesis
     const sentencesRef = useRef([]);
@@ -428,10 +430,9 @@ Do NOT mention any websites, URLs, or external references in the audio script.`
         }
     }, [isPlaying, stopPlayback, startSpeaking]);
 
-    // Download MP3
-    const downloadAudio = async () => {
+    // Download Text Script
+    const downloadText = () => {
         try {
-            // Create a simple text file with the script
             const fullScript = sentencesRef.current.join(' ');
             const blob = new Blob([fullScript], { type: 'text/plain' });
             const url = URL.createObjectURL(blob);
@@ -442,6 +443,39 @@ Do NOT mention any websites, URLs, or external references in the audio script.`
             URL.revokeObjectURL(url);
         } catch (err) {
             console.error('Download error:', err);
+        }
+    };
+
+    // Download MP3 using ElevenLabs
+    const downloadMp3 = async () => {
+        if (!sentencesRef.current.length) return;
+        setIsDownloadingMp3(true);
+        try {
+            const fullScript = sentencesRef.current.join(' ');
+            const response = await base44.functions.invoke('elevenlabsTTS', { 
+                text: fullScript,
+                voice_id: 'EXAVITQu4vr4xnSDxMaL' // Sarah voice
+            });
+            
+            if (response.data?.audio_base64) {
+                const byteCharacters = atob(response.data.audio_base64);
+                const byteNumbers = new Array(byteCharacters.length);
+                for (let i = 0; i < byteCharacters.length; i++) {
+                    byteNumbers[i] = byteCharacters.charCodeAt(i);
+                }
+                const byteArray = new Uint8Array(byteNumbers);
+                const blob = new Blob([byteArray], { type: 'audio/mpeg' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `${currentEpisode.title.replace(/[^a-z0-9]/gi, '_')}.mp3`;
+                a.click();
+                URL.revokeObjectURL(url);
+            }
+        } catch (err) {
+            console.error('MP3 download error:', err);
+        } finally {
+            setIsDownloadingMp3(false);
         }
     };
 
@@ -813,19 +847,52 @@ Do NOT mention any websites, URLs, or external references in the audio script.`
                         </div>
 
                         {/* Voice Selection & Download */}
-                        <div className="mt-4 flex items-center justify-center gap-3">
-                            <div className="flex items-center gap-2 px-3 py-1.5 bg-gray-50 border border-gray-200 rounded-lg">
-                                <Mic className="w-4 h-4 text-purple-600" />
-                                <span className="text-sm text-gray-700">Samantha</span>
+                        <div className="mt-4 flex items-center justify-center gap-3 flex-wrap">
+                            {/* Voice Selector */}
+                            <div className="relative">
+                                <button
+                                    onClick={() => setShowVoiceMenu(!showVoiceMenu)}
+                                    className="flex items-center gap-2 px-3 py-1.5 bg-gray-50 border border-gray-200 rounded-lg hover:bg-gray-100 transition-colors"
+                                >
+                                    <Mic className="w-4 h-4 text-purple-600" />
+                                    <span className="text-sm text-gray-700">{selectedVoice?.name?.split(' ')[0] || 'Voice'}</span>
+                                    <ChevronDown className="w-3 h-3 text-gray-400" />
+                                </button>
+                                {showVoiceMenu && voices.length > 0 && (
+                                    <div className="absolute bottom-full left-0 mb-2 w-48 max-h-48 overflow-y-auto bg-white border border-gray-200 rounded-lg shadow-lg z-50">
+                                        {voices.map((voice, i) => (
+                                            <button
+                                                key={i}
+                                                onClick={() => { setSelectedVoice(voice); setShowVoiceMenu(false); }}
+                                                className={`w-full text-left px-3 py-2 text-sm hover:bg-purple-50 transition-colors ${selectedVoice?.name === voice.name ? 'bg-purple-100 text-purple-700' : 'text-gray-700'}`}
+                                            >
+                                                {voice.name}
+                                            </button>
+                                        ))}
+                                    </div>
+                                )}
                             </div>
+                            
+                            {/* Text Download */}
                             <button 
-                                onClick={downloadAudio}
+                                onClick={downloadText}
                                 disabled={isGenerating}
-                                className="flex items-center gap-2 px-3 py-1.5 bg-purple-50 hover:bg-purple-100 border border-purple-200 rounded-lg text-purple-600 disabled:opacity-50 transition-colors"
+                                className="flex items-center gap-2 px-3 py-1.5 bg-gray-50 hover:bg-gray-100 border border-gray-200 rounded-lg text-gray-600 disabled:opacity-50 transition-colors"
                                 title="Download Script"
                             >
-                                <Download className="w-4 h-4" />
-                                <span className="text-sm">Download</span>
+                                <FileText className="w-4 h-4" />
+                                <span className="text-sm">Text</span>
+                            </button>
+                            
+                            {/* MP3 Download */}
+                            <button 
+                                onClick={downloadMp3}
+                                disabled={isGenerating || isDownloadingMp3}
+                                className="flex items-center gap-2 px-3 py-1.5 bg-purple-50 hover:bg-purple-100 border border-purple-200 rounded-lg text-purple-600 disabled:opacity-50 transition-colors"
+                                title="Download MP3"
+                            >
+                                {isDownloadingMp3 ? <Loader2 className="w-4 h-4 animate-spin" /> : <Music className="w-4 h-4" />}
+                                <span className="text-sm">MP3</span>
                             </button>
                         </div>
                     </div>

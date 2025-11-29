@@ -200,17 +200,30 @@ async function fetchGoogleNewsRSS(queryOrCategory, isCategory = false) {
     const url = isCategory 
         ? getGoogleNewsCategoryURL(queryOrCategory)
         : getGoogleNewsURL(queryOrCategory);
+    
+    console.log('Fetching from:', url);
         
     const response = await fetch(url, {
-        headers: { 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36' },
+        headers: { 
+            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+            'Accept': 'application/rss+xml, application/xml, text/xml, */*',
+            'Accept-Language': 'en-US,en;q=0.9',
+        },
     });
+    
+    console.log('Response status:', response.status);
     
     if (!response.ok) {
         throw new Error(`Google News returned ${response.status}`);
     }
     
     const xml = await response.text();
-    return await parseRSS(xml, 'Google News');
+    console.log('XML length:', xml.length);
+    
+    const articles = await parseRSS(xml, 'Google News');
+    console.log('Parsed articles:', articles.length);
+    
+    return articles;
 }
 
 // Deduplicate articles by URL and title similarity

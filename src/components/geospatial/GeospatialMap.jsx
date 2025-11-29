@@ -351,7 +351,7 @@ const REAL_LOCATIONS = {
 
 // Generate data points for each use case using real locations
 const generateDataPoints = (useCase, count = 25, isWorldMap = false) => {
-    const locations = REAL_LOCATIONS[useCase] || REAL_LOCATIONS.carbon;
+    const locations = REAL_LOCATIONS[useCase] || REAL_LOCATIONS.carbon || [];
     
     return locations.map((loc, i) => ({
         id: i,

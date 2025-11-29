@@ -251,20 +251,15 @@ const NewsCardSimple = ({ article, index }) => {
                 <p className="text-gray-600 text-sm line-clamp-3 mb-4">
                     {article.summary}
                 </p>
-                <a
-                    href={article.url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="inline-flex items-center gap-2 text-gray-600 hover:text-red-600 text-sm font-medium transition-colors"
-                >
+                <div className="inline-flex items-center gap-2 text-gray-600 text-sm font-medium">
                     {faviconUrl && (
                         <img src={faviconUrl} alt="" className="w-4 h-4" />
                     )}
                     <span className="text-gray-500">{domain}</span>
                     <ExternalLink className="w-3 h-3" />
-                </a>
+                </div>
             </div>
-        </article>
+        </a>
     );
 };
 

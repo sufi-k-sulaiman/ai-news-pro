@@ -284,10 +284,10 @@ export default function Learning() {
                     </div>
 
                     {/* Category tabs */}
-                    <div className="flex flex-wrap gap-2 pb-3 mb-3 border-b border-gray-100">
+                    <div className="flex gap-2 overflow-x-auto pb-3 mb-3 border-b border-gray-100">
                         <button
                             onClick={() => setActiveCategory(null)}
-                            className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${
+                            className={`px-3 py-1.5 rounded-lg text-sm font-medium whitespace-nowrap transition-colors ${
                                 !activeCategory ? 'bg-purple-100 text-purple-700' : 'text-gray-600 hover:bg-gray-100'
                             }`}
                         >
@@ -297,7 +297,7 @@ export default function Learning() {
                             <button
                                 key={cat}
                                 onClick={() => setActiveCategory(cat)}
-                                className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${
+                                className={`px-3 py-1.5 rounded-lg text-sm font-medium whitespace-nowrap transition-colors ${
                                     activeCategory === cat ? 'bg-purple-100 text-purple-700' : 'text-gray-600 hover:bg-gray-100'
                                 }`}
                             >

@@ -14,17 +14,13 @@ const MAP_TILES = {
 };
 
 const USE_CASE_CENTERS = {
-    greenhouse: { center: [51.5074, -0.1278], zoom: 10 }, // London - emissions
-    carbon: { center: [40.7128, -74.006], zoom: 10 }, // NYC - carbon
-    grid: { center: [39.8283, -98.5795], zoom: 5 }, // USA - power grid
-    production: { center: [52.52, 13.405], zoom: 8 }, // Berlin - production
-    renewables: { center: [55.6761, 12.5683], zoom: 7 }, // Copenhagen - renewables
-    reliability: { center: [34.0522, -118.2437], zoom: 9 }, // LA - grid reliability
-    provincial: { center: [43.6532, -79.3832], zoom: 6 }, // Toronto - provincial
-    towns: { center: [48.8566, 2.3522], zoom: 11 }, // Paris - towns/cities
-    smart: { center: [1.3521, 103.8198], zoom: 11 }, // Singapore - smart systems
-    environmental: { center: [-3.4653, -62.2159], zoom: 6 }, // Amazon - environmental
-    future: { center: [35.6762, 139.6503], zoom: 10 }, // Tokyo - innovation
+    carbon: { center: [51.5074, -0.1278], zoom: 10 }, // London - carbon & climate
+    airwater: { center: [40.7128, -74.006], zoom: 10 }, // NYC - air & water
+    forests: { center: [-3.4653, -62.2159], zoom: 6 }, // Amazon - forests
+    resources: { center: [39.8283, -98.5795], zoom: 5 }, // USA - natural resources
+    sustainability: { center: [55.6761, 12.5683], zoom: 7 }, // Copenhagen - sustainability
+    health: { center: [52.52, 13.405], zoom: 8 }, // Berlin - environmental health
+    treasures: { center: [37.8651, -119.5383], zoom: 8 }, // Yosemite - national treasures
 };
 
 // Generate sample data points for each use case

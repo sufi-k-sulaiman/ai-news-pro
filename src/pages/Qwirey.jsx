@@ -438,7 +438,8 @@ export default function Qwirey() {
         if (newFormat === 'dynamic' && result.dashboardData) return;
         if (newFormat === 'tabled' && result.tabledData) return;
         if (newFormat === 'reviews' && result.reviewsData) return;
-        if (newFormat === 'short' || newFormat === 'long') return; // These just use text
+        if (newFormat === 'short' && result.shortData) return;
+        if (newFormat === 'long' && result.longData) return;
         
         // Generate data for the new format
         setFormatLoading(true);

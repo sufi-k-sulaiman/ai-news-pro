@@ -172,7 +172,7 @@ Use information from news sources like:
 - Bing News: https://www.bing.com/news/search?q=${encodeURIComponent(keyword)}
 - DuckDuckGo News: https://duckduckgo.com/?q=${encodeURIComponent(keyword)}&ia=news&iar=news
 
-Provide 20 most recent and relevant news articles (we will filter out invalid URLs, so provide extra). 
+Provide 100 most recent and relevant news articles (we will filter out invalid URLs, so provide extra to ensure at least 12 valid ones). 
 
 CRITICAL: For each article, you MUST provide the REAL, ACTUAL, VALID URL to the original news article on the publisher's website (e.g., https://www.cnn.com/2024/..., https://www.bbc.com/news/..., https://www.reuters.com/...). 
 DO NOT make up URLs. Only include articles where you can provide a real, working link to the source.

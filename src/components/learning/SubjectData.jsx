@@ -66,6 +66,36 @@ export const SUBJECTS = [
     { id: 'visualarts', name: 'Visual Arts', category: 'Arts', color: '#8B5CF6', icon: 'Palette' },
     { id: 'music', name: 'Music', category: 'Arts', color: '#06B6D4', icon: 'Music' },
     { id: 'filmstudies', name: 'Film Studies', category: 'Arts', color: '#1E293B', icon: 'Film' },
+    
+    // Business & Management
+    { id: 'marketing', name: 'Marketing', category: 'Business', color: '#E11D48', icon: 'TrendingUp' },
+    { id: 'finance', name: 'Finance', category: 'Business', color: '#059669', icon: 'BarChart3' },
+    { id: 'accounting', name: 'Accounting', category: 'Business', color: '#0891B2', icon: 'Scale' },
+    { id: 'management', name: 'Management', category: 'Business', color: '#7C3AED', icon: 'Users' },
+    { id: 'entrepreneurship', name: 'Entrepreneurship', category: 'Business', color: '#F59E0B', icon: 'Rocket' },
+    
+    // Mathematics
+    { id: 'calculus', name: 'Calculus', category: 'Mathematics', color: '#3B82F6', icon: 'TrendingUp' },
+    { id: 'algebra', name: 'Algebra', category: 'Mathematics', color: '#8B5CF6', icon: 'Code' },
+    { id: 'geometry', name: 'Geometry', category: 'Mathematics', color: '#10B981', icon: 'Network' },
+    { id: 'probability', name: 'Probability', category: 'Mathematics', color: '#EC4899', icon: 'BarChart3' },
+    
+    // Languages
+    { id: 'spanish', name: 'Spanish', category: 'Languages', color: '#DC2626', icon: 'Languages' },
+    { id: 'french', name: 'French', category: 'Languages', color: '#2563EB', icon: 'Languages' },
+    { id: 'german', name: 'German', category: 'Languages', color: '#F59E0B', icon: 'Languages' },
+    { id: 'mandarin', name: 'Mandarin', category: 'Languages', color: '#EF4444', icon: 'Languages' },
+    { id: 'japanese', name: 'Japanese', category: 'Languages', color: '#EC4899', icon: 'Languages' },
+    
+    // Law & Politics
+    { id: 'law', name: 'Law', category: 'Law & Politics', color: '#1E293B', icon: 'Scale' },
+    { id: 'intrelations', name: 'International Relations', category: 'Law & Politics', color: '#0D9488', icon: 'Landmark' },
+    { id: 'publicpolicy', name: 'Public Policy', category: 'Law & Politics', color: '#6366F1', icon: 'Landmark' },
+    
+    // Communication
+    { id: 'journalism', name: 'Journalism', category: 'Communication', color: '#64748B', icon: 'BookText' },
+    { id: 'publicrelations', name: 'Public Relations', category: 'Communication', color: '#A855F7', icon: 'Users' },
+    { id: 'mediaproduction', name: 'Media Production', category: 'Communication', color: '#F43F5E', icon: 'Film' },
 ];
 
 export const CATEGORIES = [...new Set(SUBJECTS.map(s => s.category))];

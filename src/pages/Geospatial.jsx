@@ -205,11 +205,11 @@ export default function Geospatial() {
                 {/* World Map - Full Width */}
                 <div className="mb-6">
                     <GeospatialMap 
-                        useCase={currentUseCase?.id || 'greenhouse'}
+                        useCase={currentUseCase?.id || 'carbon'}
                         mapType={activeTab}
                         searchQuery={searchQuery}
                         color={currentUseCase?.color}
-                        height="500px"
+                        height="600px"
                         isWorldMap={true}
                     />
                 </div>

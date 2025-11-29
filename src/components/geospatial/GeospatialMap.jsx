@@ -78,6 +78,8 @@ const USE_CASE_RATIONALE = {
 };
 
 // Real-world location data for each use case
+const DEFAULT_CENTER = { center: [20, 0], zoom: 3 };
+
 const REAL_LOCATIONS = {
     carbon: [
         { lat: 39.9042, lng: 116.4074, name: 'Beijing, China - Highest Emitter', value: 98 },

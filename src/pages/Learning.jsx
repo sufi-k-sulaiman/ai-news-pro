@@ -327,7 +327,6 @@ export default function Learning() {
                             </div>
                         )}
                     </div>
-
                 </div>
             </div>
 

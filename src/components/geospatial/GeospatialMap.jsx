@@ -43,6 +43,18 @@ const USE_CASE_CENTERS = {
 
 // Rationale bullets for each use case
 const USE_CASE_RATIONALE = {
+    coastal: {
+        high: ['Coral bleaching from warming', 'Ocean acidification', 'Coastal development', 'Overfishing pressure', 'Plastic pollution'],
+        low: ['Marine protected areas', 'Coral restoration programs', 'Sustainable fishing', 'Clean coastal waters', 'Strong conservation laws']
+    },
+    ocean: {
+        high: ['Plastic garbage accumulation', 'Industrial shipping routes', 'Overfishing zones', 'Ocean dead zones', 'Oil spill risks'],
+        low: ['Remote pristine waters', 'Marine sanctuaries', 'Sustainable fishing practices', 'Strong international protection', 'Low human activity']
+    },
+    wildlife: {
+        high: ['Poaching and trafficking', 'Habitat destruction', 'Human-wildlife conflict', 'Climate change impact', 'Invasive species'],
+        low: ['Protected reserves', 'Anti-poaching patrols', 'Breeding programs', 'Habitat restoration', 'Community conservation']
+    },
     carbon: {
         high: ['Heavy industrial manufacturing', 'Coal-powered electricity', 'Dense vehicle traffic', 'Aging infrastructure', 'Limited renewable adoption'],
         low: ['100% renewable energy grid', 'Carbon capture programs', 'Electric transport systems', 'Strict emission controls', 'Carbon tax policies']

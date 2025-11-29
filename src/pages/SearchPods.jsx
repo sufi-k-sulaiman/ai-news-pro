@@ -1005,15 +1005,7 @@ Do NOT mention any websites, URLs, or external references in the audio script.`
                                     <Play className="w-7 h-7 ml-1" fill="currentColor" />
                                 )}
                             </button>
-                            <button 
-                                onClick={loadRecommendations}
-                                disabled={isGenerating}
-                                className="text-gray-400 hover:text-purple-600 p-2 flex flex-col items-center disabled:opacity-50"
-                                title="Recommended Pods"
-                            >
-                                <ListMusic className="w-6 h-6" />
-                                <span className="text-xs mt-0.5">More</span>
-                            </button>
+
                             <button 
                                 onClick={skipForward}
                                 disabled={isGenerating}

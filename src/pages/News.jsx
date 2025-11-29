@@ -134,6 +134,152 @@ const NewsCard = ({ article, index }) => {
 
 import { Monitor, TrendingUp as BusinessIcon, FlaskConical, HeartPulse, Landmark, Trophy, Clapperboard, Globe2, ChevronDown, ChevronUp } from 'lucide-react';
 
+const NewsGrid = ({ news }) => {
+    const [validArticles, setValidArticles] = useState([]);
+    const [checking, setChecking] = useState(true);
+    const [checkedCount, setCheckedCount] = useState(0);
+
+    useEffect(() => {
+        const validateArticles = async () => {
+            setValidArticles([]);
+            setChecking(true);
+            setCheckedCount(0);
+            
+            const valid = [];
+            for (const article of news) {
+                if (valid.length >= 12) break; // Stop once we have 12 valid articles
+                
+                if (!article.url || !article.url.startsWith('http')) {
+                    setCheckedCount(prev => prev + 1);
+                    continue;
+                }
+                
+                try {
+                    const response = await base44.functions.invoke('checkUrl', { url: article.url });
+                    if (response.data?.valid === true) {
+                        valid.push(article);
+                        setValidArticles([...valid]);
+                    }
+                } catch {
+                    // Skip invalid
+                }
+                setCheckedCount(prev => prev + 1);
+            }
+            setChecking(false);
+        };
+        
+        if (news.length > 0) {
+            validateArticles();
+        }
+    }, [news]);
+
+    return (
+        <div>
+            {checking && validArticles.length < 12 && (
+                <div className="text-center text-sm text-gray-500 mb-4">
+                    Validating articles... ({validArticles.length}/12 found)
+                </div>
+            )}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                {validArticles.map((article, index) => (
+                    <NewsCardSimple key={index} article={article} index={index} />
+                ))}
+            </div>
+            {!checking && validArticles.length === 0 && (
+                <div className="text-center py-20 bg-white rounded-2xl border border-gray-200">
+                    <Globe className="w-16 h-16 text-gray-300 mx-auto mb-4" />
+                    <h2 className="text-xl font-semibold text-gray-800 mb-2">No Valid Articles Found</h2>
+                    <p className="text-gray-500">Try a different topic</p>
+                </div>
+            )}
+        </div>
+    );
+};
+
+const NewsCardSimple = ({ article, index }) => {
+    const [imageUrl, setImageUrl] = useState(null);
+    const [imageLoading, setImageLoading] = useState(true);
+
+    useEffect(() => {
+        const generateImage = async () => {
+            setImageLoading(true);
+            try {
+                const prompt = article.imagePrompt || `Lifestyle photography, ${article.title}, natural lighting, earth tones, minimalist composition`;
+                const result = await base44.integrations.Core.GenerateImage({
+                    prompt: `${prompt}, professional photography style, soft natural lighting, lifestyle aesthetic, earth and nature elements, no text or words`
+                });
+                if (result?.url) {
+                    setImageUrl(result.url);
+                }
+            } catch (error) {
+                console.error('Image generation error:', error);
+            } finally {
+                setImageLoading(false);
+            }
+        };
+        generateImage();
+    }, [article.title, article.imagePrompt]);
+
+    return (
+        <article className="bg-white rounded-xl border border-gray-200 overflow-hidden hover:shadow-lg transition-shadow group">
+            <div className="aspect-video bg-gray-100 relative overflow-hidden">
+                {imageLoading ? (
+                    <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-gray-100 to-gray-200">
+                        <div className="flex flex-col items-center gap-3">
+                            <div className="relative">
+                                <img 
+                                    src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/692729a5f5180fbd43f297e9/622024f26_image-loading-logo.png" 
+                                    alt="Loading" 
+                                    className="w-10 h-10 object-contain"
+                                    style={{ animation: 'pulse 1.5s ease-in-out infinite' }}
+                                />
+                            </div>
+                            <span className="text-xs text-gray-400">Loading...</span>
+                        </div>
+                    </div>
+                ) : imageUrl ? (
+                    <img 
+                        src={imageUrl} 
+                        alt={article.title} 
+                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                    />
+                ) : (
+                    <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-red-50 to-orange-50">
+                        <Newspaper className="w-10 h-10 text-red-200" />
+                    </div>
+                )}
+            </div>
+            <div className="p-5">
+                <div className="flex items-center gap-2 mb-3">
+                    <span className="text-xs font-medium px-2 py-1 bg-red-100 text-red-700 rounded-full">
+                        {article.source || 'News'}
+                    </span>
+                    {article.time && (
+                        <span className="text-xs text-gray-500 flex items-center gap-1">
+                            <Clock className="w-3 h-3" />
+                            {article.time}
+                        </span>
+                    )}
+                </div>
+                <h3 className="font-semibold text-gray-900 mb-2 line-clamp-2 group-hover:text-red-600 transition-colors">
+                    {article.title}
+                </h3>
+                <p className="text-gray-600 text-sm line-clamp-3 mb-4">
+                    {article.summary}
+                </p>
+                <a
+                    href={article.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-1 text-red-600 hover:text-red-700 text-sm font-medium"
+                >
+                    Read more <ExternalLink className="w-3 h-3" />
+                </a>
+            </div>
+        </article>
+    );
+};
+
 const CATEGORIES = [
     { id: 'technology', label: 'Technology', icon: Monitor, subtopics: ['AI', 'Startups', 'Gadgets', 'Cybersecurity', 'Software', 'Cloud Computing', 'Blockchain', 'Robotics', '5G Networks', 'IoT'] },
     { id: 'business', label: 'Business', icon: BusinessIcon, subtopics: ['Stocks', 'Economy', 'Crypto', 'Real Estate', 'Finance', 'Mergers', 'IPOs', 'Venture Capital', 'Banking', 'Commodities'] },

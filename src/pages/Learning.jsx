@@ -285,11 +285,8 @@ export default function Learning() {
 
                     {/* Subjects list */}
                     <div className="flex-1 overflow-y-auto max-h-[200px]">
-                        {Object.entries(groupedSubjects).map(([category, subjects]) => (
-                            <div key={category} className="mb-4">
-                                <div className="text-xs font-semibold text-purple-600 px-2 mb-2">{category}</div>
-                                <div className="space-y-1">
-                                    {subjects.map(subject => {
+                        <div className="space-y-1">
+                            {filteredSubjects.map(subject => {
                                         const isSelected = selectedSubjects.some(s => s.id === subject.id);
                                         const IconComponent = ICON_MAP[subject.icon] || GraduationCap;
                                         return (

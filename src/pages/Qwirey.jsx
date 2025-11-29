@@ -739,49 +739,65 @@ export default function Qwirey() {
                         }}
                     />
                     
-                    <div className="flex items-center justify-between pt-4 border-t border-gray-100">
-                        {/* Left side - URL, Paperclip, Mic */}
-                        <div className="flex items-center gap-1">
-                            <button
-                                onClick={() => setShowUrlDialog(true)}
-                                className="p-2.5 rounded-lg hover:bg-gray-100 text-gray-500 hover:text-purple-600 transition-colors"
-                                title="Link a web URL"
-                            >
-                                <Globe className="w-5 h-5" />
-                            </button>
+                    <div className="pt-4 border-t border-gray-100 space-y-3">
+                        {/* Top row - Icons and Send */}
+                        <div className="flex items-center justify-between">
+                            {/* Left side - URL, Paperclip, Mic */}
+                            <div className="flex items-center gap-1">
+                                <button
+                                    onClick={() => setShowUrlDialog(true)}
+                                    className="p-2.5 rounded-lg hover:bg-gray-100 text-gray-500 hover:text-purple-600 transition-colors"
+                                    title="Link a web URL"
+                                >
+                                    <Globe className="w-5 h-5" />
+                                </button>
+                                
+                                <button
+                                    onClick={() => fileInputRef.current?.click()}
+                                    className="p-2.5 rounded-lg hover:bg-gray-100 text-gray-500 hover:text-purple-600 transition-colors"
+                                    title="Attach a document (txt, pdf, doc, md, csv, json)"
+                                >
+                                    <Paperclip className="w-5 h-5" />
+                                </button>
+                                <input
+                                    ref={fileInputRef}
+                                    type="file"
+                                    accept=".txt,.pdf,.doc,.docx,.md,.csv,.json,.xml,.html"
+                                    onChange={handleFileUpload}
+                                    className="hidden"
+                                />
+                                
+                                <button
+                                    onClick={toggleMic}
+                                    className={`p-2.5 rounded-lg transition-colors ${
+                                        isListening 
+                                            ? 'bg-red-100 text-red-600 animate-pulse' 
+                                            : 'hover:bg-gray-100 text-gray-500 hover:text-purple-600'
+                                    }`}
+                                    title={isListening ? 'Stop listening' : 'Start voice input'}
+                                >
+                                    {isListening ? <MicOff className="w-5 h-5" /> : <Mic className="w-5 h-5" />}
+                                </button>
+                            </div>
                             
+                            {/* Right side - Send */}
                             <button
-                                onClick={() => fileInputRef.current?.click()}
-                                className="p-2.5 rounded-lg hover:bg-gray-100 text-gray-500 hover:text-purple-600 transition-colors"
-                                title="Attach a document (txt, pdf, doc, md, csv, json)"
+                                onClick={() => handleSubmit()}
+                                disabled={loading || (!prompt.trim() && !fileContent)}
+                                className="p-3 rounded-xl bg-purple-600 text-white hover:bg-purple-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
+                                title="Send"
                             >
-                                <Paperclip className="w-5 h-5" />
-                            </button>
-                            <input
-                                ref={fileInputRef}
-                                type="file"
-                                accept=".txt,.pdf,.doc,.docx,.md,.csv,.json,.xml,.html"
-                                onChange={handleFileUpload}
-                                className="hidden"
-                            />
-                            
-                            <button
-                                onClick={toggleMic}
-                                className={`p-2.5 rounded-lg transition-colors ${
-                                    isListening 
-                                        ? 'bg-red-100 text-red-600 animate-pulse' 
-                                        : 'hover:bg-gray-100 text-gray-500 hover:text-purple-600'
-                                }`}
-                                title={isListening ? 'Stop listening' : 'Start voice input'}
-                            >
-                                {isListening ? <MicOff className="w-5 h-5" /> : <Mic className="w-5 h-5" />}
+                                {loading ? (
+                                    <Loader2 className="w-5 h-5 animate-spin" />
+                                ) : (
+                                    <SendArrowIcon />
+                                )}
                             </button>
                         </div>
                         
-                        {/* Right side - Format buttons + Send */}
-                        <div className="flex items-center gap-2">
-                            {selectedModel === 'qwirey' && (
-                            <div className="flex items-center gap-0.5 md:gap-1 bg-gray-100 rounded-xl p-1 h-10 md:h-12 overflow-x-auto max-w-[calc(100vw-180px)] md:max-w-none">
+                        {/* Bottom row - Format buttons */}
+                        {selectedModel === 'qwirey' && (
+                            <div className="flex items-center gap-1 bg-gray-100 rounded-xl p-1 h-12">
                                 {[
                                     { id: 'short', label: 'Short' },
                                     { id: 'long', label: 'Long' },
@@ -794,7 +810,7 @@ export default function Qwirey() {
                                         key={format.id}
                                         onClick={() => handleFormatChange(format.id)}
                                         disabled={formatLoading}
-                                        className={`px-2 md:px-3 h-8 md:h-10 rounded-lg text-[10px] md:text-xs font-medium transition-all whitespace-nowrap flex-shrink-0 ${
+                                        className={`flex-1 h-10 rounded-lg text-xs font-medium transition-all ${
                                             responseFormat === format.id
                                                 ? 'bg-white text-purple-700 shadow-sm'
                                                 : 'text-gray-500 hover:text-gray-700'
@@ -804,21 +820,7 @@ export default function Qwirey() {
                                     </button>
                                 ))}
                             </div>
-                            )}
-                            
-                            <button
-                                onClick={() => handleSubmit()}
-                                disabled={loading || (!prompt.trim() && !fileContent)}
-                                className="p-2.5 md:p-3 rounded-xl bg-purple-600 text-white hover:bg-purple-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all flex-shrink-0"
-                                title="Send"
-                            >
-                                {loading ? (
-                                    <Loader2 className="w-4 h-4 md:w-5 md:h-5 animate-spin" />
-                                ) : (
-                                    <SendArrowIcon />
-                                )}
-                            </button>
-                        </div>
+                        )}
                     </div>
                 </div>
 

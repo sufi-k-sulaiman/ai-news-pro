@@ -168,33 +168,37 @@ export default function SearchPods() {
     useEffect(() => {
         const loadVoices = () => {
             const availableVoices = window.speechSynthesis?.getVoices() || [];
-            // Filter for quality English voices - exclude novelty/effect voices
+            
+            // Whitelist of known good quality voices
+            const goodVoiceNames = [
+                'samantha', 'alex', 'victoria', 'karen', 'daniel', 'moira', 'tessa', 'fiona',
+                'google', 'microsoft', 'zira', 'david', 'mark', 'hazel', 'susan', 'george',
+                'catherine', 'arthur', 'martha', 'native', 'premium', 'enhanced', 'neural'
+            ];
+            
+            // Blacklist of novelty/broken voices
+            const badVoicePatterns = [
+                'whisper', 'wobble', 'zarvox', 'boing', 'bells', 'bad news', 'good news',
+                'bubbles', 'cellos', 'deranged', 'hysterical', 'organ', 'trinoids', 'princess',
+                'pipe', 'ralph', 'superstar', 'junior', 'albert', 'fred', 'kathy', 'bruce',
+                'agnes', 'bahh', 'jester', 'novelty', 'effect', 'robot', 'alien'
+            ];
+            
             const qualityVoices = availableVoices.filter(v => {
                 const isEnglish = v.lang.startsWith('en');
-                const name = v.name.toLowerCase();
-                // Exclude non-standard voices
-                const isNovelty = name.includes('whisper') || 
-                                  name.includes('wobble') || 
-                                  name.includes('zarvox') || 
-                                  name.includes('boing') ||
-                                  name.includes('bells') ||
-                                  name.includes('bad news') ||
-                                  name.includes('good news') ||
-                                  name.includes('bubbles') ||
-                                  name.includes('cellos') ||
-                                  name.includes('deranged') ||
-                                  name.includes('hysterical') ||
-                                  name.includes('organ') ||
-                                  name.includes('trinoids') ||
-                                  name.includes('princess') ||
-                                  name.includes('pipe') ||
-                                  name.includes('ralph') ||
-                                  name.includes('superstar') ||
-                                  name.includes('junior');
-                return isEnglish && !isNovelty;
+                const nameLower = v.name.toLowerCase();
+                
+                // Check blacklist
+                const isNovelty = badVoicePatterns.some(pattern => nameLower.includes(pattern));
+                if (isNovelty) return false;
+                
+                // Prefer whitelisted or default voices
+                const isGood = goodVoiceNames.some(name => nameLower.includes(name)) || v.default;
+                
+                return isEnglish && (isGood || v.localService);
             });
             
-            // Deduplicate by name (some appear multiple times)
+            // Deduplicate and sort by quality
             const uniqueVoices = [];
             const seenNames = new Set();
             for (const voice of qualityVoices) {
@@ -205,10 +209,22 @@ export default function SearchPods() {
                 }
             }
             
+            // Sort: premium/enhanced first, then by name
+            uniqueVoices.sort((a, b) => {
+                const aName = a.name.toLowerCase();
+                const bName = b.name.toLowerCase();
+                const aScore = (aName.includes('premium') || aName.includes('enhanced') || aName.includes('neural')) ? 0 : 1;
+                const bScore = (bName.includes('premium') || bName.includes('enhanced') || bName.includes('neural')) ? 0 : 1;
+                if (aScore !== bScore) return aScore - bScore;
+                return a.name.localeCompare(b.name);
+            });
+            
             setVoices(uniqueVoices);
             if (uniqueVoices.length > 0 && !selectedVoice) {
-                // Prefer Samantha or similar quality voice
-                const preferred = uniqueVoices.find(v => v.name.toLowerCase().includes('samantha')) || uniqueVoices[0];
+                // Prefer Samantha, then Google, then first available
+                const preferred = uniqueVoices.find(v => v.name.toLowerCase().includes('samantha')) 
+                    || uniqueVoices.find(v => v.name.toLowerCase().includes('google'))
+                    || uniqueVoices[0];
                 setSelectedVoice(preferred);
             }
         };
@@ -898,10 +914,18 @@ Do NOT mention any websites, URLs, or external references in the audio script.`
                                         {voices.map((voice, i) => (
                                             <button
                                                 key={i}
-                                                onClick={() => { setSelectedVoice(voice); setShowVoiceMenu(false); }}
+                                                onClick={() => { 
+                                                    setSelectedVoice(voice); 
+                                                    setShowVoiceMenu(false);
+                                                    // If currently playing, restart with new voice from current sentence
+                                                    if (isPlayingRef.current) {
+                                                        window.speechSynthesis?.cancel();
+                                                        setTimeout(() => speakNextSentence(), 100);
+                                                    }
+                                                }}
                                                 className={`w-full text-left px-3 py-2 text-sm hover:bg-purple-50 transition-colors ${selectedVoice?.name === voice.name ? 'bg-purple-100 text-purple-700' : 'text-gray-700'}`}
                                             >
-                                                {voice.name}
+                                                {voice.name.split('(')[0].trim()}
                                             </button>
                                         ))}
                                     </div>

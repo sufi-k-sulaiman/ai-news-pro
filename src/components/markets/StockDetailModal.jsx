@@ -524,8 +524,8 @@ export default function StockDetailModal({ stock, isOpen, onClose }) {
                                 </div>
                                 <span className="text-sm text-gray-500">Hover for details</span>
                             </div>
-                            <div className="h-72">
-                                <ResponsiveContainer width="100%" height="100%">
+                            <div className="h-56 md:h-72 overflow-x-auto">
+                                <ResponsiveContainer width="100%" height="100%" minWidth={300}>
                                     <AreaChart data={priceData}>
                                         <defs>
                                             <linearGradient id="priceGradientOverview" x1="0" y1="0" x2="0" y2="1">
@@ -545,22 +545,22 @@ export default function StockDetailModal({ stock, isOpen, onClose }) {
                                     </AreaChart>
                                 </ResponsiveContainer>
                             </div>
-                            <div className="grid grid-cols-4 gap-3 mt-4">
-                                <div className="bg-blue-50 rounded-xl p-3 text-center">
-                                    <p className="text-xs text-gray-500 mb-1">Starting Point</p>
-                                    <p className="text-lg font-bold text-blue-600">${startPrice.toFixed(2)}</p>
+                            <div className="grid grid-cols-2 md:grid-cols-4 gap-2 md:gap-3 mt-4">
+                                <div className="bg-blue-50 rounded-lg md:rounded-xl p-2 md:p-3 text-center">
+                                    <p className="text-[10px] md:text-xs text-gray-500 mb-1">Starting</p>
+                                    <p className="text-sm md:text-lg font-bold text-blue-600">${startPrice.toFixed(2)}</p>
                                 </div>
-                                <div className="bg-green-50 rounded-xl p-3 text-center">
-                                    <p className="text-xs text-gray-500 mb-1">High Point</p>
-                                    <p className="text-lg font-bold text-green-600">${highPrice.toFixed(2)}</p>
+                                <div className="bg-green-50 rounded-lg md:rounded-xl p-2 md:p-3 text-center">
+                                    <p className="text-[10px] md:text-xs text-gray-500 mb-1">High</p>
+                                    <p className="text-sm md:text-lg font-bold text-green-600">${highPrice.toFixed(2)}</p>
                                 </div>
-                                <div className="bg-red-50 rounded-xl p-3 text-center">
-                                    <p className="text-xs text-gray-500 mb-1">Low Point</p>
-                                    <p className="text-lg font-bold text-red-600">${lowPrice.toFixed(2)}</p>
+                                <div className="bg-red-50 rounded-lg md:rounded-xl p-2 md:p-3 text-center">
+                                    <p className="text-[10px] md:text-xs text-gray-500 mb-1">Low</p>
+                                    <p className="text-sm md:text-lg font-bold text-red-600">${lowPrice.toFixed(2)}</p>
                                 </div>
-                                <div className="bg-purple-50 rounded-xl p-3 text-center">
-                                    <p className="text-xs text-gray-500 mb-1">Current Position</p>
-                                    <p className="text-lg font-bold text-purple-600">${currentPrice.toFixed(2)}</p>
+                                <div className="bg-purple-50 rounded-lg md:rounded-xl p-2 md:p-3 text-center">
+                                    <p className="text-[10px] md:text-xs text-gray-500 mb-1">Current</p>
+                                    <p className="text-sm md:text-lg font-bold text-purple-600">${currentPrice.toFixed(2)}</p>
                                 </div>
                             </div>
                         </div>
@@ -625,8 +625,8 @@ export default function StockDetailModal({ stock, isOpen, onClose }) {
                                     </div>
                                     <span className="text-3xl font-bold text-purple-600">{stock.moat}<span className="text-lg text-gray-400">/100</span></span>
                                 </div>
-                                <div className="h-56">
-                                    <ResponsiveContainer width="100%" height="100%">
+                                <div className="h-56 overflow-x-auto">
+                                    <ResponsiveContainer width="100%" height="100%" minWidth={250}>
                                         <RadarChart data={moatRadarData}>
                                             <PolarGrid />
                                             <PolarAngleAxis dataKey="subject" tick={{ fontSize: 11 }} />
@@ -815,8 +815,8 @@ export default function StockDetailModal({ stock, isOpen, onClose }) {
                                     <p className="text-5xl font-bold text-orange-600">{data.sentimentScore || 42}</p>
                                     <p className="text-sm text-gray-500 mt-1">Fear Index</p>
                                 </div>
-                                <div className="h-40">
-                                    <ResponsiveContainer width="100%" height="100%">
+                                <div className="h-40 overflow-x-auto">
+                                    <ResponsiveContainer width="100%" height="100%" minWidth={200}>
                                         <RePieChart>
                                             <Pie data={sentimentGaugeData} dataKey="value" cx="50%" cy="50%" startAngle={180} endAngle={0} innerRadius={60} outerRadius={80}>
                                                 {sentimentGaugeData.map((entry, i) => <Cell key={i} fill={entry.fill} opacity={i === currentSentiment ? 1 : 0.3} />)}
@@ -958,8 +958,8 @@ export default function StockDetailModal({ stock, isOpen, onClose }) {
                                 </span>
                             </div>
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
-                                <div className="h-48 md:h-56">
-                                    <ResponsiveContainer width="100%" height="100%">
+                                <div className="h-48 md:h-56 overflow-x-auto">
+                                    <ResponsiveContainer width="100%" height="100%" minWidth={280}>
                                         <BarChart data={valuationComparison} layout="horizontal">
                                             <XAxis type="number" tick={{ fontSize: 10 }} tickFormatter={(v) => `$${v.toFixed(0)}`} />
                                             <YAxis type="category" dataKey="metric" tick={{ fontSize: 11 }} width={70} />
@@ -1041,8 +1041,8 @@ export default function StockDetailModal({ stock, isOpen, onClose }) {
                                 <h3 className="font-semibold text-gray-900 mb-4 flex items-center gap-2 text-sm md:text-base">
                                     <TrendingUp className="w-4 h-4 text-green-600" /> Revenue & Profit Growth
                                 </h3>
-                                <div className="h-44 md:h-52">
-                                    <ResponsiveContainer width="100%" height="100%">
+                                <div className="h-44 md:h-52 overflow-x-auto">
+                                    <ResponsiveContainer width="100%" height="100%" minWidth={300}>
                                         <BarChart data={revenueData}>
                                             <XAxis dataKey="year" tick={{ fontSize: 11 }} />
                                             <YAxis yAxisId="left" tick={{ fontSize: 10 }} tickFormatter={(v) => `${v}%`} />
@@ -1057,8 +1057,8 @@ export default function StockDetailModal({ stock, isOpen, onClose }) {
                             
                             <div className="bg-white rounded-2xl border border-gray-200 p-6">
                                 <h3 className="font-semibold text-gray-900 mb-4">Margin Trends</h3>
-                                <div className="h-44 md:h-52">
-                                    <ResponsiveContainer width="100%" height="100%">
+                                <div className="h-44 md:h-52 overflow-x-auto">
+                                    <ResponsiveContainer width="100%" height="100%" minWidth={300}>
                                         <ReLineChart data={marginTrends}>
                                             <XAxis dataKey="year" tick={{ fontSize: 11 }} />
                                             <YAxis tick={{ fontSize: 10 }} tickFormatter={(v) => `${v}%`} />
@@ -1143,8 +1143,8 @@ export default function StockDetailModal({ stock, isOpen, onClose }) {
                                     </div>
                                     <p className="text-xs text-gray-500">Adjusted equity returns: {stock.roe}% (boosted by efficiency)</p>
                                 </div>
-                                <div className="h-44">
-                                    <ResponsiveContainer width="100%" height="100%">
+                                <div className="h-44 overflow-x-auto">
+                                    <ResponsiveContainer width="100%" height="100%" minWidth={300}>
                                         <BarChart data={roeBreakdown} layout="horizontal">
                                             <XAxis type="number" tick={{ fontSize: 10 }} />
                                             <YAxis type="category" dataKey="factor" tick={{ fontSize: 10 }} width={120} />
@@ -1252,8 +1252,8 @@ export default function StockDetailModal({ stock, isOpen, onClose }) {
                                     {data.trend || 'Mixed'}
                                 </span>
                             </div>
-                            <div className="h-64">
-                                <ResponsiveContainer width="100%" height="100%">
+                            <div className="h-64 overflow-x-auto">
+                                <ResponsiveContainer width="100%" height="100%" minWidth={350}>
                                     <ReLineChart data={priceActionData}>
                                         <XAxis dataKey="day" tick={{ fontSize: 9 }} />
                                         <YAxis tick={{ fontSize: 10 }} tickFormatter={(v) => `$${v.toFixed(0)}`} domain={['auto', 'auto']} />
@@ -1383,9 +1383,9 @@ export default function StockDetailModal({ stock, isOpen, onClose }) {
                                         <p className="text-lg font-bold text-gray-900">{data.sharpeRatio || 1.2}</p>
                                     </div>
                                 </div>
-                                <div className="h-40">
+                                <div className="h-40 overflow-x-auto">
                                     <p className="text-sm text-gray-600 mb-2">Drawdown History</p>
-                                    <ResponsiveContainer width="100%" height="100%">
+                                    <ResponsiveContainer width="100%" height="100%" minWidth={280}>
                                         <BarChart data={drawdownData}>
                                             <XAxis dataKey="month" tick={{ fontSize: 10 }} />
                                             <YAxis tick={{ fontSize: 10 }} tickFormatter={(v) => `${v}%`} />
@@ -1637,8 +1637,8 @@ export default function StockDetailModal({ stock, isOpen, onClose }) {
                         
                         <div className="bg-white rounded-2xl border border-gray-200 p-6">
                             <h4 className="font-semibold text-gray-900 mb-4">Dividend Growth History</h4>
-                            <div className="h-48">
-                                <ResponsiveContainer width="100%" height="100%">
+                            <div className="h-48 overflow-x-auto">
+                                <ResponsiveContainer width="100%" height="100%" minWidth={300}>
                                     <ReLineChart data={dividendHistory}>
                                         <XAxis dataKey="year" tick={{ fontSize: 11 }} />
                                         <YAxis tick={{ fontSize: 11 }} tickFormatter={(v) => `$${v}`} />
@@ -1719,8 +1719,8 @@ export default function StockDetailModal({ stock, isOpen, onClose }) {
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
                             <div className="bg-white rounded-2xl border border-gray-200 p-4 md:p-6">
                                 <h4 className="font-semibold text-gray-900 mb-4 text-sm md:text-base">vs Industry Average</h4>
-                                <div className="h-48">
-                                    <ResponsiveContainer width="100%" height="100%">
+                                <div className="h-48 overflow-x-auto">
+                                    <ResponsiveContainer width="100%" height="100%" minWidth={250}>
                                         <RadarChart data={radarData}>
                                             <PolarGrid />
                                             <PolarAngleAxis dataKey="metric" tick={{ fontSize: 10 }} />
@@ -1831,8 +1831,8 @@ export default function StockDetailModal({ stock, isOpen, onClose }) {
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
                             <div className="bg-white rounded-2xl border border-gray-200 p-4 md:p-6">
                                 <h4 className="font-semibold text-gray-900 mb-4 text-sm md:text-base">Investment Projection</h4>
-                                <div className="h-48 md:h-56">
-                                    <ResponsiveContainer width="100%" height="100%">
+                                <div className="h-48 md:h-56 overflow-x-auto">
+                                    <ResponsiveContainer width="100%" height="100%" minWidth={300}>
                                         <AreaChart data={projectionData}>
                                             <defs>
                                                 <linearGradient id="projGradient" x1="0" y1="0" x2="0" y2="1">
@@ -2018,8 +2018,8 @@ export default function StockDetailModal({ stock, isOpen, onClose }) {
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
                             <div className="bg-white rounded-2xl border border-gray-200 p-4 md:p-6">
                                 <h4 className="font-semibold text-gray-900 mb-4 text-sm md:text-base">Price Target Scenarios</h4>
-                                <div className="h-48 md:h-56">
-                                    <ResponsiveContainer width="100%" height="100%">
+                                <div className="h-48 md:h-56 overflow-x-auto">
+                                    <ResponsiveContainer width="100%" height="100%" minWidth={280}>
                                         <BarChart data={scenarios} layout="horizontal">
                                             <XAxis type="number" tick={{ fontSize: 10 }} tickFormatter={(v) => `$${v}`} />
                                             <YAxis type="category" dataKey="name" tick={{ fontSize: 11 }} width={60} />
@@ -2634,8 +2634,8 @@ export default function StockDetailModal({ stock, isOpen, onClose }) {
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
                             <div className="bg-white rounded-2xl border border-gray-200 p-4 md:p-6">
                                 <h3 className="font-semibold text-gray-900 mb-4 text-sm md:text-base">Value vs Growth Comparison</h3>
-                                <div className="h-52 md:h-64">
-                                    <ResponsiveContainer width="100%" height="100%">
+                                <div className="h-52 md:h-64 overflow-x-auto">
+                                    <ResponsiveContainer width="100%" height="100%" minWidth={280}>
                                         <RadarChart data={legendRadarData}>
                                             <PolarGrid />
                                             <PolarAngleAxis dataKey="subject" tick={{ fontSize: 11 }} />
@@ -2655,8 +2655,8 @@ export default function StockDetailModal({ stock, isOpen, onClose }) {
 
                             <div className="bg-white rounded-2xl border border-gray-200 p-6">
                                 <h3 className="font-semibold text-gray-900 mb-4">Framework Ranking</h3>
-                                <div className="h-64">
-                                    <ResponsiveContainer width="100%" height="100%">
+                                <div className="h-64 overflow-x-auto">
+                                    <ResponsiveContainer width="100%" height="100%" minWidth={300}>
                                         <BarChart data={overallScores.slice(0, 8)} layout="vertical">
                                             <XAxis type="number" domain={[0, 100]} tick={{ fontSize: 10 }} />
                                             <YAxis type="category" dataKey="name" tick={{ fontSize: 10 }} width={80} />

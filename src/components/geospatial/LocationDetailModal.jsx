@@ -80,6 +80,10 @@ Be specific with real numbers, avoid generic statements. Use actual statistics w
                     properties: {
                         impact_score: { type: "number" },
                         description: { type: "string" },
+                        overview_bullets: {
+                            type: "array",
+                            items: { type: "string" }
+                        },
                         key_points: { 
                             type: "array", 
                             items: { type: "string" } 
@@ -125,6 +129,17 @@ Be specific with real numbers, avoid generic statements. Use actual statistics w
                                     current: { type: "string" },
                                     previous: { type: "string" },
                                     change: { type: "number" }
+                                }
+                            }
+                        },
+                        historical_events: {
+                            type: "array",
+                            items: {
+                                type: "object",
+                                properties: {
+                                    year: { type: "string" },
+                                    title: { type: "string" },
+                                    description: { type: "string" }
                                 }
                             }
                         }

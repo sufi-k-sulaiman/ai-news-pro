@@ -195,58 +195,54 @@ Be specific with real numbers, avoid generic statements. Use actual statistics w
                 </div>
             ) : data ? (
                 <div className="flex flex-col h-[calc(100%-3rem)] overflow-hidden">
-                        {/* Impact Score Header - Always visible */}
-                        <div className="bg-gradient-to-br from-gray-50 to-gray-100 rounded-xl p-4 border mb-4">
-                            <div className="flex items-center justify-between">
-                                <div className="flex items-center gap-4">
-                                    <div>
-                                        <p className="text-xs text-gray-500 mb-1">{categoryLabel} Impact</p>
-                                        <div className="flex items-center gap-2">
-                                            <span className="text-3xl font-bold" style={{ color: getColor(data.impact_score) }}>
-                                                {data.impact_score}
-                                            </span>
-                                            <span className="text-sm text-gray-600">/ 100</span>
-                                            <span 
-                                                className="px-2 py-0.5 rounded-full text-xs font-medium"
-                                                style={{ 
-                                                    backgroundColor: `${getColor(data.impact_score)}20`,
-                                                    color: getColor(data.impact_score)
-                                                }}
-                                            >
-                                                {getImpactLabel(data.impact_score)}
-                                            </span>
-                                        </div>
-                                    </div>
-                                </div>
+                    {/* Impact Score Header - Always visible */}
+                    <div className="bg-gradient-to-br from-gray-50 to-gray-100 p-3 border-b flex-shrink-0">
+                        <div className="flex items-center justify-between">
+                            <div>
+                                <p className="text-[10px] text-gray-500 mb-0.5">{categoryLabel} Impact</p>
                                 <div className="flex items-center gap-2">
-                                    {data.trend === 'improving' ? (
-                                        <div className="flex items-center gap-1 text-green-600 bg-green-50 px-2 py-1 rounded-full">
-                                            <TrendingDown className="w-4 h-4" />
-                                            <span className="text-xs font-medium">Improving</span>
-                                        </div>
-                                    ) : data.trend === 'worsening' ? (
-                                        <div className="flex items-center gap-1 text-red-600 bg-red-50 px-2 py-1 rounded-full">
-                                            <TrendingUp className="w-4 h-4" />
-                                            <span className="text-xs font-medium">Worsening</span>
-                                        </div>
-                                    ) : (
-                                        <div className="flex items-center gap-1 text-yellow-600 bg-yellow-50 px-2 py-1 rounded-full">
-                                            <Target className="w-4 h-4" />
-                                            <span className="text-xs font-medium">Stable</span>
-                                        </div>
-                                    )}
+                                    <span className="text-2xl font-bold" style={{ color: getColor(data.impact_score) }}>
+                                        {data.impact_score}
+                                    </span>
+                                    <span className="text-xs text-gray-600">/ 100</span>
+                                    <span 
+                                        className="px-1.5 py-0.5 rounded-full text-[10px] font-medium"
+                                        style={{ 
+                                            backgroundColor: `${getColor(data.impact_score)}20`,
+                                            color: getColor(data.impact_score)
+                                        }}
+                                    >
+                                        {getImpactLabel(data.impact_score)}
+                                    </span>
                                 </div>
                             </div>
-                            <div className="h-1.5 bg-gray-200 rounded-full overflow-hidden mt-3">
-                                <div 
-                                    className="h-full rounded-full transition-all duration-500" 
-                                    style={{ 
-                                        width: `${data.impact_score}%`, 
-                                        backgroundColor: getColor(data.impact_score) 
-                                    }} 
-                                />
-                            </div>
+                            {data.trend === 'improving' ? (
+                                <div className="flex items-center gap-1 text-green-600 bg-green-50 px-2 py-1 rounded-full">
+                                    <TrendingDown className="w-3 h-3" />
+                                    <span className="text-[10px] font-medium">Improving</span>
+                                </div>
+                            ) : data.trend === 'worsening' ? (
+                                <div className="flex items-center gap-1 text-red-600 bg-red-50 px-2 py-1 rounded-full">
+                                    <TrendingUp className="w-3 h-3" />
+                                    <span className="text-[10px] font-medium">Worsening</span>
+                                </div>
+                            ) : (
+                                <div className="flex items-center gap-1 text-yellow-600 bg-yellow-50 px-2 py-1 rounded-full">
+                                    <Target className="w-3 h-3" />
+                                    <span className="text-[10px] font-medium">Stable</span>
+                                </div>
+                            )}
                         </div>
+                        <div className="h-1 bg-gray-200 rounded-full overflow-hidden mt-2">
+                            <div 
+                                className="h-full rounded-full transition-all duration-500" 
+                                style={{ 
+                                    width: `${data.impact_score}%`, 
+                                    backgroundColor: getColor(data.impact_score) 
+                                }} 
+                            />
+                        </div>
+                    </div>
 
                         {/* Tabs for Content */}
                         <Tabs defaultValue="overview" className="flex-1 overflow-hidden flex flex-col">

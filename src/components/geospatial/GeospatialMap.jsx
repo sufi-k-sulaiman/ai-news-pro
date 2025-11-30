@@ -1,7 +1,8 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import { MapContainer, TileLayer, CircleMarker, Popup, useMap, Polyline } from 'react-leaflet';
+import { MapContainer, TileLayer, CircleMarker, useMap, Polyline } from 'react-leaflet';
 import { ZoomIn, ZoomOut, Globe } from 'lucide-react';
 import { Button } from "@/components/ui/button";
+import LocationDetailModal from './LocationDetailModal';
 
 import 'leaflet/dist/leaflet.css';
 

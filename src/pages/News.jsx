@@ -22,11 +22,12 @@ const NewsGrid = ({ news }) => {
     const articles = news.slice(0, ARTICLES_PER_CATEGORY);
 
     // Start batch image generation when articles load - use stringified news as dependency
-    const newsKey = JSON.stringify(news.map(a => a.title).slice(0, 5));
+    const newsKey = JSON.stringify(news.map(a => a.title).slice(0, 3));
     useEffect(() => {
         imageCache.clear();
+        currentCacheKey = newsKey;
         if (articles.length > 0) {
-            generateImageBatch(articles);
+            generateImageBatch(articles, newsKey);
         }
     }, [newsKey]);
 
@@ -43,7 +44,7 @@ const NewsGrid = ({ news }) => {
     return (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {articles.map((article, index) => (
-                <NewsCardSimple key={index} article={article} index={index} />
+                <NewsCardSimple key={`${newsKey}-${index}`} article={article} index={index} cacheKey={newsKey} />
             ))}
         </div>
     );
@@ -69,11 +70,12 @@ const MAX_IMAGES_TO_GENERATE = 12; // Only generate images for first 12 articles
 const BATCH_SIZE = 3; // Generate 3 images per batch
 const BATCH_DELAY = 5000; // 5 seconds between batches
 
-// Store for batch-generated image URLs
+// Store for batch-generated image URLs with category prefix
 const imageCache = new Map();
-let batchPromise = null;
+let currentCacheKey = '';
 
-const generateImageBatch = async (articles) => {
+const generateImageBatch = async (articles, cacheKey) => {
+    currentCacheKey = cacheKey;
     const batches = [];
     for (let i = 0; i < Math.min(articles.length, MAX_IMAGES_TO_GENERATE); i += BATCH_SIZE) {
         batches.push(articles.slice(i, i + BATCH_SIZE));
@@ -93,11 +95,14 @@ const generateImageBatch = async (articles) => {
             const cleanTitle = cleanHtmlFromText(article.title);
             
             try {
+                // Check if cache key still matches (topic hasn't changed)
+                if (currentCacheKey !== cacheKey) return;
+                
                 const result = await base44.integrations.Core.GenerateImage({
                     prompt: `Professional news photography depicting: ${cleanTitle}. Photorealistic, editorial style, high quality, no text or words, no logos`
                 });
-                if (result?.url) {
-                    imageCache.set(globalIndex, result.url);
+                if (result?.url && currentCacheKey === cacheKey) {
+                    imageCache.set(`${cacheKey}-${globalIndex}`, result.url);
                 }
             } catch (error) {
                 console.log(`Image ${globalIndex} skipped`);
@@ -108,7 +113,7 @@ const generateImageBatch = async (articles) => {
     }
 };
 
-const NewsCardSimple = ({ article, index, imageUrl: preloadedImageUrl }) => {
+const NewsCardSimple = ({ article, index, imageUrl: preloadedImageUrl, cacheKey }) => {
     const [imageUrl, setImageUrl] = useState(preloadedImageUrl || null);
     const [imageLoading, setImageLoading] = useState(index < MAX_IMAGES_TO_GENERATE && !preloadedImageUrl);
     
@@ -116,6 +121,10 @@ const NewsCardSimple = ({ article, index, imageUrl: preloadedImageUrl }) => {
     const cleanDescription = cleanHtmlFromText(article.description);
 
     useEffect(() => {
+        // Reset state when cache key changes
+        setImageUrl(null);
+        setImageLoading(index < MAX_IMAGES_TO_GENERATE);
+        
         if (preloadedImageUrl) {
             setImageUrl(preloadedImageUrl);
             setImageLoading(false);
@@ -128,9 +137,9 @@ const NewsCardSimple = ({ article, index, imageUrl: preloadedImageUrl }) => {
             return;
         }
         
-        // Check cache periodically for batch-generated images
+        // Check cache periodically for batch-generated images using category-specific key
         const checkCache = () => {
-            const cachedUrl = imageCache.get(index);
+            const cachedUrl = imageCache.get(`${cacheKey}-${index}`);
             if (cachedUrl) {
                 setImageUrl(cachedUrl);
                 setImageLoading(false);
@@ -157,7 +166,7 @@ const NewsCardSimple = ({ article, index, imageUrl: preloadedImageUrl }) => {
             clearInterval(interval);
             clearTimeout(timeout);
         };
-    }, [index, preloadedImageUrl]);
+    }, [index, preloadedImageUrl, cacheKey]);
 
     return (
         <a 

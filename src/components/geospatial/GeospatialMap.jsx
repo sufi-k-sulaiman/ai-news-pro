@@ -42,54 +42,6 @@ const USE_CASE_CENTERS = {
     climatepollution: { center: [39.9, 116.4], zoom: 3 },
 };
 
-// Rationale bullets for each use case
-const USE_CASE_RATIONALE = {
-    coastal: {
-        high: ['Coral bleaching from warming', 'Ocean acidification', 'Coastal development', 'Overfishing pressure', 'Plastic pollution'],
-        low: ['Marine protected areas', 'Coral restoration programs', 'Sustainable fishing', 'Clean coastal waters', 'Strong conservation laws']
-    },
-    ocean: {
-        high: ['Plastic garbage accumulation', 'Industrial shipping routes', 'Overfishing zones', 'Ocean dead zones', 'Oil spill risks'],
-        low: ['Remote pristine waters', 'Marine sanctuaries', 'Sustainable fishing practices', 'Strong international protection', 'Low human activity']
-    },
-    wildlife: {
-        high: ['Poaching and trafficking', 'Habitat destruction', 'Human-wildlife conflict', 'Climate change impact', 'Invasive species'],
-        low: ['Protected reserves', 'Anti-poaching patrols', 'Breeding programs', 'Habitat restoration', 'Community conservation']
-    },
-    carbon: {
-        high: ['Heavy industrial manufacturing', 'Coal-powered electricity', 'Dense vehicle traffic', 'Aging infrastructure', 'Limited renewable adoption'],
-        low: ['100% renewable energy grid', 'Carbon capture programs', 'Electric transport systems', 'Strict emission controls', 'Carbon tax policies']
-    },
-    forests: {
-        high: ['Agricultural expansion', 'Illegal logging operations', 'Palm oil plantations', 'Mining activities', 'Urban development pressure'],
-        low: ['Strong conservation laws', 'Reforestation programs', 'Indigenous land protection', 'Sustainable forestry', 'Protected national parks']
-    },
-    resources: {
-        high: ['Intensive extraction', 'Limited reserves remaining', 'High global demand', 'Minimal recycling', 'Export-dependent economy'],
-        low: ['Circular economy model', 'High recycling rates', 'Sustainable practices', 'Resource efficiency', 'Alternative materials used']
-    },
-    sustainability: {
-        high: ['Renewable energy leader', 'Green infrastructure', 'Electric vehicle adoption', 'Waste recycling programs', 'Climate action policies'],
-        low: ['Fossil fuel dependency', 'Limited green investment', 'Poor waste management', 'Aging power grid', 'Weak environmental laws']
-    },
-    airpollution: {
-        high: ['Industrial emissions', 'Vehicle exhaust fumes', 'Coal power plants', 'Crop burning practices', 'Weak air quality laws'],
-        low: ['Clean energy sources', 'Electric public transit', 'Strict emission standards', 'Green urban planning', 'Air quality monitoring']
-    },
-    waterpollution: {
-        high: ['Industrial discharge', 'Agricultural runoff', 'Untreated sewage', 'Plastic waste dumping', 'Mining contamination'],
-        low: ['Advanced water treatment', 'Strict discharge laws', 'Clean manufacturing', 'Protected watersheds', 'Regular water testing']
-    },
-    plasticpollution: {
-        high: ['Single-use plastic culture', 'Poor waste collection', 'Ocean current patterns', 'Limited recycling', 'Coastal population density'],
-        low: ['Plastic bans enacted', 'High recycling rates', 'Clean-up initiatives', 'Producer responsibility', 'Public awareness campaigns']
-    },
-    default: {
-        high: ['High population density', 'Industrial activity', 'Limited regulations', 'Resource extraction', 'Urban development'],
-        low: ['Strong environmental laws', 'Low population impact', 'Clean technology', 'Protected ecosystems', 'Sustainable practices']
-    }
-};
-
 // Real-world location data for each use case
 const DEFAULT_CENTER = { center: [20, 0], zoom: 3 };
 

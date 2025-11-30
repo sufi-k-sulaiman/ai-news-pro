@@ -139,8 +139,8 @@ Be specific with real numbers, avoid generic statements. Use actual statistics w
     ] : [];
 
     return (
-        <Dialog open={isOpen} onOpenChange={onClose}>
-            <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+        <Dialog open={isOpen} onOpenChange={onClose} style={{ zIndex: 9999 }}>
+            <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto z-[10000]">
                 <style>{pulseAnimation}</style>
                 <DialogHeader>
                     <DialogTitle className="flex items-center gap-2">

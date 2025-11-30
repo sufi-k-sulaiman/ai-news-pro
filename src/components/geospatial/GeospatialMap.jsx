@@ -466,6 +466,8 @@ export default function GeospatialMap({
     isWorldMap = false
 }) {
     const [selectedStyle, setSelectedStyle] = useState(mapType);
+    const [selectedLocation, setSelectedLocation] = useState(null);
+    const [modalOpen, setModalOpen] = useState(false);
     
     // Sync selectedStyle with mapType when it changes from parent
     useEffect(() => {

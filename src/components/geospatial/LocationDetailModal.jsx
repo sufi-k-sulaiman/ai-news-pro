@@ -1,0 +1,336 @@
+import React, { useState, useEffect } from 'react';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { base44 } from '@/api/base44Client';
+import { X, TrendingUp, TrendingDown, MapPin, Target, AlertTriangle, CheckCircle } from 'lucide-react';
+import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Area, AreaChart, Legend } from 'recharts';
+
+const LOADING_LOGO = "https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/692729a5f5180fbd43f297e9/622024f26_image-loading-logo.png";
+
+const pulseAnimation = `
+@keyframes pulse {
+    0%, 100% { opacity: 0.4; transform: scale(1); }
+    50% { opacity: 0.8; transform: scale(1.05); }
+}
+`;
+
+const CATEGORY_LABELS = {
+    carbon: 'Carbon Emissions',
+    forests: 'Forest Coverage',
+    resources: 'Natural Resources',
+    sustainability: 'Sustainability Index',
+    treasures: 'Heritage Protection',
+    coastal: 'Coastal Health',
+    ocean: 'Ocean Sustainability',
+    wildlife: 'Wildlife Conservation',
+    biomass: 'Biomass Production',
+    produce: 'Agricultural Output',
+    dairy: 'Dairy Production',
+    livestock: 'Livestock Industry',
+    power: 'Power Consumption',
+    wellness: 'Health & Wellness',
+    elements: 'Rare Earth Elements',
+    airpollution: 'Air Pollution',
+    waterpollution: 'Water Pollution',
+    soilpollution: 'Soil Contamination',
+    plasticpollution: 'Plastic Pollution',
+    noisepollution: 'Noise Pollution',
+    lightpollution: 'Light Pollution',
+    thermalpollution: 'Thermal Pollution',
+    radioactive: 'Radioactive Contamination',
+    chemical: 'Chemical Pollution',
+    climatepollution: 'Climate Impact',
+};
+
+export default function LocationDetailModal({ isOpen, onClose, location, useCase }) {
+    const [loading, setLoading] = useState(true);
+    const [data, setData] = useState(null);
+
+    useEffect(() => {
+        if (isOpen && location && useCase) {
+            fetchLocationData();
+        }
+    }, [isOpen, location, useCase]);
+
+    const fetchLocationData = async () => {
+        setLoading(true);
+        setData(null);
+
+        const categoryLabel = CATEGORY_LABELS[useCase] || useCase;
+
+        try {
+            const response = await base44.integrations.Core.InvokeLLM({
+                prompt: `Analyze "${location.name}" for ${categoryLabel} impact.
+
+Provide a comprehensive analysis with REAL 2024 data:
+
+1. CURRENT IMPACT SCORE (0-100): Based on actual metrics for ${categoryLabel}
+2. DESCRIPTION: 2-3 sentences explaining the current situation with specific data points
+3. KEY POINTS: 4 bullet points with specific metrics (percentages, measurements, rankings)
+4. HISTORIC SCORES: Yearly impact scores from 2019-2024 (realistic progression)
+5. FUTURE PROJECTIONS: Projected scores for 2025-2030 based on current trends and policies
+
+Be specific with real numbers, avoid generic statements. Use actual statistics where available.`,
+                add_context_from_internet: true,
+                response_json_schema: {
+                    type: "object",
+                    properties: {
+                        impact_score: { type: "number" },
+                        description: { type: "string" },
+                        key_points: { 
+                            type: "array", 
+                            items: { type: "string" } 
+                        },
+                        historic_scores: {
+                            type: "array",
+                            items: {
+                                type: "object",
+                                properties: {
+                                    year: { type: "number" },
+                                    score: { type: "number" }
+                                }
+                            }
+                        },
+                        future_projections: {
+                            type: "array",
+                            items: {
+                                type: "object",
+                                properties: {
+                                    year: { type: "number" },
+                                    score: { type: "number" }
+                                }
+                            }
+                        },
+                        trend: { type: "string", enum: ["improving", "worsening", "stable"] }
+                    }
+                }
+            });
+
+            setData(response);
+        } catch (error) {
+            console.error('Error fetching location data:', error);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const getColor = (value) => {
+        if (value >= 80) return '#DC2626';
+        if (value >= 70) return '#EF4444';
+        if (value >= 50) return '#F97316';
+        if (value >= 30) return '#FBBF24';
+        if (value >= 20) return '#84CC16';
+        return '#22C55E';
+    };
+
+    const getImpactLabel = (value) => {
+        if (value >= 80) return 'Critical';
+        if (value >= 70) return 'High';
+        if (value >= 50) return 'Moderate';
+        if (value >= 30) return 'Low';
+        return 'Minimal';
+    };
+
+    const categoryLabel = CATEGORY_LABELS[useCase] || useCase;
+
+    // Combine historic and future data for the chart
+    const chartData = data ? [
+        ...(data.historic_scores || []).map(d => ({ ...d, type: 'historic' })),
+        ...(data.future_projections || []).map(d => ({ ...d, type: 'projected' }))
+    ] : [];
+
+    return (
+        <Dialog open={isOpen} onOpenChange={onClose}>
+            <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+                <style>{pulseAnimation}</style>
+                <DialogHeader>
+                    <DialogTitle className="flex items-center gap-2">
+                        <MapPin className="w-5 h-5 text-purple-600" />
+                        <span className="truncate">{location?.name || 'Location Details'}</span>
+                    </DialogTitle>
+                </DialogHeader>
+
+                {loading ? (
+                    <div className="flex flex-col items-center justify-center py-16">
+                        <img 
+                            src={LOADING_LOGO} 
+                            alt="Loading" 
+                            className="w-16 h-16 object-contain mb-4"
+                            style={{ animation: 'pulse 1.5s ease-in-out infinite' }}
+                        />
+                        <p className="text-gray-500 text-sm">Analyzing {categoryLabel} data...</p>
+                    </div>
+                ) : data ? (
+                    <div className="space-y-6">
+                        {/* Impact Score Card */}
+                        <div className="bg-gradient-to-br from-gray-50 to-gray-100 rounded-xl p-5 border">
+                            <div className="flex items-center justify-between mb-3">
+                                <div>
+                                    <p className="text-sm text-gray-500 mb-1">{categoryLabel} Impact</p>
+                                    <div className="flex items-center gap-3">
+                                        <span className="text-4xl font-bold" style={{ color: getColor(data.impact_score) }}>
+                                            {data.impact_score}
+                                        </span>
+                                        <span className="text-lg text-gray-600">/ 100</span>
+                                        <span 
+                                            className="px-2 py-1 rounded-full text-xs font-medium"
+                                            style={{ 
+                                                backgroundColor: `${getColor(data.impact_score)}20`,
+                                                color: getColor(data.impact_score)
+                                            }}
+                                        >
+                                            {getImpactLabel(data.impact_score)}
+                                        </span>
+                                    </div>
+                                </div>
+                                <div className="flex items-center gap-2">
+                                    {data.trend === 'improving' ? (
+                                        <div className="flex items-center gap-1 text-green-600">
+                                            <TrendingDown className="w-5 h-5" />
+                                            <span className="text-sm font-medium">Improving</span>
+                                        </div>
+                                    ) : data.trend === 'worsening' ? (
+                                        <div className="flex items-center gap-1 text-red-600">
+                                            <TrendingUp className="w-5 h-5" />
+                                            <span className="text-sm font-medium">Worsening</span>
+                                        </div>
+                                    ) : (
+                                        <div className="flex items-center gap-1 text-yellow-600">
+                                            <Target className="w-5 h-5" />
+                                            <span className="text-sm font-medium">Stable</span>
+                                        </div>
+                                    )}
+                                </div>
+                            </div>
+                            <div className="h-2 bg-gray-200 rounded-full overflow-hidden">
+                                <div 
+                                    className="h-full rounded-full transition-all duration-500" 
+                                    style={{ 
+                                        width: `${data.impact_score}%`, 
+                                        backgroundColor: getColor(data.impact_score) 
+                                    }} 
+                                />
+                            </div>
+                        </div>
+
+                        {/* Description */}
+                        <div className="bg-white rounded-xl p-5 border">
+                            <h4 className="font-semibold text-gray-800 mb-2">Overview</h4>
+                            <p className="text-gray-600 text-sm leading-relaxed">{data.description}</p>
+                        </div>
+
+                        {/* Key Points */}
+                        <div className="bg-white rounded-xl p-5 border">
+                            <h4 className="font-semibold text-gray-800 mb-3">Key Findings</h4>
+                            <div className="space-y-2">
+                                {data.key_points?.map((point, i) => (
+                                    <div key={i} className="flex items-start gap-2">
+                                        {data.impact_score >= 50 ? (
+                                            <AlertTriangle className="w-4 h-4 text-orange-500 mt-0.5 flex-shrink-0" />
+                                        ) : (
+                                            <CheckCircle className="w-4 h-4 text-green-500 mt-0.5 flex-shrink-0" />
+                                        )}
+                                        <span className="text-sm text-gray-700">{point}</span>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+
+                        {/* Historic & Future Chart */}
+                        <div className="bg-white rounded-xl p-5 border">
+                            <h4 className="font-semibold text-gray-800 mb-4">Impact Score Timeline</h4>
+                            <div className="h-64">
+                                <ResponsiveContainer width="100%" height="100%">
+                                    <AreaChart data={chartData}>
+                                        <defs>
+                                            <linearGradient id="historicGradient" x1="0" y1="0" x2="0" y2="1">
+                                                <stop offset="5%" stopColor="#8B5CF6" stopOpacity={0.3}/>
+                                                <stop offset="95%" stopColor="#8B5CF6" stopOpacity={0}/>
+                                            </linearGradient>
+                                            <linearGradient id="projectedGradient" x1="0" y1="0" x2="0" y2="1">
+                                                <stop offset="5%" stopColor="#F59E0B" stopOpacity={0.3}/>
+                                                <stop offset="95%" stopColor="#F59E0B" stopOpacity={0}/>
+                                            </linearGradient>
+                                        </defs>
+                                        <CartesianGrid strokeDasharray="3 3" stroke="#E5E7EB" />
+                                        <XAxis 
+                                            dataKey="year" 
+                                            tick={{ fontSize: 11 }} 
+                                            tickLine={false}
+                                        />
+                                        <YAxis 
+                                            domain={[0, 100]} 
+                                            tick={{ fontSize: 11 }} 
+                                            tickLine={false}
+                                        />
+                                        <Tooltip 
+                                            content={({ active, payload }) => {
+                                                if (active && payload && payload[0]) {
+                                                    const d = payload[0].payload;
+                                                    return (
+                                                        <div className="bg-white p-3 rounded-lg shadow-lg border">
+                                                            <p className="font-semibold">{d.year}</p>
+                                                            <p className="text-sm">
+                                                                <span className={d.type === 'historic' ? 'text-purple-600' : 'text-amber-600'}>
+                                                                    {d.type === 'historic' ? 'Historic' : 'Projected'}
+                                                                </span>
+                                                                : {d.score}
+                                                            </p>
+                                                        </div>
+                                                    );
+                                                }
+                                                return null;
+                                            }}
+                                        />
+                                        <Area 
+                                            type="monotone" 
+                                            dataKey="score" 
+                                            stroke="#8B5CF6" 
+                                            strokeWidth={2}
+                                            fill="url(#historicGradient)"
+                                            dot={(props) => {
+                                                const { cx, cy, payload } = props;
+                                                if (payload.type === 'projected') return null;
+                                                return (
+                                                    <circle cx={cx} cy={cy} r={4} fill="#8B5CF6" stroke="#fff" strokeWidth={2} />
+                                                );
+                                            }}
+                                        />
+                                        <Area 
+                                            type="monotone" 
+                                            dataKey="score" 
+                                            stroke="#F59E0B" 
+                                            strokeWidth={2}
+                                            strokeDasharray="5 5"
+                                            fill="url(#projectedGradient)"
+                                            dot={(props) => {
+                                                const { cx, cy, payload } = props;
+                                                if (payload.type === 'historic') return null;
+                                                return (
+                                                    <circle cx={cx} cy={cy} r={4} fill="#F59E0B" stroke="#fff" strokeWidth={2} />
+                                                );
+                                            }}
+                                        />
+                                    </AreaChart>
+                                </ResponsiveContainer>
+                            </div>
+                            <div className="flex items-center justify-center gap-6 mt-3">
+                                <div className="flex items-center gap-2">
+                                    <div className="w-3 h-3 rounded-full bg-purple-600" />
+                                    <span className="text-xs text-gray-600">Historic Data</span>
+                                </div>
+                                <div className="flex items-center gap-2">
+                                    <div className="w-3 h-3 rounded-full bg-amber-500" />
+                                    <span className="text-xs text-gray-600">Future Projection</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                ) : (
+                    <div className="text-center py-12 text-gray-500">
+                        Failed to load data. Please try again.
+                    </div>
+                )}
+            </DialogContent>
+        </Dialog>
+    );
+}

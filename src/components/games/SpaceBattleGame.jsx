@@ -309,6 +309,52 @@ export default function SpaceBattleGame({ onExit }) {
         };
         window.addEventListener('mousemove', handleMouseMove);
 
+        // Mobile touch controls
+        let autoShootInterval = null;
+        const isMobile = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
+        
+        const handleTouchStart = (e) => {
+            e.preventDefault();
+            const touch = e.touches[0];
+            state.mouseX = touch.clientX;
+            state.mouseY = touch.clientY;
+            // Start auto-shooting on mobile
+            if (!autoShootInterval) {
+                autoShootInterval = setInterval(() => {
+                    state.lasers.push({ 
+                        startX: canvas.width / 2,
+                        startY: canvas.height * 0.85,
+                        targetX: state.mouseX,
+                        targetY: state.mouseY,
+                        progress: 0,
+                        speed: 0.08,
+                        color: ALIEN_COLORS[Math.floor(Math.random() * ALIEN_COLORS.length)]
+                    });
+                    state.cameraShake = 3;
+                }, 400);
+            }
+        };
+        
+        const handleTouchMove = (e) => {
+            e.preventDefault();
+            const touch = e.touches[0];
+            state.mouseX = touch.clientX;
+            state.mouseY = touch.clientY;
+        };
+        
+        const handleTouchEnd = () => {
+            if (autoShootInterval) {
+                clearInterval(autoShootInterval);
+                autoShootInterval = null;
+            }
+        };
+        
+        if (isMobile) {
+            canvas.addEventListener('touchstart', handleTouchStart, { passive: false });
+            canvas.addEventListener('touchmove', handleTouchMove, { passive: false });
+            canvas.addEventListener('touchend', handleTouchEnd);
+        }
+
         const gameLoop = () => {
             if (state.gameOver) {
                 setGameScore(state.score);
@@ -1085,6 +1131,12 @@ export default function SpaceBattleGame({ onExit }) {
             window.removeEventListener('keydown', handleKeyDown);
             window.removeEventListener('keyup', handleKeyUp);
             window.removeEventListener('mousemove', handleMouseMove);
+            if (isMobile) {
+                canvas.removeEventListener('touchstart', handleTouchStart);
+                canvas.removeEventListener('touchmove', handleTouchMove);
+                canvas.removeEventListener('touchend', handleTouchEnd);
+            }
+            if (autoShootInterval) clearInterval(autoShootInterval);
             cancelAnimationFrame(animationId);
         };
     }, [screen]);
@@ -1240,7 +1292,7 @@ export default function SpaceBattleGame({ onExit }) {
     if (screen === 'game') {
         return (
             <div className="fixed inset-0 bg-[#0a0f1a] z-[9999]">
-                <canvas ref={canvasRef} className="absolute inset-0" />
+                <canvas ref={canvasRef} className="absolute inset-0 touch-none" />
                 <Button onClick={onExit} className="absolute top-4 right-4 bg-red-600/80 hover:bg-red-700">
                     <X className="w-4 h-4 mr-1" /> Exit
                 </Button>

@@ -959,7 +959,12 @@ Do NOT mention any websites, URLs, or external references in the audio script.`
                                 {[0.5, 1, 1.5, 2].map((speed) => (
                                     <button
                                         key={speed}
-                                        onClick={() => setPlaybackSpeed(speed)}
+                                        onClick={() => {
+                                            setPlaybackSpeed(speed);
+                                            if (audioRef.current) {
+                                                audioRef.current.playbackRate = speed;
+                                            }
+                                        }}
                                         className={`px-2 py-1 rounded text-xs transition-all ${
                                             playbackSpeed === speed
                                                 ? 'bg-purple-600 text-white'

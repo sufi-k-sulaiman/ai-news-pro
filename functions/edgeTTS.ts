@@ -1,19 +1,18 @@
 import { createClientFromRequest } from 'npm:@base44/sdk@0.8.4';
 
-// Use VoiceRSS TTS (free tier available)
-async function voiceRSSTTS(text, lang = "en-gb") {
-    // Map our lang codes to VoiceRSS format
-    const langMap = {
-        'en-gb': 'en-gb',
-        'en-us': 'en-us',
-        'en-au': 'en-au',
-        'en-za': 'en-za'
-    };
+// Map voice names for StreamElements
+const VOICE_MAP = {
+    'en-gb': 'Amy',      // British female
+    'en-us': 'Matthew',  // American male
+    'en-au': 'Nicole',   // Australian female
+    'en-za': 'Brian'     // British male (closest to SA)
+};
+
+async function generateTTS(text, lang = "en-gb") {
+    const voice = VOICE_MAP[lang] || 'Amy';
     
-    const voiceLang = langMap[lang] || 'en-gb';
-    
-    // Split text into chunks (VoiceRSS has limits)
-    const maxLen = 500;
+    // Split text into chunks
+    const maxLen = 400;
     const chunks = [];
     
     let remaining = text;
@@ -21,7 +20,7 @@ async function voiceRSSTTS(text, lang = "en-gb") {
         let chunk = remaining.substring(0, maxLen);
         if (remaining.length > maxLen) {
             const lastSpace = chunk.lastIndexOf(' ');
-            if (lastSpace > 100) {
+            if (lastSpace > 50) {
                 chunk = remaining.substring(0, lastSpace);
             }
         }
@@ -32,34 +31,25 @@ async function voiceRSSTTS(text, lang = "en-gb") {
     const audioChunks = [];
     
     for (const chunk of chunks) {
-        // Using StreamElements TTS API (free, reliable)
-        const url = `https://api.streamelements.com/kappa/v2/speech?voice=Brian&text=${encodeURIComponent(chunk)}`;
+        if (!chunk) continue;
         
-        const response = await fetch(url, {
-            headers: {
-                "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"
-            }
-        });
+        const url = `https://api.streamelements.com/kappa/v2/speech?voice=${voice}&text=${encodeURIComponent(chunk)}`;
+        
+        console.log(`Fetching TTS chunk: ${chunk.substring(0, 50)}...`);
+        
+        const response = await fetch(url);
         
         if (!response.ok) {
-            // Fallback to another TTS service
-            const fallbackUrl = `https://translate.google.com/translate_tts?ie=UTF-8&tl=${voiceLang.split('-')[0]}&client=tw-ob&q=${encodeURIComponent(chunk)}`;
-            const fallbackResponse = await fetch(fallbackUrl, {
-                headers: {
-                    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"
-                }
-            });
-            
-            if (!fallbackResponse.ok) {
-                throw new Error(`TTS failed: ${response.status}`);
-            }
-            
-            const buffer = await fallbackResponse.arrayBuffer();
-            audioChunks.push(new Uint8Array(buffer));
-        } else {
-            const buffer = await response.arrayBuffer();
-            audioChunks.push(new Uint8Array(buffer));
+            console.error(`StreamElements failed: ${response.status}`);
+            throw new Error(`TTS service error: ${response.status}`);
         }
+        
+        const buffer = await response.arrayBuffer();
+        audioChunks.push(new Uint8Array(buffer));
+    }
+
+    if (audioChunks.length === 0) {
+        throw new Error('No audio generated');
     }
 
     // Combine all chunks
@@ -110,7 +100,7 @@ Deno.serve(async (req) => {
 
         console.log(`Generating TTS for ${text.length} chars with lang: ${lang}`);
 
-        const audio = await voiceRSSTTS(text, lang);
+        const audio = await generateTTS(text, lang);
         
         console.log(`Generated ${audio.length} bytes`);
 

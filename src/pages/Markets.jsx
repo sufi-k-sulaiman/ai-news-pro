@@ -1171,7 +1171,7 @@ Return data for all ${stockBatch.length} stocks.`,
 
                 {/* Dropdown Filters Row */}
                 <div className="flex items-center gap-2 flex-wrap mt-4 pt-4 border-t border-gray-200/50">
-                    <FilterChips filters={filters} setFilters={setFilters} filterOptions={FILTER_OPTIONS} sectors={sectors} />
+                    <FilterChips filters={filters} setFilters={setFilters} filterOptions={FILTER_OPTIONS} sectors={sectors} industries={industries} />
                     
                     <div className="flex items-center gap-2 ml-auto">
                         <div className="flex items-center gap-1.5 px-3 py-2 rounded-lg bg-gradient-to-r from-purple-100 to-indigo-100 border border-purple-200/50">

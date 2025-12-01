@@ -5,6 +5,7 @@ import {
 } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 import { base44 } from '@/api/base44Client';
+import WeatherDashboard from '@/components/intelligence/WeatherDashboard';
 
 const CATEGORIES = {
     Elements_Environment: {

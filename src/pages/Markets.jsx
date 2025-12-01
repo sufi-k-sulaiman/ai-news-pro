@@ -1094,9 +1094,17 @@ Return data for all ${stockBatch.length} stocks.`,
                         type="text"
                         value={searchQuery}
                         onChange={(e) => setSearchQuery(e.target.value)}
-                        placeholder="Search stocks..."
-                        className="w-full h-10 pl-9 pr-4 rounded-full border border-gray-200 bg-white focus:border-purple-300 focus:ring-2 focus:ring-purple-100 outline-none transition-all text-sm text-gray-700 placeholder:text-gray-400"
+                        placeholder="Search ticker, name, sector..."
+                        className="w-full h-10 pl-9 pr-8 rounded-full border border-gray-200 bg-white focus:border-purple-300 focus:ring-2 focus:ring-purple-100 outline-none transition-all text-sm text-gray-700 placeholder:text-gray-400"
                     />
+                    {searchQuery && (
+                        <button 
+                            onClick={() => setSearchQuery('')}
+                            className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                        >
+                            ×
+                        </button>
+                    )}
                 </div>
                 
                 {/* Preset Filters */}

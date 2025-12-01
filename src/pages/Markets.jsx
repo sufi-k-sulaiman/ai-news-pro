@@ -1056,15 +1056,30 @@ Return data for all ${stockBatch.length} stocks.`,
                 s.industry?.toLowerCase().includes(q)
             ); 
         }
-        if (activePreset === 'wide-moats') result = result.filter(s => s.moat >= 70);
-        else if (activePreset === 'undervalued') result = result.filter(s => s.pe < 20);
-        else if (activePreset === 'high-growth') result = result.filter(s => s.sgr >= 15);
-        else if (activePreset === 'top-movers') result = result.sort((a, b) => Math.abs(b.change) - Math.abs(a.change));
-        if (filters.moat !== 'Any') result = result.filter(s => s.moat >= parseInt(filters.moat));
-        if (filters.roe !== 'Any') result = result.filter(s => s.roe >= parseInt(filters.roe));
-        if (filters.pe !== 'Any') result = result.filter(s => s.pe < parseInt(filters.pe.replace('<', '')));
-        if (filters.zscore !== 'Any') result = result.filter(s => s.zscore >= parseFloat(filters.zscore));
-        if (filters.sector !== 'All Sectors') result = result.filter(s => s.sector === filters.sector);
+        // Preset filters
+        if (activePreset === 'wide-moats') result = result.filter(s => (s.moat || 0) >= 70);
+        else if (activePreset === 'undervalued') result = result.filter(s => (s.pe || 999) < 20);
+        else if (activePreset === 'high-growth') result = result.filter(s => (s.sgr || 0) >= 15);
+        else if (activePreset === 'top-movers') result = result.sort((a, b) => Math.abs(b.change || 0) - Math.abs(a.change || 0));
+        
+        // Dropdown filters - parse numeric values from filter strings like "70+", "20%+", "<15", "3+"
+        if (filters.moat && filters.moat !== 'Any') {
+            const val = parseInt(filters.moat.replace('+', ''));
+            result = result.filter(s => (s.moat || 0) >= val);
+        }
+        if (filters.roe && filters.roe !== 'Any') {
+            const val = parseInt(filters.roe.replace('%+', '').replace('+', ''));
+            result = result.filter(s => (s.roe || 0) >= val);
+        }
+        if (filters.pe && filters.pe !== 'Any') {
+            const val = parseInt(filters.pe.replace('<', ''));
+            result = result.filter(s => (s.pe || 999) < val);
+        }
+        if (filters.zscore && filters.zscore !== 'Any') {
+            const val = parseFloat(filters.zscore.replace('+', ''));
+            result = result.filter(s => (s.zscore || 0) >= val);
+        }
+        if (filters.sector && filters.sector !== 'All Sectors') result = result.filter(s => s.sector === filters.sector);
         // Chart filter
         if (chartFilter.type && chartFilter.value) {
             result = result.filter(s => 

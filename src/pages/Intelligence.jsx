@@ -4,7 +4,6 @@ import {
     Globe, Mountain, Leaf, Zap, Star, Home
 } from 'lucide-react';
 import { base44 } from '@/api/base44Client';
-import ElementsEnvironmentDetail from '@/components/intelligence/ElementsEnvironmentDetail';
 
 const CATEGORIES = {
     Elements_Environment: {
@@ -349,11 +348,7 @@ export default function Intelligence() {
                     </div>
                 ) : (
                     /* Item Detail View */
-                    selectedCategory === 'Elements_Environment' ? (
-                        <ElementsEnvironmentDetail item={selectedItem} category={currentCategory} />
-                    ) : (
-                        <ItemDetailView item={selectedItem} category={currentCategory} />
-                    )
+                    <ItemDetailView item={selectedItem} category={currentCategory} />
                 )}
             </div>
         </div>

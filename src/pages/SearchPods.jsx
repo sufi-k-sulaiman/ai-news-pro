@@ -169,16 +169,16 @@ export default function SearchPods() {
         return () => clearInterval(interval);
     }, []);
 
-    // ElevenLabs voice options
+    // Edge TTS voice options (free Microsoft neural voices)
     useEffect(() => {
-        // Set up simplified voice options for ElevenLabs
-        const elevenLabsVoices = [
-            { name: 'UK Female', voice_id: 'EXAVITQu4vr4xnSDxMaL' }, // Sarah
-            { name: 'UK Male', voice_id: 'TX3LPaxmHKxFdv7VOQHJ' }, // Liam
-            { name: 'US', voice_id: '21m00Tcm4TlvDq8ikWAM' } // Rachel
+        const edgeTTSVoices = [
+            { name: 'UK Female', voice_id: 'en-GB-SoniaNeural' },
+            { name: 'UK Male', voice_id: 'en-GB-RyanNeural' },
+            { name: 'US Female', voice_id: 'en-US-AriaNeural' },
+            { name: 'US Male', voice_id: 'en-US-GuyNeural' }
         ];
-        setVoices(elevenLabsVoices);
-        setSelectedVoice(elevenLabsVoices[0]);
+        setVoices(edgeTTSVoices);
+        setSelectedVoice(edgeTTSVoices[0]);
 
         return () => {
             if (audioRef.current) {
@@ -307,11 +307,11 @@ Do NOT mention any websites, URLs, or external references in the audio script.`
             currentIndexRef.current = 0;
             setCurrentCaption(sentences[0] || 'Ready to play');
 
-            // Generate audio using ElevenLabs
-            const voiceId = selectedVoice?.voice_id || 'EXAVITQu4vr4xnSDxMaL';
-            const response = await base44.functions.invoke('elevenlabsTTS', { 
+            // Generate audio using Edge TTS (free Microsoft neural voices)
+            const voiceId = selectedVoice?.voice_id || 'en-GB-SoniaNeural';
+            const response = await base44.functions.invoke('edgeTTS', { 
                 text: cleanText,
-                voice_id: voiceId
+                voice: voiceId
             });
 
             if (response.data?.audio) {
@@ -423,18 +423,19 @@ Do NOT mention any websites, URLs, or external references in the audio script.`
         }
     };
 
-    // Download MP3 using ElevenLabs TTS
+    // Download MP3 using Edge TTS
     const downloadMp3 = async () => {
         if (!sentencesRef.current.length) return;
         setIsDownloadingMp3(true);
-        
+
         try {
             const fullScript = sentencesRef.current.join(' ');
-            
-            // Call ElevenLabs TTS backend function
-            const response = await base44.functions.invoke('elevenlabsTTS', { 
+
+            // Call Edge TTS backend function
+            const voiceId = selectedVoice?.voice_id || 'en-GB-SoniaNeural';
+            const response = await base44.functions.invoke('edgeTTS', { 
                 text: fullScript,
-                voice_id: 'EXAVITQu4vr4xnSDxMaL'
+                voice: voiceId
             });
             
             // The response.data contains base64 audio
@@ -565,11 +566,11 @@ Do NOT mention any websites, URLs, or external references in the audio script.`
                 .filter(s => s.length > 3);
 
             if (newSentences.length > 0) {
-                // Generate audio for new content
-                const voiceId = selectedVoice?.voice_id || 'EXAVITQu4vr4xnSDxMaL';
-                const audioResponse = await base44.functions.invoke('elevenlabsTTS', { 
+                // Generate audio for new content using Edge TTS
+                const voiceId = selectedVoice?.voice_id || 'en-GB-SoniaNeural';
+                const audioResponse = await base44.functions.invoke('edgeTTS', { 
                     text: cleanText,
-                    voice_id: voiceId
+                    voice: voiceId
                 });
 
                 if (audioResponse.data?.audio) {

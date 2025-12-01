@@ -1119,7 +1119,20 @@ Return data for all ${stockBatch.length} stocks.`,
             )}
 
             <div className="flex items-center justify-between mb-3 md:mb-4">
-                <p className="text-gray-600 text-xs md:text-sm">Showing <span className="font-bold text-gray-900">{filteredStocks.length}</span> of {stocks.length} stocks</p>
+                <div className="flex items-center gap-2">
+                    <p className="text-gray-600 text-xs md:text-sm">Showing <span className="font-bold text-gray-900">{filteredStocks.length}</span> of {stocks.length} stocks</p>
+                    {chartFilter.value && (
+                        <span className="px-2 py-1 rounded-full bg-purple-100 text-purple-700 text-xs font-medium flex items-center gap-1">
+                            {chartFilter.type === 'sector' ? 'Sector' : 'Industry'}: {chartFilter.value}
+                            <button 
+                                onClick={() => setChartFilter({ type: null, value: null })}
+                                className="ml-1 hover:text-purple-900"
+                            >
+                                ×
+                            </button>
+                        </span>
+                    )}
+                </div>
             </div>
 
             {loading ? (

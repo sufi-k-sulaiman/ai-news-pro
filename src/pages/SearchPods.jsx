@@ -947,12 +947,8 @@ Do NOT mention any websites, URLs, or external references in the audio script.`
                                     onValueChange={([v]) => { 
                                         setVolume(v); 
                                         setIsMuted(v === 0);
-                                        // Update current utterance volume if playing
-                                        if (utteranceRef.current && window.speechSynthesis.speaking) {
-                                            window.speechSynthesis.cancel();
-                                            if (isPlayingRef.current) {
-                                                setTimeout(() => speakNextSentence(), 100);
-                                            }
+                                        if (audioRef.current) {
+                                            audioRef.current.volume = v / 100;
                                         }
                                     }}
                                     className="w-20"

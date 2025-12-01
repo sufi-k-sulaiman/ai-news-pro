@@ -18,28 +18,28 @@ const CATEGORIES = {
         icon: Mountain,
         color: "#10B981",
         gradient: "from-emerald-500 to-teal-500",
-        items: ["Mountains", "Rivers", "Oceans", "Forests", "Deserts"]
+        items: ["Mountains", "Rivers", "Oceans", "Forests", "Deserts", "Islands", "Valleys", "Grasslands", "Polar Regions", "Caves"]
     },
     Living_Things: {
         name: "Living Things",
         icon: Leaf,
         color: "#22C55E",
         gradient: "from-green-500 to-lime-500",
-        items: ["Plants", "Animals", "Microorganisms", "Insects", "Birds", "Fish", "Reptiles", "Humans"]
+        items: ["Plants", "Animals", "Microorganisms", "Insects", "Birds", "Fish", "Reptiles", "Humans", "Amphibians", "Fungi"]
     },
     Forces_Cycles: {
         name: "Forces & Cycles",
         icon: Zap,
         color: "#F59E0B",
         gradient: "from-amber-500 to-orange-500",
-        items: ["Gravity", "Seasons", "Weather", "Energy", "Time"]
+        items: ["Gravity", "Seasons", "Weather", "Energy", "Time", "Magnetism", "Water Cycle", "Life Cycles", "Tectonic Activity", "Evolution"]
     },
     Cosmic_Celestial: {
         name: "Cosmic & Celestial",
         icon: Star,
         color: "#8B5CF6",
         gradient: "from-purple-500 to-indigo-500",
-        items: ["Universe", "Galaxy", "Solar System", "Planets", "Asteroids", "Comets", "Black Holes", "Nebulae"]
+        items: ["Universe", "Galaxy", "Solar System", "Planets", "Asteroids", "Comets", "Black Holes", "Nebulae", "Constellations", "Exoplanets"]
     }
 };
 

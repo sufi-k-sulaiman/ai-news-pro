@@ -489,7 +489,7 @@ Do NOT mention any websites, URLs, or external references in the audio script.`
         
         // Speak the utterance
         window.speechSynthesis.speak(utterance);
-    }, [playbackSpeed, isMuted, volume, selectedVoice, duration, stopPlayback]);
+    }, [playbackSpeed, isMuted, volume, selectedVoice, duration]);
 
     // Stop playback
     const stopPlayback = useCallback(() => {

@@ -177,56 +177,61 @@ function ItemDetailView({ item, category }) {
         setData(null);
         try {
             const response = await base44.integrations.Core.InvokeLLM({
-                prompt: `Provide extremely comprehensive intelligence data about "${item}" in the context of ${category?.name || 'natural world'}. 
+                prompt: `You are a scientific expert. Provide REAL, ACCURATE, and SPECIFIC intelligence data about "${item}" (in the category: ${category?.name || 'natural world'}).
 
-Generate detailed scientific data including:
+IMPORTANT: All data must be FACTUALLY CORRECT and SPECIFIC to "${item}". Do not generate generic placeholder data.
 
-1. Overview: A detailed description (4-5 sentences)
-2. Key Facts: 8 fascinating and surprising facts
-3. Fun Facts: 5 entertaining and memorable facts that would amaze people
-4. Significance: Why it matters to humans and the planet (detailed)
+Generate the following with REAL scientific data:
 
-5. Physical Compositions: Provide detailed structural attributes including:
-   - Structure description
-   - Measurable properties (with specific values and units)
-   - Physical states and forms
-   - Density, mass, or size metrics where applicable
+1. Overview: 4-5 sentences describing what "${item}" actually is, with real facts.
 
-6. Chemical Compositions: Provide elemental and molecular makeup including:
-   - Primary elements with percentages
-   - Key compounds or molecules
-   - Chemical properties and reactions
-   - Molecular structure description
+2. Key Facts: 8 REAL fascinating facts specifically about "${item}" - include actual numbers, measurements, and verified information.
 
-7. Mathematical Illustrations: Provide relevant equations and models:
-   - Key equations (with variable explanations)
-   - Mathematical models used to describe behavior
-   - Geometric representations if applicable
-   - Statistical patterns or ratios
+3. Fun Facts: 5 surprising but TRUE facts about "${item}" that would amaze people.
 
-8. Research Data: Provide evidence-based insights:
-   - 5 key research findings with study references
-   - Statistical data points with sources
-   - Recent discoveries (2020-2024)
-   - Ongoing research areas
+4. Significance: Real explanation of why "${item}" matters to humans, ecosystems, or science.
 
-9. Subject Matter Experts: List 5 renowned experts:
-   - Name, institution, specialty
-   - Key contributions to the field
+5. Physical Compositions for "${item}":
+   - Actual structure description (e.g., for Water: molecular structure H2O, hydrogen bonds)
+   - Real measurable properties with ACTUAL values (e.g., Water: boiling point 100°C, freezing point 0°C, density 1 g/cm³)
+   - Actual physical states and forms
+   - Real metrics specific to "${item}"
 
-10. Chart Data: Generate realistic data for 10 different visualizations:
-    - Distribution data (8 categories with percentages)
-    - Trend data (12 time points showing changes)
-    - Comparison data (6 items to compare)
-    - Composition breakdown (5 components)
-    - Geographic distribution (6 regions)
-    - Annual statistics (10 years)
-    - Performance metrics (8 metrics)
-    - Correlation data (10 x,y points)
-    - Ranking data (8 items ranked)
-    - Cyclical patterns (12 months)
+6. Chemical Compositions for "${item}":
+   - REAL elements with accurate percentages (e.g., Water: Hydrogen 11.2%, Oxygen 88.8%)
+   - Actual compounds and molecules
+   - Real chemical properties
+   - Accurate molecular structure
 
-11. Related Topics: 6 related concepts to explore`,
+7. Mathematical Illustrations for "${item}":
+   - REAL equations used in studying "${item}" (e.g., for Gravity: F = Gm₁m₂/r²)
+   - Actual scientific models
+   - Real geometric or mathematical representations
+   - Verified statistical patterns
+
+8. Research Data about "${item}":
+   - 5 REAL research findings with actual study names/institutions
+   - Real statistics with credible sources
+   - Actual recent discoveries (2020-2024)
+   - Current ongoing research areas
+
+9. Subject Matter Experts on "${item}":
+   - 5 REAL scientists/researchers who study "${item}"
+   - Their actual institutions and contributions
+
+10. Chart Data - Generate REALISTIC numerical data relevant to "${item}":
+    - Distribution: Real breakdown of "${item}" types/categories
+    - Trend: Actual historical trends related to "${item}"
+    - Comparison: Real comparisons within "${item}" domain
+    - Composition: Actual composition breakdown of "${item}"
+    - Geographic: Real geographic distribution data
+    - Annual: Actual yearly statistics
+    - Performance: Real metrics for "${item}"
+    - Correlation: Realistic correlated variables
+    - Ranking: Real rankings within the field
+    - Cyclical: Actual seasonal/cyclical patterns
+
+11. Related Topics: 6 genuinely related scientific concepts`,
                 add_context_from_internet: true,
                 response_json_schema: {
                     type: "object",

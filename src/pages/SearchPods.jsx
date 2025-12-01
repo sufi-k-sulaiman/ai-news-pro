@@ -166,10 +166,6 @@ export default function SearchPods() {
     // Available Edge TTS voices
     const edgeVoices = [
         { id: 'en-US-AriaNeural', label: 'US Female', locale: 'US' },
-        { id: 'en-US-GuyNeural', label: 'US Male', locale: 'US' },
-        { id: 'en-GB-SoniaNeural', label: 'UK Female', locale: 'UK' },
-        { id: 'en-GB-RyanNeural', label: 'UK Male', locale: 'UK' },
-        { id: 'en-AU-NatashaNeural', label: 'AU Female', locale: 'AU' },
     ];
 
     // Cleanup audio on unmount
@@ -801,8 +797,17 @@ As we wrap up, remember that learning is a continuous journey. Thank you for lis
                                         </p>
                                     ) : (
                                         <p className="text-center leading-relaxed text-sm text-gray-700 line-clamp-3">
-                                            {currentCaption}
-                                        </p>
+                                                    {captionWords.map((word, i) => {
+                                                        const progress = duration > 0 ? currentTime / duration : 0;
+                                                        const wordProgress = captionWords.length > 0 ? (i / captionWords.length) : 0;
+                                                        const isHighlighted = Math.abs(progress * captionWords.length - i) < 1.5;
+                                                        return (
+                                                            <span key={i} className={isHighlighted ? 'text-purple-600 font-semibold' : ''}>
+                                                                {word}{' '}
+                                                            </span>
+                                                        );
+                                                    })}
+                                                </p>
                                     )}
                                 </div>
                                 {/* Tell me more button */}

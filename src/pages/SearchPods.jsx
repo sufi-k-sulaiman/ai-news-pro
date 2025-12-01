@@ -150,13 +150,13 @@ export default function SearchPods() {
     const [isExtending, setIsExtending] = useState(false);
     const [recommendations, setRecommendations] = useState([]);
     
-    // Refs for audio playback
+    // Refs for speech synthesis
     const sentencesRef = useRef([]);
     const currentIndexRef = useRef(0);
     const isPlayingRef = useRef(false);
+    const utteranceRef = useRef(null);
     const timerRef = useRef(null);
     const audioRef = useRef(null);
-    const audioUrlRef = useRef(null);
     const [podImage, setPodImage] = useState(null);
     const [imageLoading, setImageLoading] = useState(false);
     const [trending, setTrending] = useState(getRandomTrending);
@@ -169,25 +169,57 @@ export default function SearchPods() {
         return () => clearInterval(interval);
     }, []);
 
-    // Edge TTS voice options (free Microsoft neural voices)
+    // Load voices - including mobile browser voices
     useEffect(() => {
-        const edgeTTSVoices = [
-            { name: 'UK Female', voice_id: 'en-GB-SoniaNeural' },
-            { name: 'UK Male', voice_id: 'en-GB-RyanNeural' },
-            { name: 'US Female', voice_id: 'en-US-AriaNeural' },
-            { name: 'US Male', voice_id: 'en-US-GuyNeural' }
-        ];
-        setVoices(edgeTTSVoices);
-        setSelectedVoice(edgeTTSVoices[0]);
-
+        const loadVoices = () => {
+            const availableVoices = window.speechSynthesis?.getVoices() || [];
+            
+            // On mobile, Google voices may not be available, so include all English voices
+            const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+            
+            let filteredVoices;
+            if (isMobile) {
+                // On mobile, get all English voices
+                filteredVoices = availableVoices.filter(v => v.lang.startsWith('en'));
+            } else {
+                // On desktop, prefer Google voices but fall back to all English if none
+                const googleVoices = availableVoices.filter(v => 
+                    v.name.toLowerCase().includes('google') && v.lang.startsWith('en')
+                );
+                filteredVoices = googleVoices.length > 0 
+                    ? googleVoices 
+                    : availableVoices.filter(v => v.lang.startsWith('en'));
+            }
+            
+            // Sort alphabetically
+            filteredVoices.sort((a, b) => a.name.localeCompare(b.name));
+            
+            setVoices(filteredVoices);
+            
+            // Always set the default voice when voices load
+            if (filteredVoices.length > 0 && !selectedVoice) {
+                const preferred = filteredVoices.find(v => v.name === 'Google UK English Female')
+                    || filteredVoices.find(v => v.name.toLowerCase().includes('female'))
+                    || filteredVoices.find(v => v.name.toLowerCase().includes('samantha'))
+                    || filteredVoices[0];
+                setSelectedVoice(preferred);
+            }
+        };
+        
+        if ('speechSynthesis' in window) {
+            // Load voices immediately
+            loadVoices();
+            // Also listen for async voice loading
+            window.speechSynthesis.onvoiceschanged = loadVoices;
+            
+            // Force reload voices after delays (some browsers need this, especially mobile)
+            setTimeout(loadVoices, 100);
+            setTimeout(loadVoices, 500);
+            setTimeout(loadVoices, 1000);
+        }
+        
         return () => {
-            if (audioRef.current) {
-                audioRef.current.pause();
-                audioRef.current = null;
-            }
-            if (audioUrlRef.current) {
-                URL.revokeObjectURL(audioUrlRef.current);
-            }
+            window.speechSynthesis?.cancel();
             if (timerRef.current) clearInterval(timerRef.current);
         };
     }, []);
@@ -287,89 +319,37 @@ Use short sentences for better pacing. Do NOT use any markdown formatting.
 Do NOT mention any websites, URLs, or external references in the audio script.`
             });
             
-            setGenerationStep('Generating audio...');
-
+            setGenerationStep('Preparing audio...');
+            
             const rawText = script || `Welcome to this episode about ${episode.title}. Let me share some fascinating insights with you today.`;
             const cleanText = cleanTextForSpeech(rawText);
-
+            
             // Split into sentences for caption sync
             const sentences = cleanText
                 .replace(/\n+/g, ' ')
                 .split(/(?<=[.!?])\s+/)
                 .map(s => s.trim())
                 .filter(s => s.length > 3);
-
+            
             if (sentences.length === 0) {
                 sentences.push(`Welcome to ${episode.title}. This is an exciting topic to explore.`);
             }
-
+            
             sentencesRef.current = sentences;
             currentIndexRef.current = 0;
+            
+            // Estimate duration (average 3 seconds per sentence)
+            setDuration(sentences.length * 3);
+            setIsGenerating(false);
             setCurrentCaption(sentences[0] || 'Ready to play');
-
-            // Generate audio using Edge TTS (free Microsoft neural voices)
-            const voiceId = selectedVoice?.voice_id || 'en-GB-SoniaNeural';
-            const response = await base44.functions.invoke('edgeTTS', { 
-                text: cleanText,
-                voice: voiceId
-            });
-
-            if (response.data?.audio) {
-                // Decode base64 to binary
-                const binaryString = atob(response.data.audio);
-                const bytes = new Uint8Array(binaryString.length);
-                for (let i = 0; i < binaryString.length; i++) {
-                    bytes[i] = binaryString.charCodeAt(i);
-                }
-
-                // Clean up previous audio URL
-                if (audioUrlRef.current) {
-                    URL.revokeObjectURL(audioUrlRef.current);
-                }
-
-                const blob = new Blob([bytes], { type: 'audio/mpeg' });
-                const audioUrl = URL.createObjectURL(blob);
-                audioUrlRef.current = audioUrl;
-
-                // Create audio element
-                const audio = new Audio(audioUrl);
-                audioRef.current = audio;
-
-                audio.onloadedmetadata = () => {
-                    setDuration(audio.duration);
-                };
-
-                audio.ontimeupdate = () => {
-                    setCurrentTime(audio.currentTime);
-                    // Update caption based on time
-                    const progress = audio.currentTime / audio.duration;
-                    const sentenceIndex = Math.floor(progress * sentences.length);
-                    if (sentenceIndex !== currentIndexRef.current && sentenceIndex < sentences.length) {
-                        currentIndexRef.current = sentenceIndex;
-                        setCurrentCaption(sentences[sentenceIndex]);
-                        setCaptionWords(sentences[sentenceIndex].split(/\s+/));
-                    }
-                };
-
-                audio.onended = () => {
-                    isPlayingRef.current = false;
-                    setIsPlaying(false);
-                };
-
-                audio.volume = volume / 100;
-                audio.playbackRate = playbackSpeed;
-
-                setIsGenerating(false);
-
-                // Auto-start playback
+            
+            // Auto-start playback with browser TTS
+            setTimeout(() => {
+                startSpeaking();
                 setTimeout(() => {
-                    audio.play();
-                    isPlayingRef.current = true;
-                    setIsPlaying(true);
-                }, 300);
-            } else {
-                throw new Error(response.data?.error || 'Failed to generate audio');
-            }
+                    speakNextSentence();
+                }, 100);
+            }, 500);
             
         } catch (error) {
             console.error('Script generation error:', error);
@@ -383,29 +363,155 @@ Do NOT mention any websites, URLs, or external references in the audio script.`
         }
     };
 
+    // Start speaking
+    const startSpeaking = useCallback(() => {
+        if (!('speechSynthesis' in window)) {
+            setCurrentCaption('Text-to-speech is not supported in your browser.');
+            return;
+        }
+        
+        // Cancel any pending speech first
+        window.speechSynthesis.cancel();
+        
+        // Mobile browsers require a workaround - speech synthesis can get "stuck"
+        // This forces it to reset on mobile
+        if (/iPhone|iPad|iPod|Android/i.test(navigator.userAgent)) {
+            // On mobile, we need to "wake up" speechSynthesis
+            const wakeSpeech = new SpeechSynthesisUtterance('');
+            wakeSpeech.volume = 0;
+            window.speechSynthesis.speak(wakeSpeech);
+            window.speechSynthesis.cancel();
+        }
+        
+        isPlayingRef.current = true;
+        setIsPlaying(true);
+        
+        // Start timer for progress
+        if (timerRef.current) clearInterval(timerRef.current);
+        timerRef.current = setInterval(() => {
+            setCurrentTime(prev => {
+                if (prev >= duration) {
+                    clearInterval(timerRef.current);
+                    return duration;
+                }
+                return prev + 1;
+            });
+        }, 1000);
+    }, [duration]);
+
+    // Speak next sentence
+    const speakNextSentence = useCallback(() => {
+        if (!isPlayingRef.current) return;
+        
+        if (currentIndexRef.current >= sentencesRef.current.length) {
+            stopPlayback();
+            return;
+        }
+        
+        const text = sentencesRef.current[currentIndexRef.current];
+        setCurrentCaption(text);
+        const words = text.split(/\s+/);
+        setCaptionWords(words);
+        setCurrentWordIndex(-1);
+        
+        const utterance = new SpeechSynthesisUtterance(text);
+        utterance.rate = playbackSpeed;
+        utterance.volume = isMuted ? 0 : volume / 100;
+        utterance.pitch = 1;
+        
+        // Get available voices
+        const availableVoices = window.speechSynthesis.getVoices();
+        
+        // Force set the voice - required for it to work
+        if (selectedVoice) {
+            utterance.voice = selectedVoice;
+        } else if (availableVoices.length > 0) {
+            // If no voice selected yet, try to find a good default
+            const googleVoice = availableVoices.find(v => v.name === 'Google UK English Female') 
+                || availableVoices.find(v => v.name.toLowerCase().includes('google'))
+                || availableVoices.find(v => v.lang.startsWith('en'));
+            if (googleVoice) {
+                utterance.voice = googleVoice;
+            }
+        }
+        
+        // Word boundary event for highlighting (not supported on all mobile browsers)
+        utterance.onboundary = (event) => {
+            if (event.name === 'word') {
+                const spokenText = text.substring(0, event.charIndex);
+                const wordCount = spokenText.split(/\s+/).filter(w => w.length > 0).length;
+                setCurrentWordIndex(wordCount);
+            }
+        };
+        
+        utterance.onend = () => {
+            setCurrentWordIndex(-1);
+            currentIndexRef.current++;
+            // Update time based on sentence progress
+            const progress = currentIndexRef.current / sentencesRef.current.length;
+            setCurrentTime(Math.floor(progress * duration));
+            
+            if (isPlayingRef.current && currentIndexRef.current < sentencesRef.current.length) {
+                // Longer delay on mobile for stability
+                const delay = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent) ? 300 : 200;
+                setTimeout(() => speakNextSentence(), delay);
+            } else if (currentIndexRef.current >= sentencesRef.current.length) {
+                stopPlayback();
+            }
+        };
+        
+        utterance.onerror = (event) => {
+            if (event.error !== 'interrupted' && event.error !== 'canceled') {
+                console.error('Speech error:', event.error);
+            }
+            setCurrentWordIndex(-1);
+            currentIndexRef.current++;
+            if (isPlayingRef.current && currentIndexRef.current < sentencesRef.current.length) {
+                setTimeout(() => speakNextSentence(), 300);
+            }
+        };
+        
+        utteranceRef.current = utterance;
+        
+        // Mobile browsers sometimes need the speak call wrapped
+        try {
+            window.speechSynthesis.speak(utterance);
+        } catch (e) {
+            console.error('Speech synthesis error:', e);
+            // Retry once after a delay
+            setTimeout(() => {
+                try {
+                    window.speechSynthesis.speak(utterance);
+                } catch (e2) {
+                    console.error('Speech synthesis retry failed:', e2);
+                }
+            }, 100);
+        }
+    }, [playbackSpeed, isMuted, volume, selectedVoice, duration]);
+
     // Stop playback
     const stopPlayback = useCallback(() => {
-        if (audioRef.current) {
-            audioRef.current.pause();
-        }
+        window.speechSynthesis?.cancel();
         isPlayingRef.current = false;
         setIsPlaying(false);
+        if (timerRef.current) {
+            clearInterval(timerRef.current);
+            timerRef.current = null;
+        }
     }, []);
 
     // Toggle play/pause
     const togglePlay = useCallback(() => {
-        if (!audioRef.current) return;
-
         if (isPlaying) {
-            audioRef.current.pause();
-            isPlayingRef.current = false;
-            setIsPlaying(false);
+            stopPlayback();
         } else {
-            audioRef.current.play();
-            isPlayingRef.current = true;
-            setIsPlaying(true);
+            startSpeaking();
+            // Small delay then start speaking
+            setTimeout(() => {
+                speakNextSentence();
+            }, 100);
         }
-    }, [isPlaying]);
+    }, [isPlaying, stopPlayback, startSpeaking, speakNextSentence]);
 
     // Download Text Script
     const downloadText = () => {
@@ -423,19 +529,18 @@ Do NOT mention any websites, URLs, or external references in the audio script.`
         }
     };
 
-    // Download MP3 using Edge TTS
+    // Download MP3 using ElevenLabs TTS
     const downloadMp3 = async () => {
         if (!sentencesRef.current.length) return;
         setIsDownloadingMp3(true);
-
+        
         try {
             const fullScript = sentencesRef.current.join(' ');
-
-            // Call Edge TTS backend function
-            const voiceId = selectedVoice?.voice_id || 'en-GB-SoniaNeural';
-            const response = await base44.functions.invoke('edgeTTS', { 
+            
+            // Call ElevenLabs TTS backend function
+            const response = await base44.functions.invoke('elevenlabsTTS', { 
                 text: fullScript,
-                voice: voiceId
+                voice_id: 'EXAVITQu4vr4xnSDxMaL'
             });
             
             // The response.data contains base64 audio
@@ -472,11 +577,8 @@ Do NOT mention any websites, URLs, or external references in the audio script.`
         stopPlayback();
         if (audioRef.current) {
             audioRef.current.pause();
+            URL.revokeObjectURL(audioRef.current.src);
             audioRef.current = null;
-        }
-        if (audioUrlRef.current) {
-            URL.revokeObjectURL(audioUrlRef.current);
-            audioUrlRef.current = null;
         }
         setShowPlayer(false);
         setCurrentEpisode(null);
@@ -499,13 +601,41 @@ Do NOT mention any websites, URLs, or external references in the audio script.`
 
     // Skip forward/backward
     const skipForward = () => {
-        if (!audioRef.current) return;
-        audioRef.current.currentTime = Math.min(audioRef.current.currentTime + 30, audioRef.current.duration);
+        const skipSeconds = 30;
+        const skipSentences = Math.ceil(skipSeconds / 3); // ~3 seconds per sentence
+        const newIndex = Math.min(currentIndexRef.current + skipSentences, sentencesRef.current.length - 1);
+        
+        window.speechSynthesis?.cancel();
+        currentIndexRef.current = newIndex;
+        setCurrentTime(prev => Math.min(prev + skipSeconds, duration));
+        
+        const text = sentencesRef.current[currentIndexRef.current] || '';
+        setCurrentCaption(text);
+        setCaptionWords(text.split(/\s+/));
+        setCurrentWordIndex(-1);
+        
+        if (isPlayingRef.current) {
+            setTimeout(() => speakNextSentence(), 100);
+        }
     };
 
     const skipBackward = () => {
-        if (!audioRef.current) return;
-        audioRef.current.currentTime = Math.max(audioRef.current.currentTime - 15, 0);
+        const skipSeconds = 15;
+        const skipSentences = Math.ceil(skipSeconds / 3);
+        const newIndex = Math.max(currentIndexRef.current - skipSentences, 0);
+        
+        window.speechSynthesis?.cancel();
+        currentIndexRef.current = newIndex;
+        setCurrentTime(prev => Math.max(prev - skipSeconds, 0));
+        
+        const text = sentencesRef.current[currentIndexRef.current] || '';
+        setCurrentCaption(text);
+        setCaptionWords(text.split(/\s+/));
+        setCurrentWordIndex(-1);
+        
+        if (isPlayingRef.current) {
+            setTimeout(() => speakNextSentence(), 100);
+        }
     };
 
     // Load recommendations based on current episode
@@ -547,81 +677,27 @@ Do NOT mention any websites, URLs, or external references in the audio script.`
     const extendPodcast = async () => {
         if (!currentEpisode || isExtending) return;
         setIsExtending(true);
-
+        
         try {
             const currentContent = sentencesRef.current.join(' ');
-
+            
             const response = await base44.integrations.Core.InvokeLLM({
-                prompt: `Continue this podcast about "${currentEpisode.title}". Here's what was covered so far (summary): "${currentContent.substring(0, 500)}..."
+                                prompt: `Continue this podcast about "${currentEpisode.title}". Here's what was covered so far (summary): "${currentContent.substring(0, 500)}..."
 
-    Write 12 more paragraphs (about 5 minutes worth) expanding on the topic with new insights, examples, stories, or related points. Keep the same conversational tone. Do NOT use markdown formatting.`,
-                add_context_from_internet: true
-            });
-
+                                Write 12 more paragraphs (about 5 minutes worth) expanding on the topic with new insights, examples, stories, or related points. Keep the same conversational tone. Do NOT use markdown formatting.`,
+                                add_context_from_internet: true
+                            });
+            
             const cleanText = cleanTextForSpeech(response || '');
             const newSentences = cleanText
                 .replace(/\n+/g, ' ')
                 .split(/(?<=[.!?])\s+/)
                 .map(s => s.trim())
                 .filter(s => s.length > 3);
-
+            
             if (newSentences.length > 0) {
-                // Generate audio for new content using Edge TTS
-                const voiceId = selectedVoice?.voice_id || 'en-GB-SoniaNeural';
-                const audioResponse = await base44.functions.invoke('edgeTTS', { 
-                    text: cleanText,
-                    voice: voiceId
-                });
-
-                if (audioResponse.data?.audio) {
-                    // Stop current audio
-                    if (audioRef.current) {
-                        audioRef.current.pause();
-                    }
-
-                    // Create new audio with extended content
-                    const binaryString = atob(audioResponse.data.audio);
-                    const bytes = new Uint8Array(binaryString.length);
-                    for (let i = 0; i < binaryString.length; i++) {
-                        bytes[i] = binaryString.charCodeAt(i);
-                    }
-
-                    if (audioUrlRef.current) {
-                        URL.revokeObjectURL(audioUrlRef.current);
-                    }
-
-                    const blob = new Blob([bytes], { type: 'audio/mpeg' });
-                    const audioUrl = URL.createObjectURL(blob);
-                    audioUrlRef.current = audioUrl;
-
-                    const audio = new Audio(audioUrl);
-                    audioRef.current = audio;
-
-                    sentencesRef.current = [...sentencesRef.current, ...newSentences];
-
-                    audio.onloadedmetadata = () => {
-                        setDuration(prev => prev + audio.duration);
-                    };
-
-                    audio.ontimeupdate = () => {
-                        const progress = audio.currentTime / audio.duration;
-                        const sentenceIndex = Math.floor(progress * newSentences.length);
-                        if (sentenceIndex < newSentences.length) {
-                            setCurrentCaption(newSentences[sentenceIndex]);
-                        }
-                    };
-
-                    audio.onended = () => {
-                        isPlayingRef.current = false;
-                        setIsPlaying(false);
-                    };
-
-                    audio.volume = volume / 100;
-                    audio.playbackRate = playbackSpeed;
-                    audio.play();
-                    isPlayingRef.current = true;
-                    setIsPlaying(true);
-                }
+                sentencesRef.current = [...sentencesRef.current, ...newSentences];
+                setDuration(sentencesRef.current.length * 3);
             }
         } catch (error) {
             console.error('Error extending podcast:', error);
@@ -923,10 +999,24 @@ Do NOT mention any websites, URLs, or external references in the audio script.`
                             <div 
                                 className="relative h-2 bg-gray-200 rounded-full cursor-pointer group"
                                 onClick={(e) => {
-                                    if (!audioRef.current) return;
                                     const rect = e.currentTarget.getBoundingClientRect();
                                     const percent = (e.clientX - rect.left) / rect.width;
-                                    audioRef.current.currentTime = percent * audioRef.current.duration;
+                                    const newTime = Math.floor(percent * duration);
+                                    const newIndex = Math.floor(percent * sentencesRef.current.length);
+                                    
+                                    // Stop current speech and jump to new position
+                                    window.speechSynthesis?.cancel();
+                                    currentIndexRef.current = Math.max(0, Math.min(newIndex, sentencesRef.current.length - 1));
+                                    setCurrentTime(newTime);
+                                    
+                                    const text = sentencesRef.current[currentIndexRef.current] || '';
+                                    setCurrentCaption(text);
+                                    setCaptionWords(text.split(/\s+/));
+                                    setCurrentWordIndex(-1);
+                                    
+                                    if (isPlayingRef.current) {
+                                        setTimeout(() => speakNextSentence(), 100);
+                                    }
                                 }}
                             >
                                 <div 
@@ -988,8 +1078,12 @@ Do NOT mention any websites, URLs, or external references in the audio script.`
                                     onValueChange={([v]) => { 
                                         setVolume(v); 
                                         setIsMuted(v === 0);
-                                        if (audioRef.current) {
-                                            audioRef.current.volume = v / 100;
+                                        // Update current utterance volume if playing
+                                        if (utteranceRef.current && window.speechSynthesis.speaking) {
+                                            window.speechSynthesis.cancel();
+                                            if (isPlayingRef.current) {
+                                                setTimeout(() => speakNextSentence(), 100);
+                                            }
                                         }
                                     }}
                                     className="w-20"
@@ -1000,12 +1094,7 @@ Do NOT mention any websites, URLs, or external references in the audio script.`
                                 {[0.5, 1, 1.5, 2].map((speed) => (
                                     <button
                                         key={speed}
-                                        onClick={() => {
-                                            setPlaybackSpeed(speed);
-                                            if (audioRef.current) {
-                                                audioRef.current.playbackRate = speed;
-                                            }
-                                        }}
+                                        onClick={() => setPlaybackSpeed(speed)}
                                         className={`px-2 py-1 rounded text-xs transition-all ${
                                             playbackSpeed === speed
                                                 ? 'bg-purple-600 text-white'
@@ -1018,22 +1107,52 @@ Do NOT mention any websites, URLs, or external references in the audio script.`
                             </div>
                         </div>
 
-                        {/* Voice Selection - ElevenLabs voices */}
+                        {/* Voice Selection - Simplified */}
                         {voices.length > 0 && (
                             <div className="mt-4 flex items-center justify-center gap-2">
-                                {voices.map((voice, i) => (
-                                    <button
-                                        key={i}
-                                        onClick={() => setSelectedVoice(voice)}
-                                        className={`px-4 py-2 rounded-full text-sm font-medium transition-all ${
-                                            selectedVoice?.voice_id === voice.voice_id 
-                                                ? 'bg-purple-600 text-white' 
-                                                : 'bg-gray-100 text-gray-600 hover:bg-purple-100 hover:text-purple-600'
-                                        }`}
-                                    >
-                                        {voice.name}
-                                    </button>
-                                ))}
+                                {(() => {
+                                    // Create simplified voice options
+                                    const ukFemale = voices.find(v => 
+                                        (v.name.toLowerCase().includes('uk') || v.name.toLowerCase().includes('kingdom')) && 
+                                        v.name.toLowerCase().includes('female')
+                                    ) || voices.find(v => v.name === 'Google UK English Female') || voices.find(v => v.name.toLowerCase().includes('female'));
+                                    
+                                    const ukMale = voices.find(v => 
+                                        (v.name.toLowerCase().includes('uk') || v.name.toLowerCase().includes('kingdom')) && 
+                                        v.name.toLowerCase().includes('male') && !v.name.toLowerCase().includes('female')
+                                    ) || voices.find(v => v.name === 'Google UK English Male');
+                                    
+                                    const usFemale = voices.find(v => 
+                                        (v.name.toLowerCase().includes('us') || v.name.toLowerCase().includes('states')) && 
+                                        v.name.toLowerCase().includes('female')
+                                    ) || voices.find(v => v.name === 'Google US English') || voices.find(v => v.name === 'Samantha');
+                                    
+                                    const voiceOptions = [
+                                        { label: 'UK Female', voice: ukFemale },
+                                        { label: 'UK Male', voice: ukMale },
+                                        { label: 'US', voice: usFemale }
+                                    ].filter(opt => opt.voice);
+                                    
+                                    return voiceOptions.map((opt, i) => (
+                                        <button
+                                            key={i}
+                                            onClick={() => { 
+                                                setSelectedVoice(opt.voice); 
+                                                if (isPlayingRef.current) {
+                                                    window.speechSynthesis?.cancel();
+                                                    setTimeout(() => speakNextSentence(), 100);
+                                                }
+                                            }}
+                                            className={`px-4 py-2 rounded-full text-sm font-medium transition-all ${
+                                                selectedVoice?.name === opt.voice.name 
+                                                    ? 'bg-purple-600 text-white' 
+                                                    : 'bg-gray-100 text-gray-600 hover:bg-purple-100 hover:text-purple-600'
+                                            }`}
+                                        >
+                                            {opt.label}
+                                        </button>
+                                    ));
+                                })()}
                             </div>
                         )}
 

@@ -28,25 +28,37 @@ const VOICES = {
 };
 
 // Generate speech for a single text segment using Edge TTS WebSocket
-async function generateSpeechSegment(text, voice, rate = 0, pitch = 0) {
+async function generateSpeechSegment(text, voice, rate = 0, pitch = 0, retryCount = 0) {
     const outputFormat = 'audio-24khz-96kbitrate-mono-mp3';
     const requestId = crypto.randomUUID().replace(/-/g, '');
-    const wsUrl = `wss://speech.platform.bing.com/consumer/speech/synthesize/readaloud/edge/v1?TrustedClientToken=6A5AA1D4EAFF4E9FB37E23D68491D6F4&ConnectionId=${requestId}`;
+    
+    // Use different tokens for retry attempts
+    const tokens = [
+        '6A5AA1D4EAFF4E9FB37E23D68491D6F4',
+        '6A5AA1D4EAFF4E9FB37E23D68491D6F4'
+    ];
+    const token = tokens[retryCount % tokens.length];
+    const wsUrl = `wss://speech.platform.bing.com/consumer/speech/synthesize/readaloud/edge/v1?TrustedClientToken=${token}&ConnectionId=${requestId}`;
     
     return new Promise((resolve, reject) => {
         const audioChunks = [];
         let ws;
+        let resolved = false;
         
         try {
             ws = new WebSocket(wsUrl);
             ws.binaryType = 'arraybuffer';
             
             const timeout = setTimeout(() => {
-                ws.close();
-                reject(new Error('WebSocket timeout'));
+                if (!resolved) {
+                    resolved = true;
+                    try { ws.close(); } catch(e) {}
+                    reject(new Error('WebSocket timeout after 60s'));
+                }
             }, 60000);
             
             ws.onopen = () => {
+                console.log('WebSocket connected, sending config...');
                 // Send configuration
                 const configMessage = `Content-Type:application/json; charset=utf-8\r\nPath:speech.config\r\n\r\n{"context":{"synthesis":{"audio":{"metadataoptions":{"sentenceBoundaryEnabled":"false","wordBoundaryEnabled":"false"},"outputFormat":"${outputFormat}"}}}}`;
                 ws.send(configMessage);
@@ -59,6 +71,7 @@ async function generateSpeechSegment(text, voice, rate = 0, pitch = 0) {
                 const date = new Date().toISOString();
                 const ssmlMessage = `X-RequestId:${requestId}\r\nContent-Type:application/ssml+xml\r\nX-Timestamp:${date}Z\r\nPath:ssml\r\n\r\n${ssml}`;
                 ws.send(ssmlMessage);
+                console.log('SSML sent, waiting for audio...');
             };
             
             ws.onmessage = (event) => {
@@ -73,35 +86,65 @@ async function generateSpeechSegment(text, voice, rate = 0, pitch = 0) {
                     }
                 } else if (typeof event.data === 'string') {
                     if (event.data.includes('Path:turn.end')) {
-                        clearTimeout(timeout);
-                        ws.close();
-                        
-                        const totalLength = audioChunks.reduce((sum, chunk) => sum + chunk.length, 0);
-                        const combined = new Uint8Array(totalLength);
-                        let offset = 0;
-                        for (const chunk of audioChunks) {
-                            combined.set(chunk, offset);
-                            offset += chunk.length;
+                        if (!resolved) {
+                            resolved = true;
+                            clearTimeout(timeout);
+                            try { ws.close(); } catch(e) {}
+                            
+                            const totalLength = audioChunks.reduce((sum, chunk) => sum + chunk.length, 0);
+                            console.log(`Received ${totalLength} bytes of audio`);
+                            const combined = new Uint8Array(totalLength);
+                            let offset = 0;
+                            for (const chunk of audioChunks) {
+                                combined.set(chunk, offset);
+                                offset += chunk.length;
+                            }
+                            resolve(combined);
                         }
-                        resolve(combined);
                     }
                 }
             };
             
             ws.onerror = (error) => {
-                clearTimeout(timeout);
-                reject(new Error('WebSocket error'));
+                console.error('WebSocket error:', error);
+                if (!resolved) {
+                    resolved = true;
+                    clearTimeout(timeout);
+                    reject(new Error('WebSocket connection error'));
+                }
             };
             
             ws.onclose = (event) => {
-                if (audioChunks.length === 0 && event.code !== 1000) {
-                    reject(new Error('WebSocket closed without audio'));
+                console.log(`WebSocket closed: code=${event.code}, reason=${event.reason}`);
+                if (!resolved && audioChunks.length === 0) {
+                    resolved = true;
+                    clearTimeout(timeout);
+                    reject(new Error(`WebSocket closed without audio (code: ${event.code})`));
                 }
             };
         } catch (error) {
+            console.error('WebSocket creation error:', error);
             reject(error);
         }
     });
+}
+
+// Wrapper with retry logic
+async function generateSpeechWithRetry(text, voice, rate = 0, pitch = 0, maxRetries = 2) {
+    let lastError;
+    for (let attempt = 0; attempt <= maxRetries; attempt++) {
+        try {
+            if (attempt > 0) {
+                console.log(`Retry attempt ${attempt}...`);
+                await new Promise(r => setTimeout(r, 1000 * attempt)); // Exponential backoff
+            }
+            return await generateSpeechSegment(text, voice, rate, pitch, attempt);
+        } catch (error) {
+            console.error(`Attempt ${attempt} failed:`, error.message);
+            lastError = error;
+        }
+    }
+    throw lastError;
 }
 
 // Generate silent MP3 frames for pause between paragraphs
@@ -240,7 +283,7 @@ Deno.serve(async (req) => {
         for (let i = 0; i < paragraphs.length; i++) {
             console.log(`Processing paragraph ${i + 1}/${paragraphs.length}...`);
             
-            const audio = await generateSpeechSegment(paragraphs[i], voice, rate, pitch);
+            const audio = await generateSpeechWithRetry(paragraphs[i], voice, rate, pitch);
             audioSegments.push(audio);
             
             // Add pause between paragraphs (not after last one)

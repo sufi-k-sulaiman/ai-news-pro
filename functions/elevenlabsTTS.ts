@@ -78,9 +78,18 @@ Deno.serve(async (req) => {
         }
 
         const audioBuffer = await response.arrayBuffer();
+        const bytes = new Uint8Array(audioBuffer);
         
-        // Return as base64 encoded JSON for easier frontend handling
-        const base64Audio = btoa(String.fromCharCode(...new Uint8Array(audioBuffer)));
+        console.log('Audio generated, bytes:', bytes.length);
+        
+        // Convert to base64 in chunks to avoid stack overflow for large files
+        let binary = '';
+        const chunkSize = 8192;
+        for (let i = 0; i < bytes.length; i += chunkSize) {
+            const chunk = bytes.subarray(i, Math.min(i + chunkSize, bytes.length));
+            binary += String.fromCharCode.apply(null, chunk);
+        }
+        const base64Audio = btoa(binary);
         
         return Response.json({ 
             audio: base64Audio,

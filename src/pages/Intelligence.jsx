@@ -522,7 +522,7 @@ For "${item}", provide COMPLETE data:
                     </ChartCard>
 
                     {/* 6. Annual Area Chart */}
-                    <ChartCard title="Annual Statistics" color={category?.color}>
+                    <ChartCard title={`${item} Annual Data (2019-2024)`} color={category?.color}>
                         <ResponsiveContainer width="100%" height="100%">
                             <AreaChart data={data?.chartData?.annual || []}>
                                 <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />

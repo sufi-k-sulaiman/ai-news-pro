@@ -287,37 +287,89 @@ Use short sentences for better pacing. Do NOT use any markdown formatting.
 Do NOT mention any websites, URLs, or external references in the audio script.`
             });
             
-            setGenerationStep('Preparing audio...');
-            
+            setGenerationStep('Generating audio...');
+
             const rawText = script || `Welcome to this episode about ${episode.title}. Let me share some fascinating insights with you today.`;
             const cleanText = cleanTextForSpeech(rawText);
-            
+
             // Split into sentences for caption sync
             const sentences = cleanText
                 .replace(/\n+/g, ' ')
                 .split(/(?<=[.!?])\s+/)
                 .map(s => s.trim())
                 .filter(s => s.length > 3);
-            
+
             if (sentences.length === 0) {
                 sentences.push(`Welcome to ${episode.title}. This is an exciting topic to explore.`);
             }
-            
+
             sentencesRef.current = sentences;
             currentIndexRef.current = 0;
-            
-            // Estimate duration (average 3 seconds per sentence)
-            setDuration(sentences.length * 3);
-            setIsGenerating(false);
             setCurrentCaption(sentences[0] || 'Ready to play');
-            
-            // Auto-start playback with browser TTS
-            setTimeout(() => {
-                startSpeaking();
+
+            // Generate audio using ElevenLabs
+            const voiceId = selectedVoice?.voice_id || 'EXAVITQu4vr4xnSDxMaL';
+            const response = await base44.functions.invoke('elevenlabsTTS', { 
+                text: cleanText,
+                voice_id: voiceId
+            });
+
+            if (response.data?.audio) {
+                // Decode base64 to binary
+                const binaryString = atob(response.data.audio);
+                const bytes = new Uint8Array(binaryString.length);
+                for (let i = 0; i < binaryString.length; i++) {
+                    bytes[i] = binaryString.charCodeAt(i);
+                }
+
+                // Clean up previous audio URL
+                if (audioUrlRef.current) {
+                    URL.revokeObjectURL(audioUrlRef.current);
+                }
+
+                const blob = new Blob([bytes], { type: 'audio/mpeg' });
+                const audioUrl = URL.createObjectURL(blob);
+                audioUrlRef.current = audioUrl;
+
+                // Create audio element
+                const audio = new Audio(audioUrl);
+                audioRef.current = audio;
+
+                audio.onloadedmetadata = () => {
+                    setDuration(audio.duration);
+                };
+
+                audio.ontimeupdate = () => {
+                    setCurrentTime(audio.currentTime);
+                    // Update caption based on time
+                    const progress = audio.currentTime / audio.duration;
+                    const sentenceIndex = Math.floor(progress * sentences.length);
+                    if (sentenceIndex !== currentIndexRef.current && sentenceIndex < sentences.length) {
+                        currentIndexRef.current = sentenceIndex;
+                        setCurrentCaption(sentences[sentenceIndex]);
+                        setCaptionWords(sentences[sentenceIndex].split(/\s+/));
+                    }
+                };
+
+                audio.onended = () => {
+                    isPlayingRef.current = false;
+                    setIsPlaying(false);
+                };
+
+                audio.volume = volume / 100;
+                audio.playbackRate = playbackSpeed;
+
+                setIsGenerating(false);
+
+                // Auto-start playback
                 setTimeout(() => {
-                    speakNextSentence();
-                }, 100);
-            }, 500);
+                    audio.play();
+                    isPlayingRef.current = true;
+                    setIsPlaying(true);
+                }, 300);
+            } else {
+                throw new Error(response.data?.error || 'Failed to generate audio');
+            }
             
         } catch (error) {
             console.error('Script generation error:', error);

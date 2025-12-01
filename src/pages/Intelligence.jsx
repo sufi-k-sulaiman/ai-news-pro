@@ -4,6 +4,7 @@ import {
     Globe, Mountain, Leaf, Zap, Star, Home
 } from 'lucide-react';
 import { base44 } from '@/api/base44Client';
+import ElementsEnvironmentDetail from '@/components/intelligence/ElementsEnvironmentDetail';
 
 const CATEGORIES = {
     Elements_Environment: {

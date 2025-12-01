@@ -12,7 +12,56 @@ const CATEGORIES = {
         icon: Globe,
         color: "#3B82F6",
         gradient: "from-blue-500 to-cyan-500",
-        items: ["Earth", "Soil", "Water", "Air", "Fire", "Sunlight", "Moon", "Stars", "Sky", "Space"]
+        corePhilosophy: {
+            understanding: "Explain the fundamental elements (earth, air, fire, water, space) and environmental systems.",
+            education: "Provide structured lessons, interactive models, and case studies across ecosystems and climates.",
+            compression: "Distill complex environmental data into clear charts, graphs, and summaries.",
+            knowledge: "Organize facts, history, folklore, and science into a searchable encyclopedia.",
+            wisdom: "Offer guidance for sustainable living, health, and harmony with nature."
+        },
+        features: [
+            "Elements & Environment Encyclopedia",
+            "Educational Modules",
+            "Knowledge Expansion", 
+            "Wisdom & Guidance",
+            "Charts & Graphs",
+            "Filters & Customization"
+        ],
+        items: ["Earth", "Soil", "Water", "Air", "Fire", "Sunlight", "Moon", "Stars", "Sky", "Space"],
+        subCategories: {
+            "Earth": {
+                description: "Soil, geology, tectonics, erosion, minerals",
+                charts: ["Soil composition", "Erosion rates", "Tectonic activity"],
+                cultural: "Indigenous land wisdom, earth-based rituals"
+            },
+            "Air": {
+                description: "Atmosphere, wind patterns, air quality, ozone",
+                charts: ["AQI trends", "Wind rose diagrams", "Jet stream maps"],
+                cultural: "Breath practices, wind folklore"
+            },
+            "Fire": {
+                description: "Energy, volcanism, combustion, solar radiation",
+                charts: ["Energy consumption", "Volcanic activity", "Solar cycles"],
+                cultural: "Fire ceremonies, transformation myths"
+            },
+            "Water": {
+                description: "Oceans, rivers, precipitation, hydrological cycles",
+                charts: ["Water availability", "Precipitation bars", "River flow"],
+                cultural: "Water rituals, purification traditions"
+            },
+            "Space": {
+                description: "Cosmos, seasons, celestial bodies, planetary systems",
+                charts: ["Daylight curves", "Planetary comparisons", "Orbital patterns"],
+                cultural: "Astronomical traditions, seasonal celebrations"
+            }
+        },
+        dataVisualizations: {
+            environmental: ["Air Quality Trends", "Water Cycle Flow", "Carbon Emissions", "Temperature Anomalies", "Biodiversity Loss"],
+            elemental: ["Soil Composition", "Wind Patterns", "Energy Consumption", "Ocean Currents", "Seasonal Daylight"],
+            causeEffect: ["Deforestation Impact", "Human Activity Systems", "Climate Feedback Loops"]
+        },
+        filters: ["Location (local/regional/global)", "Depth (quick glance/deep dive)", "Interest (science/sustainability/culture)", "Visualization (charts/graphs/text)", "Accessibility (simplified/audio/high-contrast)"],
+        nuances: ["Micro vs macro ecosystems", "Seasonal awareness", "Historical wisdom", "Philosophical reflections", "Cultural diversity (Greek, Chinese, Indian elemental theory)"]
     },
     Natural_Landscapes_Features: {
         name: "Natural Landscapes",

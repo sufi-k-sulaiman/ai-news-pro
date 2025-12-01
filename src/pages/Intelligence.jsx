@@ -177,61 +177,60 @@ function ItemDetailView({ item, category }) {
         setData(null);
         try {
             const response = await base44.integrations.Core.InvokeLLM({
-                prompt: `You are a scientific expert. Provide REAL, ACCURATE, and SPECIFIC intelligence data about "${item}" (in the category: ${category?.name || 'natural world'}).
+                prompt: `You are an expert scientist. Generate ACCURATE, REAL scientific data specifically about "${item}" in the category "${category?.name || 'natural world'}".
 
-IMPORTANT: All data must be FACTUALLY CORRECT and SPECIFIC to "${item}". Do not generate generic placeholder data.
+CRITICAL: Every piece of data must be REAL and SPECIFIC to "${item}". Use your knowledge and web context to provide factual information.
 
-Generate the following with REAL scientific data:
+For "${item}", provide:
 
-1. Overview: 4-5 sentences describing what "${item}" actually is, with real facts.
+1. OVERVIEW: What is "${item}"? Give 4-5 factual sentences with real scientific information.
 
-2. Key Facts: 8 REAL fascinating facts specifically about "${item}" - include actual numbers, measurements, and verified information.
+2. KEY FACTS: 8 real, verified facts about "${item}" with actual numbers/measurements where applicable.
 
-3. Fun Facts: 5 surprising but TRUE facts about "${item}" that would amaze people.
+3. FUN FACTS: 5 surprising but true facts specifically about "${item}".
 
-4. Significance: Real explanation of why "${item}" matters to humans, ecosystems, or science.
+4. SIGNIFICANCE: Why "${item}" matters - real importance to science, environment, or humanity.
 
-5. Physical Compositions for "${item}":
-   - Actual structure description (e.g., for Water: molecular structure H2O, hydrogen bonds)
-   - Real measurable properties with ACTUAL values (e.g., Water: boiling point 100°C, freezing point 0°C, density 1 g/cm³)
-   - Actual physical states and forms
-   - Real metrics specific to "${item}"
+5. PHYSICAL COMPOSITIONS specific to "${item}":
+   - Structure: Real physical structure of "${item}"
+   - Measurable Properties: Real values (e.g., temperature, density, size, mass) with actual units
+   - Physical States: Actual states "${item}" can exist in
+   - Metrics: Real measurements specific to "${item}"
 
-6. Chemical Compositions for "${item}":
-   - REAL elements with accurate percentages (e.g., Water: Hydrogen 11.2%, Oxygen 88.8%)
-   - Actual compounds and molecules
-   - Real chemical properties
-   - Accurate molecular structure
+6. CHEMICAL COMPOSITIONS specific to "${item}":
+   - Elements: Real elemental composition with accurate percentages
+   - Compounds: Actual molecules/compounds in "${item}"
+   - Properties: Real chemical properties
+   - Molecular Structure: Accurate molecular description
 
-7. Mathematical Illustrations for "${item}":
-   - REAL equations used in studying "${item}" (e.g., for Gravity: F = Gm₁m₂/r²)
-   - Actual scientific models
-   - Real geometric or mathematical representations
-   - Verified statistical patterns
+7. MATHEMATICAL ILLUSTRATIONS for "${item}":
+   - Equations: Real scientific equations used to study/describe "${item}" (e.g., physics formulas, rate equations)
+   - Models: Actual mathematical/computational models
+   - Geometric Representations: Real geometric patterns in "${item}"
+   - Statistical Patterns: Real statistical data about "${item}"
 
-8. Research Data about "${item}":
-   - 5 REAL research findings with actual study names/institutions
-   - Real statistics with credible sources
-   - Actual recent discoveries (2020-2024)
-   - Current ongoing research areas
+8. RESEARCH DATA about "${item}":
+   - Findings: 5 real research discoveries with actual institution names and years
+   - Statistics: Real statistical data with sources
+   - Recent Discoveries: Actual discoveries from 2020-2024
+   - Ongoing Research: Current real research areas
 
-9. Subject Matter Experts on "${item}":
-   - 5 REAL scientists/researchers who study "${item}"
-   - Their actual institutions and contributions
+9. EXPERTS on "${item}":
+   - 5 real scientists who study "${item}" with their actual institutions, specialties, and contributions
 
-10. Chart Data - Generate REALISTIC numerical data relevant to "${item}":
-    - Distribution: Real breakdown of "${item}" types/categories
-    - Trend: Actual historical trends related to "${item}"
-    - Comparison: Real comparisons within "${item}" domain
-    - Composition: Actual composition breakdown of "${item}"
-    - Geographic: Real geographic distribution data
-    - Annual: Actual yearly statistics
-    - Performance: Real metrics for "${item}"
-    - Correlation: Realistic correlated variables
-    - Ranking: Real rankings within the field
-    - Cyclical: Actual seasonal/cyclical patterns
+10. CHART DATA - Generate realistic numerical data specific to "${item}":
+    - Distribution: Types/categories of "${item}" with real percentages
+    - Trend: Historical data showing real changes over time
+    - Comparison: Compare aspects of "${item}" with real values
+    - Composition: Real breakdown of what makes up "${item}"
+    - Geographic: Where "${item}" is found/occurs with real data
+    - Annual: Year-by-year real statistics
+    - Performance: Measurable metrics with real scores
+    - Correlation: Two related variables with realistic data points
+    - Ranking: Rankings within the field with real scores
+    - Cyclical: Seasonal/monthly patterns with real values
 
-11. Related Topics: 6 genuinely related scientific concepts`,
+11. RELATED TOPICS: 6 scientifically related concepts to "${item}"`,
                 add_context_from_internet: true,
                 response_json_schema: {
                     type: "object",

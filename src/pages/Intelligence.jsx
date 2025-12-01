@@ -436,7 +436,7 @@ For "${item}", provide COMPLETE data:
                 </h3>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     {/* 1. Distribution Pie Chart */}
-                    <ChartCard title="Distribution Analysis" color={category?.color}>
+                    <ChartCard title={`${item} Type Distribution`} color={category?.color}>
                         <ResponsiveContainer width="100%" height="100%">
                             <RechartsPie>
                                 <Pie

@@ -1,9 +1,9 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { base44 } from '@/api/base44Client';
 import { 
-    Play, Pause, SkipBack, SkipForward, Volume2, VolumeX, Download, FileText, Music,
+    Play, Pause, SkipBack, SkipForward, Volume2, VolumeX, Music,
     Sparkles, Radio, Loader2, TrendingUp, Users, Mic, ChevronDown,
-    ChevronRight, X, Clock, Search, Plus, AlertTriangle, RotateCcw, RotateCw,
+    ChevronRight, X, Clock, Plus, AlertTriangle, RotateCcw, RotateCw,
     ListMusic, Sliders, Eye, MessageSquarePlus
 } from 'lucide-react';
 import { Button } from "@/components/ui/button";
@@ -14,37 +14,36 @@ import { Progress } from "@/components/ui/progress";
 import { ERROR_CODES, getErrorCode } from '@/components/ErrorDisplay';
 
 const CATEGORIES = [
-    { id: 'technology', name: 'Technology', color: '#10B981', episodes: 16 },
-    { id: 'education', name: 'Education', color: '#3B82F6', episodes: 12 },
-    { id: 'entertainment', name: 'Entertainment', color: '#EC4899', episodes: 8 },
-    { id: 'health', name: 'Health', color: '#F59E0B', episodes: 10 },
-    { id: 'business', name: 'Business', color: '#8B5CF6', episodes: 14 },
-    { id: 'science', name: 'Science', color: '#06B6D4', episodes: 9 },
-    { id: 'morning-boost', name: 'Morning Boost', color: '#FF9800', episodes: 6 },
-    { id: 'daily-gratitude', name: 'Daily Gratitude', color: '#E91E63', episodes: 5 },
-    { id: 'positive-mindset', name: 'Positive Mindset', color: '#9C27B0', episodes: 7 },
-    { id: 'sleep-story', name: 'Sleep Story', color: '#3F51B5', episodes: 8 },
-    { id: 'dream-journey', name: 'Dream Journey', color: '#673AB7', episodes: 5 },
-    { id: 'calm-night', name: 'Calm Night', color: '#1A237E', episodes: 6 },
-    { id: 'health-tip', name: 'Health Tip', color: '#4CAF50', episodes: 10 },
-    { id: 'wellness-hack', name: 'Wellness Hack', color: '#00BCD4', episodes: 8 },
-    { id: 'mindful-moment', name: 'Mindful Moment', color: '#009688', episodes: 7 },
-    { id: 'sunrise-focus', name: 'Sunrise Focus', color: '#FFC107', episodes: 5 },
-    { id: 'fresh-start', name: 'Fresh Start', color: '#8BC34A', episodes: 6 },
-    { id: 'inner-strength', name: 'Inner Strength', color: '#795548', episodes: 7 },
-    { id: 'peaceful-rest', name: 'Peaceful Rest', color: '#607D8B', episodes: 5 },
-    { id: 'starry-escape', name: 'Starry Escape', color: '#311B92', episodes: 4 },
-    { id: 'night-calm', name: 'Night Calm', color: '#1B5E20', episodes: 6 },
-    { id: 'body-balance', name: 'Body Balance', color: '#EF6C00', episodes: 8 },
-    { id: 'healthy-habit', name: 'Healthy Habit', color: '#00897B', episodes: 9 },
-    { id: 'calm-breath', name: 'Calm Breath', color: '#5C6BC0', episodes: 6 },
-    { id: 'vital-energy', name: 'Vital Energy', color: '#F44336', episodes: 7 },
-    { id: 'joy-spark', name: 'Joy Spark', color: '#FFEB3B', episodes: 5 },
-    { id: 'mind-reset', name: 'Mind Reset', color: '#00ACC1', episodes: 6 },
-    { id: 'soul-care', name: 'Soul Care', color: '#AB47BC', episodes: 7 },
-    { id: 'sleep-calm', name: 'Sleep Calm', color: '#26A69A', episodes: 5 },
-    { id: 'gratitude-glow', name: 'Gratitude Glow', color: '#FF7043', episodes: 6 },
-    { id: 'energy-reset', name: 'Energy Reset', color: '#66BB6A', episodes: 7 },
+    { id: 'hope', name: 'Hope', color: '#10B981', episodes: 8 },
+    { id: 'courage', name: 'Courage', color: '#EF4444', episodes: 10 },
+    { id: 'confidence', name: 'Confidence', color: '#F59E0B', episodes: 9 },
+    { id: 'success', name: 'Success', color: '#8B5CF6', episodes: 12 },
+    { id: 'growth', name: 'Growth', color: '#22C55E', episodes: 11 },
+    { id: 'resilience', name: 'Resilience', color: '#3B82F6', episodes: 8 },
+    { id: 'determination', name: 'Determination', color: '#DC2626', episodes: 9 },
+    { id: 'passion', name: 'Passion', color: '#EC4899', episodes: 7 },
+    { id: 'gratitude', name: 'Gratitude', color: '#F97316', episodes: 10 },
+    { id: 'optimism', name: 'Optimism', color: '#FBBF24', episodes: 8 },
+    { id: 'focus', name: 'Focus', color: '#6366F1', episodes: 9 },
+    { id: 'discipline', name: 'Discipline', color: '#64748B', episodes: 11 },
+    { id: 'mindfulness', name: 'Mindfulness', color: '#14B8A6', episodes: 10 },
+    { id: 'vision', name: 'Vision', color: '#A855F7', episodes: 7 },
+    { id: 'purpose', name: 'Purpose', color: '#0EA5E9', episodes: 9 },
+    { id: 'balance', name: 'Balance', color: '#84CC16', episodes: 8 },
+    { id: 'clarity', name: 'Clarity', color: '#06B6D4', episodes: 7 },
+    { id: 'drive', name: 'Drive', color: '#E11D48', episodes: 10 },
+    { id: 'ambition', name: 'Ambition', color: '#7C3AED', episodes: 9 },
+    { id: 'persistence', name: 'Persistence', color: '#059669', episodes: 8 },
+    { id: 'momentum', name: 'Momentum', color: '#2563EB', episodes: 7 },
+    { id: 'progress', name: 'Progress', color: '#16A34A', episodes: 11 },
+    { id: 'breakthrough', name: 'Breakthrough', color: '#D946EF', episodes: 6 },
+    { id: 'achievement', name: 'Achievement', color: '#CA8A04', episodes: 10 },
+    { id: 'triumph', name: 'Triumph', color: '#B91C1C', episodes: 7 },
+    { id: 'empowerment', name: 'Empowerment', color: '#9333EA', episodes: 9 },
+    { id: 'leadership', name: 'Leadership', color: '#1D4ED8', episodes: 12 },
+    { id: 'creativity', name: 'Creativity', color: '#DB2777', episodes: 8 },
+    { id: 'innovation', name: 'Innovation', color: '#0891B2', episodes: 10 },
+    { id: 'excellence', name: 'Excellence', color: '#7E22CE', episodes: 9 },
 ];
 
 const QUICK_TOPICS = ['AI trends', 'Morning motivation', 'Sleep story', 'Health tips', 'World news', 'Book summary'];
@@ -906,11 +905,11 @@ Do NOT mention any websites, URLs, or external references in the audio script.`
                                                 captionWords.map((word, idx) => (
                                                     <span
                                                         key={idx}
-                                                        className={`transition-colors duration-100 ${
+                                                        className={`transition-all duration-150 ${
                                                             idx === currentWordIndex 
-                                                                ? 'text-purple-600 font-semibold' 
+                                                                ? 'text-purple-600 font-bold bg-purple-100 px-1 py-0.5 rounded' 
                                                                 : idx < currentWordIndex 
-                                                                    ? 'text-gray-500' 
+                                                                    ? 'text-gray-400' 
                                                                     : 'text-gray-700'
                                                         }`}
                                                     >
@@ -1084,26 +1083,6 @@ Do NOT mention any websites, URLs, or external references in the audio script.`
 
                         {/* Options Row */}
                         <div className="mt-4 flex items-center justify-center gap-2 flex-wrap">
-                            <button 
-                                onClick={downloadText}
-                                disabled={isGenerating || !sentencesRef.current.length}
-                                className="flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm bg-gray-50 hover:bg-gray-100 border border-gray-200 text-gray-600 transition-colors disabled:opacity-50"
-                            >
-                                <FileText className="w-4 h-4" />
-                                Script
-                            </button>
-                            <button 
-                                onClick={downloadMp3}
-                                disabled={isGenerating || isDownloadingMp3 || !sentencesRef.current.length}
-                                className="flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm bg-gray-50 hover:bg-gray-100 border border-gray-200 text-gray-600 transition-colors disabled:opacity-50"
-                            >
-                                {isDownloadingMp3 ? (
-                                    <Loader2 className="w-4 h-4 animate-spin" />
-                                ) : (
-                                    <Download className="w-4 h-4" />
-                                )}
-                                MP3
-                            </button>
                             <button 
                                 onClick={() => setShowBraille(!showBraille)}
                                 className={`flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm transition-colors ${

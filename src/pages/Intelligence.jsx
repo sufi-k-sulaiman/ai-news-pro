@@ -299,108 +299,30 @@ Generate the following with REAL scientific data:
             setData(response);
         } catch (error) {
             console.error('Failed to fetch item data:', error);
-            // Set fallback data on error
-            setData({
-                overview: `${item} is a fascinating subject within ${category?.name || 'the natural world'}. It represents one of the most intriguing aspects of our universe that scientists and researchers continue to study.`,
-                keyFacts: [
-                    `${item} has been studied for centuries by scientists worldwide`,
-                    `New discoveries about ${item} are being made regularly`,
-                    `${item} plays a crucial role in various natural processes`,
-                    `Understanding ${item} helps us comprehend larger systems`,
-                    `${item} exhibits unique properties that distinguish it from other phenomena`
-                ],
-                funFacts: [
-                    `${item} has inspired countless works of art and literature`,
-                    `Ancient civilizations had fascinating beliefs about ${item}`,
-                    `${item} continues to surprise researchers with unexpected behaviors`
-                ],
-                significance: `${item} is essential to understanding our world and has significant implications for science, technology, and daily life.`,
-                physicalCompositions: {
-                    structure: `${item} exhibits complex structural patterns that vary based on environmental conditions.`,
-                    measurableProperties: [
-                        { property: "Scale", value: "Variable", unit: "units" },
-                        { property: "Density", value: "Varies", unit: "g/cm³" }
-                    ],
-                    physicalStates: ["Solid", "Liquid", "Gas"],
-                    metrics: "Measurements depend on specific conditions and context."
-                },
-                chemicalCompositions: {
-                    elements: [
-                        { element: "Primary Element", percentage: 60 },
-                        { element: "Secondary Element", percentage: 30 },
-                        { element: "Trace Elements", percentage: 10 }
-                    ],
-                    compounds: ["Various compounds present"],
-                    properties: "Chemical properties vary based on composition and environment.",
-                    molecularStructure: "Complex molecular arrangements typical of this category."
-                },
-                mathematicalIllustrations: {
-                    equations: [
-                        { equation: "f(x) = ax² + bx + c", description: "General relationship model" }
-                    ],
-                    models: ["Statistical models", "Predictive algorithms"],
-                    geometricRepresentations: "Various geometric patterns observed.",
-                    statisticalPatterns: "Data follows typical distribution patterns."
-                },
-                researchData: {
-                    findings: [
-                        { finding: `Recent studies have expanded our understanding of ${item}`, source: "Scientific Journal", year: 2023 }
-                    ],
-                    statistics: [
-                        { stat: "Research papers published annually", value: "1000+", source: "Academic databases" }
-                    ],
-                    recentDiscoveries: [`New aspects of ${item} discovered in 2023`],
-                    ongoingResearch: ["Climate impact studies", "Behavioral analysis"]
-                },
-                experts: [
-                    { name: "Dr. Research Expert", institution: "Leading University", specialty: `${item} Studies`, contribution: "Pioneering research in the field" }
-                ],
-                chartData: {
-                    distribution: [
-                        { name: "Type A", value: 35 }, { name: "Type B", value: 25 },
-                        { name: "Type C", value: 20 }, { name: "Type D", value: 20 }
-                    ],
-                    trend: [
-                        { period: "Jan", value: 100 }, { period: "Feb", value: 120 },
-                        { period: "Mar", value: 115 }, { period: "Apr", value: 130 },
-                        { period: "May", value: 145 }, { period: "Jun", value: 160 }
-                    ],
-                    comparison: [
-                        { name: "A", valueA: 80, valueB: 60 }, { name: "B", valueA: 65, valueB: 75 },
-                        { name: "C", valueA: 90, valueB: 85 }
-                    ],
-                    composition: [
-                        { name: "Component 1", value: 40 }, { name: "Component 2", value: 30 },
-                        { name: "Component 3", value: 30 }
-                    ],
-                    geographic: [
-                        { region: "North America", value: 30 }, { region: "Europe", value: 25 },
-                        { region: "Asia", value: 35 }, { region: "Other", value: 10 }
-                    ],
-                    annual: [
-                        { year: 2020, value: 100 }, { year: 2021, value: 120 },
-                        { year: 2022, value: 140 }, { year: 2023, value: 165 }
-                    ],
-                    performance: [
-                        { metric: "Efficiency", score: 85, max: 100 },
-                        { metric: "Quality", score: 90, max: 100 },
-                        { metric: "Impact", score: 75, max: 100 }
-                    ],
-                    correlation: [
-                        { x: 10, y: 20 }, { x: 20, y: 35 }, { x: 30, y: 45 },
-                        { x: 40, y: 60 }, { x: 50, y: 70 }
-                    ],
-                    ranking: [
-                        { name: "First", rank: 1, score: 95 }, { name: "Second", rank: 2, score: 88 },
-                        { name: "Third", rank: 3, score: 82 }
-                    ],
-                    cyclical: [
-                        { month: "Jan", value: 50 }, { month: "Apr", value: 80 },
-                        { month: "Jul", value: 100 }, { month: "Oct", value: 70 }
-                    ]
-                },
-                relatedTopics: ["Related Topic 1", "Related Topic 2", "Related Topic 3"]
-            });
+            // Retry once on error
+            try {
+                const retryResponse = await base44.integrations.Core.InvokeLLM({
+                    prompt: `Provide scientific facts about "${item}". Include overview, 5 key facts, significance, and 4 related topics.`,
+                    add_context_from_internet: true,
+                    response_json_schema: {
+                        type: "object",
+                        properties: {
+                            overview: { type: "string" },
+                            keyFacts: { type: "array", items: { type: "string" } },
+                            significance: { type: "string" },
+                            relatedTopics: { type: "array", items: { type: "string" } }
+                        }
+                    }
+                });
+                setData({
+                    ...retryResponse,
+                    funFacts: retryResponse.keyFacts?.slice(0, 3) || [],
+                    chartData: { distribution: [], trend: [], comparison: [], composition: [], geographic: [], annual: [], performance: [], correlation: [], ranking: [], cyclical: [] }
+                });
+            } catch (retryError) {
+                console.error('Retry also failed:', retryError);
+                setData(null);
+            }
         } finally {
             setLoading(false);
         }

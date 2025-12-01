@@ -8,7 +8,7 @@ import {
 } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Dialog, DialogContent } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Slider } from "@/components/ui/slider";
 import { Progress } from "@/components/ui/progress";
 import { ERROR_CODES, getErrorCode } from '@/components/ErrorDisplay';
@@ -924,7 +924,8 @@ export default function SearchPods() {
 
             {/* Player Modal */}
             <Dialog open={showPlayer} onOpenChange={closePlayer}>
-                <DialogContent className="max-w-lg p-0 bg-white border-gray-200 overflow-hidden">
+                <DialogContent className="max-w-lg p-0 bg-white border-gray-200 overflow-hidden" aria-describedby={undefined}>
+                    <DialogTitle className="sr-only">Now Playing</DialogTitle>
                     <div className="p-6">
                         {/* Header */}
                         <div className="flex justify-between items-center mb-6">

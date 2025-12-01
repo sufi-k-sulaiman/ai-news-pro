@@ -1,18 +1,27 @@
 import { createClientFromRequest } from 'npm:@base44/sdk@0.8.4';
 
-// Use Google Translate TTS (free, no API key needed)
-async function googleTTS(text, lang = "en") {
-    // Google TTS has a limit per request, so split if needed
-    const maxLen = 200;
+// Use VoiceRSS TTS (free tier available)
+async function voiceRSSTTS(text, lang = "en-gb") {
+    // Map our lang codes to VoiceRSS format
+    const langMap = {
+        'en-gb': 'en-gb',
+        'en-us': 'en-us',
+        'en-au': 'en-au',
+        'en-za': 'en-za'
+    };
+    
+    const voiceLang = langMap[lang] || 'en-gb';
+    
+    // Split text into chunks (VoiceRSS has limits)
+    const maxLen = 500;
     const chunks = [];
     
     let remaining = text;
     while (remaining.length > 0) {
         let chunk = remaining.substring(0, maxLen);
-        // Try to break at a space
         if (remaining.length > maxLen) {
             const lastSpace = chunk.lastIndexOf(' ');
-            if (lastSpace > 50) {
+            if (lastSpace > 100) {
                 chunk = remaining.substring(0, lastSpace);
             }
         }
@@ -23,7 +32,8 @@ async function googleTTS(text, lang = "en") {
     const audioChunks = [];
     
     for (const chunk of chunks) {
-        const url = `https://translate.google.com/translate_tts?ie=UTF-8&tl=${lang}&client=tw-ob&q=${encodeURIComponent(chunk)}`;
+        // Using StreamElements TTS API (free, reliable)
+        const url = `https://api.streamelements.com/kappa/v2/speech?voice=Brian&text=${encodeURIComponent(chunk)}`;
         
         const response = await fetch(url, {
             headers: {
@@ -32,11 +42,24 @@ async function googleTTS(text, lang = "en") {
         });
         
         if (!response.ok) {
-            throw new Error(`Google TTS failed: ${response.status}`);
+            // Fallback to another TTS service
+            const fallbackUrl = `https://translate.google.com/translate_tts?ie=UTF-8&tl=${voiceLang.split('-')[0]}&client=tw-ob&q=${encodeURIComponent(chunk)}`;
+            const fallbackResponse = await fetch(fallbackUrl, {
+                headers: {
+                    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"
+                }
+            });
+            
+            if (!fallbackResponse.ok) {
+                throw new Error(`TTS failed: ${response.status}`);
+            }
+            
+            const buffer = await fallbackResponse.arrayBuffer();
+            audioChunks.push(new Uint8Array(buffer));
+        } else {
+            const buffer = await response.arrayBuffer();
+            audioChunks.push(new Uint8Array(buffer));
         }
-        
-        const buffer = await response.arrayBuffer();
-        audioChunks.push(new Uint8Array(buffer));
     }
 
     // Combine all chunks
@@ -85,9 +108,9 @@ Deno.serve(async (req) => {
             return Response.json({ error: "No text provided" }, { status: 400 });
         }
 
-        console.log(`Generating TTS for ${text.length} chars`);
+        console.log(`Generating TTS for ${text.length} chars with lang: ${lang}`);
 
-        const audio = await googleTTS(text, lang);
+        const audio = await voiceRSSTTS(text, lang);
         
         console.log(`Generated ${audio.length} bytes`);
 

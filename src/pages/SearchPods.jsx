@@ -655,11 +655,11 @@ export default function SearchPods() {
 
             const cleanText = cleanTextForSpeech(response || '');
 
-            // Generate new audio for extended content
+            // Generate new audio for extended content using ElevenLabs
             const ttsResponse = await base44.functions.invoke('elevenlabsTTS', {
-                                    text: cleanText,
-                                    voice_id: selectedVoice
-                                });
+                text: cleanText,
+                voice_id: selectedVoice
+            });
 
             if (ttsResponse.data?.audio) {
                 // Add new sentences to the ref

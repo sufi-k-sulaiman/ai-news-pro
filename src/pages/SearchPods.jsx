@@ -172,7 +172,9 @@ export default function SearchPods() {
     // Load voices - including mobile browser voices
     useEffect(() => {
         const loadVoices = () => {
-            const availableVoices = window.speechSynthesis?.getVoices() || [];
+            if (!window.speechSynthesis) return;
+            
+            const availableVoices = window.speechSynthesis.getVoices() || [];
             
             // On mobile, Google voices may not be available, so include all English voices
             const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
@@ -206,21 +208,37 @@ export default function SearchPods() {
             }
         };
         
-        if ('speechSynthesis' in window) {
-            // Load voices immediately
-            loadVoices();
-            // Also listen for async voice loading
-            window.speechSynthesis.onvoiceschanged = loadVoices;
-            
-            // Force reload voices after delays (some browsers need this, especially mobile)
-            setTimeout(loadVoices, 100);
-            setTimeout(loadVoices, 500);
-            setTimeout(loadVoices, 1000);
+        // Check if speechSynthesis exists (it should on all modern browsers including mobile)
+        const initSpeechSynthesis = () => {
+            if (typeof window !== 'undefined' && window.speechSynthesis) {
+                // Load voices immediately
+                loadVoices();
+                // Also listen for async voice loading
+                window.speechSynthesis.onvoiceschanged = loadVoices;
+                
+                // Force reload voices after delays (mobile browsers need multiple attempts)
+                setTimeout(loadVoices, 100);
+                setTimeout(loadVoices, 300);
+                setTimeout(loadVoices, 500);
+                setTimeout(loadVoices, 1000);
+                setTimeout(loadVoices, 2000);
+            }
+        };
+        
+        // Run immediately
+        initSpeechSynthesis();
+        
+        // Also run after DOM is fully loaded (helps with mobile)
+        if (document.readyState === 'complete') {
+            initSpeechSynthesis();
+        } else {
+            window.addEventListener('load', initSpeechSynthesis);
         }
         
         return () => {
             window.speechSynthesis?.cancel();
             if (timerRef.current) clearInterval(timerRef.current);
+            window.removeEventListener('load', initSpeechSynthesis);
         };
     }, []);
 

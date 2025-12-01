@@ -1,33 +1,38 @@
 import { createClientFromRequest } from 'npm:@base44/sdk@0.8.4';
 
 Deno.serve(async (req) => {
-    // Handle test endpoint
-    const url = new URL(req.url);
-    if (url.searchParams.get('test') === 'true') {
-        const apiKey = Deno.env.get('ELEVENLABS_API_KEY');
-        
-        // Test API key by fetching user info
-        const testResponse = await fetch('https://api.elevenlabs.io/v1/user', {
-            headers: { 'xi-api-key': apiKey || '' }
-        });
-        
-        if (testResponse.ok) {
-            const userData = await testResponse.json();
-            return Response.json({ 
-                status: 'API key valid', 
-                subscription: userData.subscription,
-                character_count: userData.subscription?.character_count,
-                character_limit: userData.subscription?.character_limit
-            });
-        } else {
-            const error = await testResponse.text();
-            return Response.json({ status: 'API key invalid', error }, { status: 401 });
-        }
-    }
-
     try {
         const base44 = createClientFromRequest(req);
         const user = await base44.auth.me();
+        
+        if (!user) {
+            return Response.json({ error: 'Unauthorized' }, { status: 401 });
+        }
+
+        const body = await req.json();
+        
+        // Handle test mode
+        if (body.test === true) {
+            const apiKey = Deno.env.get('ELEVENLABS_API_KEY');
+            
+            // Test API key by fetching user info
+            const testResponse = await fetch('https://api.elevenlabs.io/v1/user', {
+                headers: { 'xi-api-key': apiKey || '' }
+            });
+            
+            if (testResponse.ok) {
+                const userData = await testResponse.json();
+                return Response.json({ 
+                    status: 'API key valid', 
+                    subscription: userData.subscription,
+                    character_count: userData.subscription?.character_count,
+                    character_limit: userData.subscription?.character_limit
+                });
+            } else {
+                const error = await testResponse.text();
+                return Response.json({ status: 'API key invalid', error }, { status: 401 });
+            }
+        }
         
         if (!user) {
             return Response.json({ error: 'Unauthorized' }, { status: 401 });

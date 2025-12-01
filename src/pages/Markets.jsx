@@ -1111,6 +1111,7 @@ Return data for all ${stockBatch.length} stocks.`,
 
     const topMovers = useMemo(() => [...stocks].sort((a, b) => Math.abs(b.change) - Math.abs(a.change)).slice(0, 20), [stocks]);
     const sectors = useMemo(() => ['All Sectors', ...[...new Set(stocks.map(s => s.sector).filter(Boolean))].sort()], [stocks]);
+    const industries = useMemo(() => ['All Industries', ...[...new Set(stocks.map(s => s.industry).filter(Boolean))].sort()], [stocks]);
     const clearFilters = () => { setFilters({ market: 'All Markets', sector: 'All Sectors', industry: 'All Industries', moat: 'Any', roe: 'Any', pe: 'Any', zscore: 'Any' }); setActivePreset('all'); setSearchQuery(''); setChartFilter({ type: null, value: null }); };
     
     const handleChartFilter = (type, value) => {

@@ -498,16 +498,26 @@ export default function SpaceBattleGame({ onExit }) {
                     const shipImageIndex = Math.floor(Math.random() * ENEMY_SHIPS.length);
                     const alienColor = ALIEN_COLORS[Math.floor(Math.random() * ALIEN_COLORS.length)];
                     
-                    // Spawn from top of screen (80% chance) or sides (20%)
-                    const fromTop = Math.random() < 0.8;
+                    // Spawn from various top positions
+                    const spawnZone = Math.random();
                     let startX, startScreenY;
                     
-                    if (fromTop) {
-                        startX = (Math.random() - 0.5) * 600;
-                        startScreenY = -100 - Math.random() * 150;
+                    if (spawnZone < 0.25) {
+                        // Top left
+                        startX = -200 - Math.random() * 200;
+                        startScreenY = -50 - Math.random() * 100;
+                    } else if (spawnZone < 0.5) {
+                        // Top right
+                        startX = 200 + Math.random() * 200;
+                        startScreenY = -50 - Math.random() * 100;
+                    } else if (spawnZone < 0.75) {
+                        // Top middle
+                        startX = (Math.random() - 0.5) * 300;
+                        startScreenY = -80 - Math.random() * 120;
                     } else {
-                        startX = Math.random() > 0.5 ? -400 : 400;
-                        startScreenY = Math.random() * canvas.height * 0.3;
+                        // Random across top
+                        startX = (Math.random() - 0.5) * 700;
+                        startScreenY = -30 - Math.random() * 150;
                     }
                     
                     state.enemies.push({
@@ -571,7 +581,7 @@ export default function SpaceBattleGame({ onExit }) {
                     screenY = Math.min(screenY, horizon + (canvas.height - horizon) * enemy.z * 0.6);
                 }
                 
-                const size = 160 * scale; // 2x bigger aliens
+                const size = 107 * scale; // 33% smaller
 
                 if (enemy.z > 1.2) {
                     state.player.health--;
@@ -584,27 +594,21 @@ export default function SpaceBattleGame({ onExit }) {
                 ctx.save();
                 ctx.translate(screenX, screenY);
 
-                // Draw ship image if loaded - 2x bigger
+                // Draw ship image if loaded - no glow
                 const shipImg = state.enemyImages[enemy.shipImageIndex];
                 if (shipImg && shipImg.complete) {
-                    const imgWidth = size * 2;
-                    const imgHeight = size * 1.2;
-                    ctx.shadowBlur = 20;
-                    ctx.shadowColor = enemy.color;
+                    const imgWidth = size * 1.3;
+                    const imgHeight = size * 0.8;
                     ctx.drawImage(shipImg, -imgWidth/2, -imgHeight/2, imgWidth, imgHeight);
-                    ctx.shadowBlur = 0;
                 } else {
                     // Fallback UFO drawing
                     ctx.fillStyle = enemy.color;
-                    ctx.shadowBlur = 25;
-                    ctx.shadowColor = enemy.color;
                     ctx.beginPath();
                     ctx.ellipse(0, 0, size/2, size/6, 0, 0, Math.PI * 2);
                     ctx.fill();
                     ctx.beginPath();
                     ctx.arc(0, -size/8, size/4, Math.PI, 0, false);
                     ctx.fill();
-                    ctx.shadowBlur = 0;
                 }
 
                 ctx.restore();

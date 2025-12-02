@@ -673,16 +673,16 @@ export default function TankCity({ onExit }) {
                             spawnParticles(bullet.x, bullet.y, brick.color);
 
                             if (brick.health <= 0) {
-                                state.score += 100;
-                                state.wordsDestroyed++;
-                                console.log('Word destroyed:', state.wordsDestroyed, '/', state.totalWords);
-                                setScore(state.score);
-                                setWordsDestroyed(state.wordsDestroyed);
+                                    state.score += 100;
+                                    state.wordsDestroyed++;
+                                    console.log('Word destroyed:', state.wordsDestroyed, '/', state.totalWords);
+                                    setScore(state.score);
+                                    setWordsDestroyed(state.wordsDestroyed);
 
-                                // Show word and short definition
-                                const shortDef = brick.definition ? brick.definition.split('.')[0].substring(0, 50) : '';
-                                addFloatingText(brick.x + brick.width/2, brick.y, `${brick.word.toUpperCase()}: ${shortDef}`, brick.color, 100);
-                            }
+                                    // Show definition only (no word title)
+                                    const shortDef = brick.definition ? brick.definition.split('.')[0].substring(0, 60) : '';
+                                    addFloatingText(brick.x + brick.width/2, brick.y, shortDef, brick.color, 100);
+                                }
                         }
                         // Enemy bullets just bounce off words (block them)
                         return false;
@@ -764,20 +764,20 @@ export default function TankCity({ onExit }) {
                 return ft.y > -150;
             });
             
-            // Process queue - show next text when current one is high enough
+            // Process queue - show next text when current one has moved up enough
             if (state.textQueue?.length > 0) {
                 const lastText = state.floatingTexts[state.floatingTexts.length - 1];
-                // Spawn next when no texts or last text has moved up enough
-                if (!lastText || lastText.y < canvas.height * 0.6) {
+                // Spawn next when no texts or last text has moved up by ~80px
+                if (!lastText || lastText.y < lastText.startY - 80) {
                     const next = state.textQueue.shift();
                     state.floatingTexts.push({
                         x: canvas.width / 2,
                         y: canvas.height + 50,
-                        vy: -1.5,
+                        vy: -1.8,
                         text: next.text,
                         bonus: next.bonus,
-                        life: 600,
-                        maxLife: 600,
+                        life: 800,
+                        maxLife: 800,
                         color: next.color,
                         startY: canvas.height + 50,
                     });
@@ -1003,39 +1003,29 @@ export default function TankCity({ onExit }) {
                 const travelDistance = ft.startY - ft.y;
                 const maxTravel = canvas.height + 150;
                 const progress = Math.min(1, Math.max(0, travelDistance / maxTravel));
-                
+
                 // Perspective scale - starts large at bottom, shrinks toward top
-                const scale = Math.max(0.2, 1.2 - progress * 1.0);
+                const scale = Math.max(0.3, 1.1 - progress * 0.8);
                 // Fade out only when near very top of screen (y < 50)
                 const alpha = ft.y < 50 ? Math.max(0, ft.y / 50) : 1;
-                
+
                 ctx.save();
                 ctx.globalAlpha = alpha;
                 ctx.translate(ft.x, ft.y);
-                ctx.scale(scale, scale * 0.7); // Perspective squish
-                
-                // Split text into word and definition
-                const parts = ft.text.split(': ');
-                const word = parts[0] || '';
-                const def = parts[1] || '';
-                
+                ctx.scale(scale, scale * 0.8); // Perspective squish
+
+                // Draw definition text
                 ctx.fillStyle = ft.color;
-                ctx.font = 'bold 36px Inter';
+                ctx.font = 'bold 28px Inter';
                 ctx.textAlign = 'center';
-                ctx.fillText(word, 0, 0);
-                
-                if (def) {
-                    ctx.fillStyle = '#e2e8f0';
-                    ctx.font = '20px Inter';
-                    ctx.fillText(def, 0, 40);
-                }
-                
+                ctx.fillText(ft.text, 0, 0);
+
                 if (ft.bonus > 0) {
                     ctx.fillStyle = '#ffd700';
-                    ctx.font = 'bold 22px Inter';
-                    ctx.fillText(`+${ft.bonus}`, 0, def ? 70 : 40);
+                    ctx.font = 'bold 20px Inter';
+                    ctx.fillText(`+${ft.bonus}`, 0, 35);
                 }
-                
+
                 ctx.restore();
             }
             ctx.globalAlpha = 1;

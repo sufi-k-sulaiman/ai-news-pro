@@ -13,35 +13,35 @@ const CATEGORIES = {
         icon: Globe,
         color: "#3B82F6",
         gradient: "from-blue-500 to-cyan-500",
-        items: ["Earth", "Soil", "Water", "Air", "Fire", "Sunlight", "Moon", "Stars", "Sky", "Space"]
+        items: ["Earth", "Soil", "Water", "Air", "Fire", "Sunlight", "Moon", "Stars", "Sky", "Space", "Lightning", "Ice", "Climate", "Darkness"]
     },
     Natural_Landscapes_Features: {
         name: "Natural Landscapes",
         icon: Mountain,
         color: "#10B981",
         gradient: "from-emerald-500 to-teal-500",
-        items: ["Mountains", "Rivers", "Oceans", "Forests", "Deserts", "Islands", "Valleys", "Grasslands", "Polar Regions", "Caves"]
+        items: ["Mountains", "Rivers", "Oceans", "Forests", "Deserts", "Islands", "Valleys", "Grasslands", "Polar Regions", "Caves", "Wetlands", "Plateaus", "Volcanoes", "Coral Reefs"]
     },
     Living_Things: {
         name: "Living Things",
         icon: Leaf,
         color: "#22C55E",
         gradient: "from-green-500 to-lime-500",
-        items: ["Plants", "Animals", "Microorganisms", "Insects", "Birds", "Fish", "Reptiles", "Humans", "Amphibians", "Fungi"]
+        items: ["Plants", "Animals", "Microorganisms", "Insects", "Birds", "Fish", "Reptiles", "Humans", "Amphibians", "Fungi", "Mollusks", "Crustaceans", "Arachnids", "Algae", "Dinosaurs"]
     },
     Forces_Cycles: {
         name: "Forces & Cycles",
         icon: Zap,
         color: "#F59E0B",
         gradient: "from-amber-500 to-orange-500",
-        items: ["Gravity", "Seasons", "Weather", "Energy", "Time", "Magnetism", "Water Cycle", "Life Cycles", "Tectonic Activity", "Evolution"]
+        items: ["Gravity", "Seasons", "Weather", "Energy", "Time", "Magnetism", "Water Cycle", "Life Cycles", "Tectonic Activity", "Evolution", "Photosynthesis", "Carbon Cycle", "Erosion", "Radiation"]
     },
     Cosmic_Celestial: {
         name: "Cosmic & Celestial",
         icon: Star,
         color: "#8B5CF6",
         gradient: "from-purple-500 to-indigo-500",
-        items: ["Universe", "Galaxy", "Solar System", "Planets", "Asteroids", "Comets", "Black Holes", "Nebulae", "Constellations", "Exoplanets"]
+        items: ["Universe", "Galaxy", "Solar System", "Planets", "Asteroids", "Comets", "Black Holes", "Nebulae", "Constellations", "Exoplanets", "Supernovae", "Pulsars", "Quasars", "Dark Matter", "Dark Energy"]
     }
 };
 
@@ -86,7 +86,7 @@ function CategoryCard({ category, onClick }) {
             <p className="text-white/80 text-sm mb-4">{category.items.length} topics to explore</p>
             <div className="flex flex-wrap gap-1.5">
                 {category.items.map((item, i) => (
-                    <span key={i} className="px-2 py-0.5 bg-white/20 rounded-full text-xs">
+                    <span key={i} className="px-2.5 py-1 bg-white/20 rounded-full text-sm font-medium">
                         {item}
                     </span>
                 ))}

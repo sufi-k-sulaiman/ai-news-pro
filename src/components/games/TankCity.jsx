@@ -727,10 +727,7 @@ export default function TankCity({ onExit }) {
                             setScore(state.score);
                             setEnemiesLeft(state.enemiesLeft);
 
-                            // Check for level complete - need all enemies AND all words destroyed
-                                    if (state.enemiesLeft <= 0 && state.enemies.length === 0 && state.wordsDestroyed >= state.totalWords) {
-                                        state.levelComplete = true;
-                                    }
+                            // Level complete check is done in main game loop
                             return false;
                         }
                     }
@@ -1121,7 +1118,8 @@ export default function TankCity({ onExit }) {
             updateParticles();
             
             // Check level complete after all updates
-            if (!state.levelComplete && state.enemiesLeft <= 0 && state.enemies.length === 0 && state.wordsDestroyed >= state.totalWords) {
+            // enemiesTotal tracks spawns remaining, enemies.length tracks alive enemies
+            if (!state.levelComplete && state.enemiesTotal <= 0 && state.enemies.length === 0 && state.wordsDestroyed >= state.totalWords) {
                 state.levelComplete = true;
             }
             

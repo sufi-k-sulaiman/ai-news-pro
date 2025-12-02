@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { Gamepad2, Rocket, Target, Shield } from 'lucide-react';
+import { Gamepad2, Rocket, Target, Shield, Blocks } from 'lucide-react';
 
 import WordShooter from '@/components/games/WordShooter';
 import SpaceBattleGame from '@/components/games/SpaceBattleGame';
 import TankCity from '@/components/games/TankCity';
+import TetrisGalaxy from '@/components/games/TetrisGalaxy';
 import { Button } from '@/components/ui/button';
 
 export default function Games() {
@@ -25,6 +26,10 @@ export default function Games() {
 
     if (activeGame === 'tank-city') {
         return <TankCity onExit={() => setActiveGame(null)} />;
+    }
+
+    if (activeGame === 'tetris-galaxy') {
+        return <TetrisGalaxy onExit={() => setActiveGame(null)} />;
     }
 
     return (
@@ -70,6 +75,18 @@ export default function Games() {
                       <h2 className="text-xl font-bold text-gray-900 mb-2">Cosmic Tank</h2>
                       <p className="text-gray-500 text-sm mb-4 flex-grow">Space tank battle - defend your base from enemies!</p>
                       <Button onClick={() => setActiveGame('tank-city')} size="lg" className="w-full bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700">
+                          Play Now
+                      </Button>
+                  </div>
+
+                  {/* Tetris Galaxy Game Card */}
+                  <div className="bg-white rounded-2xl p-6 border border-gray-200 shadow-sm text-center flex flex-col">
+                      <div className="w-16 h-16 bg-gradient-to-br from-cyan-500 to-teal-600 rounded-xl flex items-center justify-center mx-auto mb-4">
+                          <Blocks className="w-8 h-8 text-white" />
+                      </div>
+                      <h2 className="text-xl font-bold text-gray-900 mb-2">Tetris Galaxy</h2>
+                      <p className="text-gray-500 text-sm mb-4 flex-grow">Stack word blocks and learn vocabulary as you clear lines!</p>
+                      <Button onClick={() => setActiveGame('tetris-galaxy')} size="lg" className="w-full bg-gradient-to-r from-cyan-500 to-teal-600 hover:from-cyan-600 hover:to-teal-700">
                           Play Now
                       </Button>
                   </div>

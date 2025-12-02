@@ -191,7 +191,7 @@ export default function SearchPage() {
         setTabResults(prev => ({ ...prev, pods: { loading: true, data: null } }));
         try {
             const response = await base44.integrations.Core.InvokeLLM({
-                prompt: `Generate 4 podcast episode ideas about "${searchQuery}". Include title, description, and estimated duration.`,
+                prompt: `Generate 6 unique podcast episode ideas about "${searchQuery}". Each should be engaging and educational. Include creative titles, compelling descriptions, and realistic durations.`,
                 response_json_schema: {
                     type: "object",
                     properties: {
@@ -203,6 +203,25 @@ export default function SearchPage() {
         } catch (error) {
             console.error('Pods fetch failed:', error);
             setTabResults(prev => ({ ...prev, pods: { loading: false, data: null } }));
+        }
+    };
+
+    const fetchMindmapsResults = async (searchQuery) => {
+        setTabResults(prev => ({ ...prev, mindmaps: { loading: true, data: [] } }));
+        try {
+            const response = await base44.integrations.Core.InvokeLLM({
+                prompt: `Generate 6 mindmap topic ideas related to "${searchQuery}". Each should be a great starting point for visual brainstorming and exploration.`,
+                response_json_schema: {
+                    type: "object",
+                    properties: {
+                        topics: { type: "array", items: { type: "object", properties: { title: { type: "string" }, description: { type: "string" }, subtopics: { type: "array", items: { type: "string" } } } } }
+                    }
+                }
+            });
+            setTabResults(prev => ({ ...prev, mindmaps: { loading: false, data: response?.topics || [] } }));
+        } catch (error) {
+            console.error('Mindmaps fetch failed:', error);
+            setTabResults(prev => ({ ...prev, mindmaps: { loading: false, data: [] } }));
         }
     };
 
@@ -222,6 +241,7 @@ export default function SearchPage() {
         fetchIntelligenceResults(searchQuery);
         fetchLearningResults(searchQuery);
         fetchPodsResults(searchQuery);
+        fetchMindmapsResults(searchQuery);
         
         try {
             const response = await base44.integrations.Core.InvokeLLM({

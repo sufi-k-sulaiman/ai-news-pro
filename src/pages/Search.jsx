@@ -93,7 +93,8 @@ export default function SearchPage() {
         news: { loading: false, data: [] },
         pods: { loading: false, data: null },
         intelligence: { loading: false, data: null },
-        learning: { loading: false, data: [] }
+        learning: { loading: false, data: [] },
+        mindmaps: { loading: false, data: [] }
     });
 
     // Filter matching pages from navigation
@@ -210,7 +211,7 @@ export default function SearchPage() {
         
         setLoading(true);
         setSearchedQuery(searchQuery);
-        setActiveTab('all');
+        setActiveTab('news');
         
         // Search in-app content first
         const appMatches = searchInAppContent(searchQuery);
@@ -380,15 +381,15 @@ export default function SearchPage() {
                         {/* Tabbed Results */}
                         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
                             <TabsList className="w-full justify-start bg-white border border-gray-200 rounded-xl p-1 mb-4 flex-wrap h-auto gap-1">
-                                <TabsTrigger value="all" className="rounded-lg data-[state=active]:bg-purple-600 data-[state=active]:text-white">
-                                    <FileText className="w-4 h-4 mr-2" /> All
-                                </TabsTrigger>
                                 <TabsTrigger value="news" className="rounded-lg data-[state=active]:bg-red-600 data-[state=active]:text-white">
                                     <Newspaper className="w-4 h-4 mr-2" /> News
                                     {tabResults.news.data?.length > 0 && <span className="ml-1 text-xs">({tabResults.news.data.length})</span>}
                                 </TabsTrigger>
                                 <TabsTrigger value="pods" className="rounded-lg data-[state=active]:bg-pink-600 data-[state=active]:text-white">
                                     <Headphones className="w-4 h-4 mr-2" /> Pods
+                                </TabsTrigger>
+                                <TabsTrigger value="mindmaps" className="rounded-lg data-[state=active]:bg-emerald-600 data-[state=active]:text-white">
+                                    <Brain className="w-4 h-4 mr-2" /> MindMaps
                                 </TabsTrigger>
                                 <TabsTrigger value="intelligence" className="rounded-lg data-[state=active]:bg-violet-600 data-[state=active]:text-white">
                                     <Lightbulb className="w-4 h-4 mr-2" /> Intelligence
@@ -397,28 +398,6 @@ export default function SearchPage() {
                                     <BookOpen className="w-4 h-4 mr-2" /> Learning
                                 </TabsTrigger>
                             </TabsList>
-
-                            {/* All Results Tab */}
-                            <TabsContent value="all" className="space-y-3">
-                                {results.results?.length > 0 && results.results.map((result, i) => (
-                                    <div key={i} className="bg-white rounded-xl p-5 border border-gray-200 hover:border-purple-200 hover:shadow-md transition-all">
-                                        <div className="flex items-start gap-3">
-                                            <div className="w-10 h-10 rounded-lg bg-gray-100 flex items-center justify-center flex-shrink-0">
-                                                <FileText className="w-5 h-5 text-gray-500" />
-                                            </div>
-                                            <div className="flex-1">
-                                                <h4 className="font-semibold text-gray-900 mb-1">{result.title}</h4>
-                                                <p className="text-gray-600 text-sm mb-2">{result.description}</p>
-                                                {result.url && (
-                                                    <a href={result.url} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1 text-purple-600 hover:text-purple-700 text-sm font-medium">
-                                                        Learn more <ExternalLink className="w-3 h-3" />
-                                                    </a>
-                                                )}
-                                            </div>
-                                        </div>
-                                    </div>
-                                ))}
-                            </TabsContent>
 
                             {/* News Tab */}
                             <TabsContent value="news">

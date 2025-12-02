@@ -261,9 +261,9 @@ export default function TankCity({ onExit }) {
             });
         }
 
-        // Place base at bottom center
-        const baseTileX = Math.floor(MAP_W / 2);
-        const baseTileY = MAP_H - 2;
+        // Place base at middle bottom
+        const baseX = canvas.width / 2 - TILE;
+        const baseY = canvas.height - TILE * 2.5;
 
         const state = {
             player: {
@@ -456,10 +456,8 @@ export default function TankCity({ onExit }) {
             }
             
             // Check base collision
-            const baseX = (baseTileX - 1) * TILE;
-            const baseY = (baseTileY - 1) * TILE;
             if (x < baseX + TILE * 2 && x + size > baseX &&
-                y < baseY + TILE * 2 && y + size > baseY) {
+                y < baseY + TILE * 1.5 && y + size > baseY) {
                 return false;
             }
             
@@ -659,12 +657,10 @@ export default function TankCity({ onExit }) {
                 }
 
                 // Check base collision
-                const baseX = (baseTileX - 1) * TILE;
-                const baseY = (baseTileY - 1) * TILE;
                 if (bullet.x > baseX && bullet.x < baseX + TILE * 2 &&
-                    bullet.y > baseY && bullet.y < baseY + TILE * 2) {
+                    bullet.y > baseY && bullet.y < baseY + TILE * 1.5) {
                     state.baseDestroyed = true;
-                    spawnParticles(baseX + TILE, baseY + TILE, '#ffd700', 50);
+                    spawnParticles(baseX + TILE, baseY + TILE * 0.75, '#ffd700', 50);
                     state.gameOver = true;
                     return false;
                 }
@@ -745,20 +741,20 @@ export default function TankCity({ onExit }) {
             const w = canvas.width;
             const h = canvas.height;
 
-            // Background
-            ctx.fillStyle = '#1a1a2e';
+            // Dark background like the image
+            ctx.fillStyle = '#0a0a15';
             ctx.fillRect(0, 0, w, h);
 
-            // Grid pattern
-            ctx.strokeStyle = 'rgba(255,255,255,0.03)';
+            // Subtle grid pattern
+            ctx.strokeStyle = 'rgba(100,100,150,0.08)';
             ctx.lineWidth = 1;
-            for (let x = 0; x < w; x += TILE) {
+            for (let x = 0; x < w; x += 40) {
                 ctx.beginPath();
                 ctx.moveTo(x, 0);
                 ctx.lineTo(x, h);
                 ctx.stroke();
             }
-            for (let y = 0; y < h; y += TILE) {
+            for (let y = 0; y < h; y += 40) {
                 ctx.beginPath();
                 ctx.moveTo(0, y);
                 ctx.lineTo(w, y);
@@ -798,28 +794,35 @@ export default function TankCity({ onExit }) {
                 ctx.restore();
             }
 
-            // Draw base with logo
+            // Draw base with logo and topic title
             if (!state.baseDestroyed) {
-                const baseX = (baseTileX - 1) * TILE;
-                const baseY = (baseTileY - 1) * TILE;
+                // Draw topic title above base (like center text in image)
+                ctx.fillStyle = '#ffffff';
+                ctx.shadowBlur = 30;
+                ctx.shadowColor = '#8b5cf6';
+                ctx.font = 'bold 48px Inter, sans-serif';
+                ctx.textAlign = 'center';
+                ctx.fillText(currentTopic.toUpperCase(), canvas.width / 2, baseY - 40);
+                
+                // Second line with glow
+                ctx.shadowColor = '#10b981';
+                ctx.font = 'bold 36px Inter, sans-serif';
+                ctx.fillStyle = '#10b981';
+                ctx.fillText(currentTopic.toLowerCase(), canvas.width / 2, baseY - 5);
+                ctx.shadowBlur = 0;
+                
+                // Base glow
                 ctx.fillStyle = '#ffd700';
-                ctx.shadowBlur = 20;
+                ctx.shadowBlur = 30;
                 ctx.shadowColor = '#ffd700';
-                ctx.fillRect(baseX + 5, baseY + 5, TILE * 2 - 10, TILE * 2 - 10);
+                ctx.beginPath();
+                ctx.roundRect(baseX, baseY, TILE * 2, TILE * 1.5, 10);
+                ctx.fill();
                 ctx.shadowBlur = 0;
                 
                 // Draw logo if loaded
                 if (imagesRef.current.logo) {
-                    ctx.drawImage(imagesRef.current.logo, baseX + 10, baseY + 10, TILE * 2 - 20, TILE * 2 - 20);
-                } else {
-                    ctx.fillStyle = '#ff4500';
-                    ctx.beginPath();
-                    ctx.arc(baseX + TILE, baseY + TILE, 15, 0, Math.PI * 2);
-                    ctx.fill();
-                    ctx.fillStyle = '#fff';
-                    ctx.font = 'bold 10px Inter';
-                    ctx.textAlign = 'center';
-                    ctx.fillText('BASE', baseX + TILE, baseY + TILE + 4);
+                    ctx.drawImage(imagesRef.current.logo, baseX + 15, baseY + 10, TILE * 2 - 30, TILE * 1.5 - 20);
                 }
             }
 

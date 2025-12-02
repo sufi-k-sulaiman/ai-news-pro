@@ -15,6 +15,16 @@ const ENEMY_SHIPS = [
     'https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/692729a5f5180fbd43f297e9/52957b8d6_ship5.png',
 ];
 
+// Space background images per level
+const SPACE_BACKGROUNDS = [
+    'https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/692729a5f5180fbd43f297e9/5319c6157_9791334.jpg',
+    'https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/692729a5f5180fbd43f297e9/d2ddee7b0_9791314.jpg',
+    'https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/692729a5f5180fbd43f297e9/cd1f98f84_9791329.jpg',
+    'https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/692729a5f5180fbd43f297e9/092f6eef4_9805703.jpg',
+    'https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/692729a5f5180fbd43f297e9/cf4d32f1a_5438748.jpg',
+    'https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/692729a5f5180fbd43f297e9/7ae729873_9742184.jpg',
+];
+
 export default function SpaceBattleGame({ onExit }) {
     const [screen, setScreen] = useState('menu');
     const [activeCategory, setActiveCategory] = useState('trending');
@@ -205,6 +215,9 @@ export default function SpaceBattleGame({ onExit }) {
             levelComplete: false,
             enemySpawnTimer: 180,
             enemyImages: [],
+            backgroundImage: null,
+            bgOffsetX: 0,
+            bgOffsetY: 0,
             cameraShake: 0,
             fov: 90,
             viewAngle: 0,
@@ -277,6 +290,14 @@ export default function SpaceBattleGame({ onExit }) {
                 state.enemyImages[i] = img;
             };
         });
+
+        // Load background image for current level
+        const bgIndex = (currentLevel - 1) % SPACE_BACKGROUNDS.length;
+        const bgImg = new Image();
+        bgImg.src = SPACE_BACKGROUNDS[bgIndex];
+        bgImg.onload = () => {
+            state.backgroundImage = bgImg;
+        };
 
         const keys = {};
         const handleKeyDown = (e) => {
@@ -406,164 +427,51 @@ export default function SpaceBattleGame({ onExit }) {
             ctx.save();
             ctx.translate(shakeX, shakeY);
 
-            // Sky gradient (dark atmosphere)
-            const skyGradient = ctx.createLinearGradient(0, 0, 0, horizon);
-            skyGradient.addColorStop(0, '#0a0f1a');
-            skyGradient.addColorStop(0.5, '#1a2744');
-            skyGradient.addColorStop(1, '#2d3a52');
-            ctx.fillStyle = skyGradient;
-            ctx.fillRect(0, 0, canvas.width, horizon);
+            // Animate background offset for parallax effect
+            state.bgOffsetX = Math.sin(state.time * 0.002) * 20;
+            state.bgOffsetY = Math.cos(state.time * 0.001) * 10;
 
-            // Draw twinkling stars
+            // Draw background image if loaded
+            if (state.backgroundImage && state.backgroundImage.complete) {
+                // Scale to cover canvas while maintaining aspect ratio
+                const imgRatio = state.backgroundImage.width / state.backgroundImage.height;
+                const canvasRatio = canvas.width / canvas.height;
+                let drawWidth, drawHeight, drawX, drawY;
+                
+                if (imgRatio > canvasRatio) {
+                    drawHeight = canvas.height + 40;
+                    drawWidth = drawHeight * imgRatio;
+                    drawX = (canvas.width - drawWidth) / 2 + state.bgOffsetX;
+                    drawY = -20 + state.bgOffsetY;
+                } else {
+                    drawWidth = canvas.width + 40;
+                    drawHeight = drawWidth / imgRatio;
+                    drawX = -20 + state.bgOffsetX;
+                    drawY = (canvas.height - drawHeight) / 2 + state.bgOffsetY;
+                }
+                
+                ctx.drawImage(state.backgroundImage, drawX, drawY, drawWidth, drawHeight);
+            } else {
+                // Fallback gradient
+                const skyGradient = ctx.createLinearGradient(0, 0, 0, canvas.height);
+                skyGradient.addColorStop(0, '#0a0f1a');
+                skyGradient.addColorStop(0.5, '#1a2744');
+                skyGradient.addColorStop(1, '#2d3a52');
+                ctx.fillStyle = skyGradient;
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+            }
+
+            // Draw subtle animated stars overlay
+            ctx.globalAlpha = 0.6;
             state.bgLayers.stars.forEach(star => {
                 star.twinkle += 0.05;
-                const opacity = 0.3 + Math.sin(star.twinkle) * 0.3;
+                const opacity = 0.3 + Math.sin(star.twinkle) * 0.4;
                 ctx.fillStyle = `rgba(255,255,255,${opacity})`;
                 ctx.beginPath();
-                ctx.arc(star.x - state.viewAngle * star.speed, star.y, star.size, 0, Math.PI * 2);
+                ctx.arc(star.x - state.viewAngle * star.speed * 0.5, star.y, star.size, 0, Math.PI * 2);
                 ctx.fill();
-            });
-
-            // Draw galaxies/nebulae at 16% opacity
-            ctx.globalAlpha = 0.16;
-            state.bgLayers.galaxies.forEach(galaxy => {
-                ctx.save();
-                ctx.translate(galaxy.x - state.viewAngle * galaxy.speed, galaxy.y);
-                ctx.rotate(galaxy.rotation);
-                const gradient = ctx.createRadialGradient(0, 0, 0, 0, 0, galaxy.width / 2);
-                gradient.addColorStop(0, galaxy.color.replace('0.3)', '1)'));
-                gradient.addColorStop(1, 'transparent');
-                ctx.fillStyle = gradient;
-                ctx.beginPath();
-                ctx.ellipse(0, 0, galaxy.width / 2, galaxy.height / 2, 0, 0, Math.PI * 2);
-                ctx.fill();
-                ctx.restore();
-            });
-
-            // Draw planets at 16% opacity
-            state.bgLayers.planets.forEach(planet => {
-                const px = planet.x - state.viewAngle * planet.speed;
-                ctx.save();
-                ctx.translate(px, planet.y);
-
-                // Planet shadow
-                ctx.fillStyle = 'rgba(0,0,0,0.3)';
-                ctx.beginPath();
-                ctx.arc(3, 3, planet.radius, 0, Math.PI * 2);
-                ctx.fill();
-
-                // Planet body with gradient
-                const planetGradient = ctx.createRadialGradient(-planet.radius * 0.3, -planet.radius * 0.3, 0, 0, 0, planet.radius);
-                planetGradient.addColorStop(0, planet.color);
-                planetGradient.addColorStop(1, 'rgba(0,0,0,0.5)');
-                ctx.fillStyle = planetGradient;
-                ctx.beginPath();
-                ctx.arc(0, 0, planet.radius, 0, Math.PI * 2);
-                ctx.fill();
-
-                // Rings if applicable
-                if (planet.rings) {
-                    ctx.strokeStyle = `${planet.color}88`;
-                    ctx.lineWidth = 3;
-                    ctx.beginPath();
-                    ctx.ellipse(0, 0, planet.radius * 1.5, planet.radius * 0.3, 0.3, 0, Math.PI * 2);
-                    ctx.stroke();
-                }
-
-                ctx.restore();
             });
             ctx.globalAlpha = 1;
-
-            // Far mountains (slowest parallax)
-            ctx.fillStyle = '#1a2235';
-            state.bgLayers.farMountains.forEach(m => {
-                const parallaxX = m.x - state.viewAngle * 0.2;
-                const wrappedX = ((parallaxX % (canvas.width + 600)) + canvas.width + 600) % (canvas.width + 600) - 300;
-                ctx.beginPath();
-                ctx.moveTo(wrappedX - m.width/2, horizon);
-                ctx.lineTo(wrappedX, horizon - m.height);
-                ctx.lineTo(wrappedX + m.width/2, horizon);
-                ctx.fill();
-            });
-
-            // Near mountains (faster parallax)
-            ctx.fillStyle = '#252d40';
-            state.bgLayers.nearMountains.forEach(m => {
-                const parallaxX = m.x - state.viewAngle * 0.5;
-                const wrappedX = ((parallaxX % (canvas.width + 400)) + canvas.width + 400) % (canvas.width + 400) - 200;
-                ctx.beginPath();
-                ctx.moveTo(wrappedX - m.width/2, horizon);
-                ctx.lineTo(wrappedX, horizon - m.height);
-                ctx.lineTo(wrappedX + m.width/2, horizon);
-                ctx.fill();
-            });
-
-            // Ground plane with perspective grid
-            const groundGradient = ctx.createLinearGradient(0, horizon, 0, canvas.height);
-            groundGradient.addColorStop(0, '#2d3a52');
-            groundGradient.addColorStop(1, '#1a2235');
-            ctx.fillStyle = groundGradient;
-            ctx.fillRect(0, horizon, canvas.width, canvas.height - horizon);
-
-            // Perspective grid lines (FPS depth effect)
-            ctx.strokeStyle = 'rgba(100, 150, 200, 0.1)';
-            ctx.lineWidth = 1;
-            
-            // Horizontal lines with perspective
-            for (let i = 0; i < 20; i++) {
-                const yOffset = Math.pow(i / 20, 2) * (canvas.height - horizon);
-                const y = horizon + yOffset;
-                ctx.beginPath();
-                ctx.moveTo(0, y);
-                ctx.lineTo(canvas.width, y);
-                ctx.stroke();
-            }
-
-            // Vertical lines converging to horizon (vanishing point) - animated moving toward player
-            for (let i = -10; i <= 10; i++) {
-                const baseX = centerX + i * 150 - (state.viewAngle % 150);
-                ctx.beginPath();
-                ctx.moveTo(baseX, horizon);
-                const endX = centerX + (baseX - centerX) * 4;
-                ctx.lineTo(endX, canvas.height);
-                ctx.stroke();
-            }
-
-            // Horizontal lines moving toward player (forward motion effect)
-            const numHorizontalLines = 15;
-            for (let i = 0; i < numHorizontalLines; i++) {
-                // Lines start at horizon and move toward bottom (toward player)
-                const baseProgress = (i / numHorizontalLines + state.floorOffset / 500) % 1;
-                const perspectiveY = horizon + Math.pow(baseProgress, 1.5) * (canvas.height - horizon);
-
-                if (perspectiveY > horizon && perspectiveY < canvas.height) {
-                    ctx.strokeStyle = `rgba(100, 150, 200, ${0.05 + baseProgress * 0.1})`;
-                    ctx.beginPath();
-                    ctx.moveTo(0, perspectiveY);
-                    ctx.lineTo(canvas.width, perspectiveY);
-                    ctx.stroke();
-                }
-            }
-
-            // Additional animated floor markers moving toward player
-            ctx.fillStyle = 'rgba(100, 150, 200, 0.15)';
-            for (let row = 0; row < 12; row++) {
-                // Calculate row position with forward animation
-                const rowProgress = ((row / 12) + state.floorOffset / 300) % 1;
-                const rowY = horizon + Math.pow(rowProgress, 1.5) * (canvas.height - horizon);
-                const scale = rowProgress;
-                const markerSpacing = 60 + scale * 120;
-
-                for (let col = -8; col <= 8; col++) {
-                    const markerX = centerX + col * markerSpacing - state.viewAngle * scale;
-                    const markerSize = 2 + scale * 8;
-                    const alpha = 0.1 + scale * 0.2;
-                    ctx.fillStyle = `rgba(100, 150, 200, ${alpha})`;
-                    ctx.beginPath();
-                    ctx.arc(markerX, rowY, markerSize, 0, Math.PI * 2);
-                    ctx.fill();
-                }
-            }
 
             // Player view rotation based on mouse
             const targetAngle = ((state.mouseX - centerX) / centerX) * 30;
@@ -577,7 +485,7 @@ export default function SpaceBattleGame({ onExit }) {
             if (keys.a) state.viewAngle -= 3;
             if (keys.d) state.viewAngle += 3;
 
-            // Spawn enemies - max 10 on screen at a time, spawn a few at a time
+            // Spawn enemies - max 10 on screen at a time, spawn from top
             state.enemySpawnTimer--;
             if (state.enemySpawnTimer <= 0 && state.enemies.length < state.maxEnemiesOnScreen) {
                 // Spawn 1-3 enemies at a time
@@ -590,59 +498,80 @@ export default function SpaceBattleGame({ onExit }) {
                     const shipImageIndex = Math.floor(Math.random() * ENEMY_SHIPS.length);
                     const alienColor = ALIEN_COLORS[Math.floor(Math.random() * ALIEN_COLORS.length)];
                     
-                    // Random spawn - enemies come from random positions toward player
-                    const startX = (Math.random() - 0.5) * 800;
-                    const startZ = 0.02 + Math.random() * 0.1; // Start far away
-                    const startVx = (Math.random() - 0.5) * 1.5; // Slower horizontal movement
+                    // Spawn from top of screen (80% chance) or sides (20%)
+                    const fromTop = Math.random() < 0.8;
+                    let startX, startScreenY;
+                    
+                    if (fromTop) {
+                        startX = (Math.random() - 0.5) * 600;
+                        startScreenY = -100 - Math.random() * 150;
+                    } else {
+                        startX = Math.random() > 0.5 ? -400 : 400;
+                        startScreenY = Math.random() * canvas.height * 0.3;
+                    }
                     
                     state.enemies.push({
                         x: startX,
-                        z: startZ,
-                        y: 0,
-                        vy: 0,
+                        z: 0.05 + Math.random() * 0.1,
+                        screenY: startScreenY,
                         shipImageIndex: shipImageIndex,
                         color: alienColor,
                         health: 1,
                         wobble: Math.random() * Math.PI * 2,
-                        vx: startVx,
-                        fromAbove: false
+                        hoverDirection: Math.random() > 0.5 ? 1 : -1,
+                        hoverSpeed: 1 + Math.random() * 2,
+                        hoverTime: 0,
+                        hoverDuration: 60 + Math.random() * 120, // How long to hover before attacking
+                        attacking: false,
+                        attackSpeed: 0.5 + Math.random() * 0.5,
                     });
                 }
-                state.enemySpawnTimer = 200 + Math.random() * 100; // Slower spawn rate
+                state.enemySpawnTimer = 150 + Math.random() * 100;
             }
 
-            // Update and draw enemies with 3D perspective - SLOWER movement
+            // Update and draw enemies - hover left/right then attack
             state.enemies = state.enemies.filter((enemy) => {
-                enemy.z += 0.001; // Much slower approach
                 enemy.wobble += 0.03;
-                // Apply horizontal movement if enemy has velocity
-                if (enemy.vx) {
-                    enemy.x += enemy.vx;
-                    // Gradually move toward center
-                    enemy.vx *= 0.995;
-                }
+                enemy.hoverTime++;
                 
-                // Apply vertical movement for aliens coming from above
-                if (enemy.fromAbove && enemy.y !== undefined) {
-                    enemy.y += enemy.vy || 3;
-                    // Slow down as they reach their target position
-                    if (enemy.y > 0) {
-                        enemy.vy *= 0.95;
-                        if (Math.abs(enemy.vy) < 0.5) {
-                            enemy.fromAbove = false; // Stop vertical movement
-                        }
+                // Movement behavior: hover left/right, then randomly attack
+                if (!enemy.attacking) {
+                    // Hover left and right
+                    enemy.x += enemy.hoverDirection * enemy.hoverSpeed;
+                    
+                    // Bounce off screen edges
+                    if (enemy.x > 350) enemy.hoverDirection = -1;
+                    if (enemy.x < -350) enemy.hoverDirection = 1;
+                    
+                    // Move down slowly to visible area
+                    if (enemy.screenY < canvas.height * 0.25) {
+                        enemy.screenY += 1.5;
                     }
+                    
+                    // Randomly start attacking after hover duration
+                    if (enemy.hoverTime > enemy.hoverDuration && Math.random() < 0.02) {
+                        enemy.attacking = true;
+                    }
+                } else {
+                    // Attacking - move toward player (increase z)
+                    enemy.z += 0.002 * enemy.attackSpeed;
+                    // Continue slight horizontal movement
+                    enemy.x += Math.sin(enemy.wobble * 2) * 1.5;
+                    // Move down screen
+                    enemy.screenY += 2;
                 }
                 
-                // 3D to 2D projection with wobble
+                // 3D to 2D projection
                 const scale = enemy.z * 3;
-                const screenX = centerX + (enemy.x - state.viewAngle * 2) * scale + Math.sin(enemy.wobble) * 5;
-                // Adjust screenY for aliens coming from above
-                let screenY = horizon + (canvas.height - horizon) * enemy.z * 0.8;
-                if (enemy.fromAbove && enemy.y !== undefined) {
-                    screenY = enemy.y + horizon * enemy.z;
+                const screenX = centerX + (enemy.x - state.viewAngle * 2) * scale + Math.sin(enemy.wobble) * 8;
+                let screenY = enemy.screenY !== undefined ? enemy.screenY : horizon * 0.5;
+                
+                // When attacking, also move screen position based on z
+                if (enemy.attacking) {
+                    screenY = Math.min(screenY, horizon + (canvas.height - horizon) * enemy.z * 0.6);
                 }
-                const size = 80 * scale; // Larger aliens
+                
+                const size = 160 * scale; // 2x bigger aliens
 
                 if (enemy.z > 1.2) {
                     state.player.health--;
@@ -655,11 +584,11 @@ export default function SpaceBattleGame({ onExit }) {
                 ctx.save();
                 ctx.translate(screenX, screenY);
 
-                // Draw ship image if loaded
+                // Draw ship image if loaded - 2x bigger
                 const shipImg = state.enemyImages[enemy.shipImageIndex];
                 if (shipImg && shipImg.complete) {
-                    const imgWidth = size * 1.5;
-                    const imgHeight = size * 0.8;
+                    const imgWidth = size * 2;
+                    const imgHeight = size * 1.2;
                     ctx.shadowBlur = 20;
                     ctx.shadowColor = enemy.color;
                     ctx.drawImage(shipImg, -imgWidth/2, -imgHeight/2, imgWidth, imgHeight);

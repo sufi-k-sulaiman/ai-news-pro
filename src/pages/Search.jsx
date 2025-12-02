@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { base44 } from '@/api/base44Client';
-import { Search, Loader2, FileText, Lightbulb, ExternalLink, Brain, Map, BookOpen, Newspaper, Headphones, ChevronRight, Globe, ListTodo, Plus } from 'lucide-react';
+import { Search, Loader2, FileText, Lightbulb, ExternalLink, Brain, Map, BookOpen, Newspaper, Headphones, ChevronRight, Globe, ListTodo, Plus, Play, Clock, TrendingUp } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
 import { menuItems } from '@/components/NavigationConfig';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 // In-app content definitions for searchable pages
 const IN_APP_CONTENT = {

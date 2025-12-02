@@ -184,7 +184,7 @@ export default function TankCity({ onExit }) {
         const MAP_W = Math.floor(canvas.width / TILE);
         const MAP_H = Math.floor(canvas.height / TILE);
 
-        // Generate map with word bricks
+        // Generate maze-like map with word bricks
         const map = [];
         const wordBricks = [];
         const shuffledWords = [...wordData].sort(() => Math.random() - 0.5);
@@ -195,23 +195,49 @@ export default function TankCity({ onExit }) {
             }
         }
 
-        // Place word bricks in rows
+        // Create maze-like pattern with words
         let wordIndex = 0;
-        for (let row = 2; row < MAP_H - 4; row += 3) {
-            for (let col = 2; col < MAP_W - 2 && wordIndex < shuffledWords.length; col += 4) {
-                if (Math.random() > 0.3) {
-                    const word = shuffledWords[wordIndex++];
-                    wordBricks.push({
-                        x: col * TILE,
-                        y: row * TILE,
-                        width: Math.max(TILE * 2, word.primary.length * 12 + 20),
-                        height: TILE,
-                        word: word.primary,
-                        definition: word.definition,
-                        health: 1,
-                        color: ['#8b5cf6', '#10b981', '#f59e0b', '#ef4444', '#3b82f6', '#ec4899'][Math.floor(Math.random() * 6)]
-                    });
-                }
+        const colors = ['#8b5cf6', '#10b981', '#f59e0b', '#ef4444', '#3b82f6', '#ec4899'];
+        
+        // Vertical walls with gaps
+        for (let col = 3; col < MAP_W - 3; col += 4) {
+            for (let row = 2; row < MAP_H - 5; row++) {
+                // Leave gaps for passages
+                if (row % 4 === 0 || row % 4 === 1) continue;
+                if (wordIndex >= shuffledWords.length) break;
+                
+                const word = shuffledWords[wordIndex++];
+                wordBricks.push({
+                    x: col * TILE,
+                    y: row * TILE,
+                    width: TILE * 2,
+                    height: TILE,
+                    word: word.primary,
+                    definition: word.definition,
+                    health: 1,
+                    color: colors[Math.floor(Math.random() * colors.length)]
+                });
+            }
+        }
+        
+        // Horizontal walls with gaps
+        for (let row = 4; row < MAP_H - 6; row += 4) {
+            for (let col = 1; col < MAP_W - 2; col += 3) {
+                // Leave gaps and avoid overlapping with vertical walls
+                if (col % 4 === 3 || col % 4 === 0) continue;
+                if (wordIndex >= shuffledWords.length) break;
+                
+                const word = shuffledWords[wordIndex++];
+                wordBricks.push({
+                    x: col * TILE,
+                    y: row * TILE,
+                    width: TILE * 2,
+                    height: TILE,
+                    word: word.primary,
+                    definition: word.definition,
+                    health: 1,
+                    color: colors[Math.floor(Math.random() * colors.length)]
+                });
             }
         }
 
@@ -477,15 +503,15 @@ export default function TankCity({ onExit }) {
                 enemy.moveTimer++;
 
                 // AI: Change direction periodically or when blocked
-                // Enemies move forward, left, right but NOT backwards (opposite of current dir)
+                // Enemies move forward, left, right but NEVER backwards
                 if (enemy.moveTimer > 60 + Math.random() * 60) {
                     const currentDir = enemy.dir;
                     const oppositeDir = (currentDir + 2) % 4;
                     
-                    // Possible directions: current, left turn, right turn (not opposite)
+                    // Possible directions: current, left turn, right turn (NOT opposite/backwards)
                     const possibleDirs = [0, 1, 2, 3].filter(d => d !== oppositeDir);
                     
-                    // Bias towards player direction
+                    // Bias towards player direction but never go backwards
                     const dx = state.player.x - enemy.x;
                     const dy = state.player.y - enemy.y;
                     let preferredDir = currentDir;
@@ -496,7 +522,7 @@ export default function TankCity({ onExit }) {
                         preferredDir = dy > 0 ? 2 : 0;
                     }
                     
-                    // Choose direction with preference
+                    // Only use preferred if it's not backwards
                     if (possibleDirs.includes(preferredDir) && Math.random() > 0.3) {
                         enemy.targetDir = preferredDir;
                     } else {
@@ -506,7 +532,7 @@ export default function TankCity({ onExit }) {
                     enemy.moveTimer = 0;
                 }
 
-                // Smoothly rotate to target direction
+                // Set direction (never backwards)
                 enemy.dir = enemy.targetDir;
 
                 // Shoot in the direction the tank is facing
@@ -529,9 +555,14 @@ export default function TankCity({ onExit }) {
                     enemy.x = newX;
                     enemy.y = newY;
                 } else {
-                    // Change direction when blocked (but not opposite)
-                    const oppositeDir = (enemy.dir + 2) % 4;
-                    const possibleDirs = [0, 1, 2, 3].filter(d => d !== oppositeDir && d !== enemy.dir);
+                    // Change direction when blocked - only left or right turn, never backwards
+                    const currentDir = enemy.dir;
+                    const oppositeDir = (currentDir + 2) % 4;
+                    const leftTurn = (currentDir + 3) % 4;
+                    const rightTurn = (currentDir + 1) % 4;
+                    
+                    // Try left or right turn only
+                    const possibleDirs = [leftTurn, rightTurn];
                     enemy.targetDir = possibleDirs[Math.floor(Math.random() * possibleDirs.length)];
                     enemy.moveTimer = 0;
                 }

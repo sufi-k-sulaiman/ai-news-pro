@@ -14,7 +14,7 @@ const PLAYER_TANK = 'https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/
 const ENEMY_TANK_1 = 'https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/692729a5f5180fbd43f297e9/abb6f137a_tank2.png';
 const ENEMY_TANK_2 = 'https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/692729a5f5180fbd43f297e9/7a4edc67f_tank3.png';
 
-const TILE = 80; // 2x bigger tanks
+const TILE = 48; // 40% smaller tanks
 
 // Tile types
 const TILE_EMPTY = 0;
@@ -223,13 +223,12 @@ export default function TankCity({ onExit }) {
                     wordBricks.push({
                         x: TILE + col * gridCellW,
                         y: TILE + row * gridCellH,
-                        width: isVertical ? TILE * 0.8 : Math.min(gridCellW - 10, word.primary.length * 12 + 20),
-                        height: isVertical ? gridCellH - 10 : TILE * 0.6,
+                        width: Math.min(gridCellW - 10, word.primary.length * 10 + 20),
+                        height: TILE * 0.5,
                         word: word.primary,
                         definition: word.definition,
                         health: 1,
-                        color: colors[i % colors.length],
-                        vertical: isVertical
+                        color: colors[i % colors.length]
                     });
                     placed = true;
                 }
@@ -666,24 +665,28 @@ export default function TankCity({ onExit }) {
             const w = canvas.width;
             const h = canvas.height;
 
-            // Dark background like the image
-            ctx.fillStyle = '#0a0a15';
+            // Space background
+            ctx.fillStyle = '#000011';
             ctx.fillRect(0, 0, w, h);
 
-            // Subtle grid pattern
-            ctx.strokeStyle = 'rgba(100,100,150,0.08)';
-            ctx.lineWidth = 1;
-            for (let x = 0; x < w; x += 40) {
-                ctx.beginPath();
-                ctx.moveTo(x, 0);
-                ctx.lineTo(x, h);
-                ctx.stroke();
+            // Draw stars
+            if (!state.stars) {
+                state.stars = [];
+                for (let i = 0; i < 150; i++) {
+                    state.stars.push({
+                        x: Math.random() * w,
+                        y: Math.random() * h,
+                        size: Math.random() * 2 + 0.5,
+                        brightness: Math.random()
+                    });
+                }
             }
-            for (let y = 0; y < h; y += 40) {
+            for (const star of state.stars) {
+                const flicker = 0.5 + Math.sin(Date.now() * 0.003 + star.brightness * 10) * 0.3;
+                ctx.fillStyle = `rgba(255, 255, 255, ${flicker})`;
                 ctx.beginPath();
-                ctx.moveTo(0, y);
-                ctx.lineTo(w, y);
-                ctx.stroke();
+                ctx.arc(star.x, star.y, star.size, 0, Math.PI * 2);
+                ctx.fill();
             }
 
             // Draw word bricks
@@ -702,40 +705,43 @@ export default function TankCity({ onExit }) {
                 ctx.textAlign = 'center';
                 ctx.textBaseline = 'middle';
 
-                if (brick.vertical) {
-                    ctx.translate(brick.x + brick.width/2, brick.y + brick.height/2);
-                    ctx.rotate(-Math.PI / 2);
-                    ctx.fillText(brick.word.toUpperCase(), 0, 0);
-                } else {
-                    ctx.fillText(brick.word.toUpperCase(), brick.x + brick.width/2, brick.y + brick.height/2);
-                }
+                // All words horizontal (transposed vertical words)
+                ctx.fillText(brick.word.toUpperCase(), brick.x + brick.width/2, brick.y + brick.height/2);
                 ctx.restore();
             }
 
-            // Draw base with protective layer and topic title
+            // Draw base with shield and topic title
             if (!state.baseDestroyed) {
-                // Protective layer around base (brick wall)
-                ctx.fillStyle = '#8B4513';
-                const wallThickness = 12;
-                ctx.fillRect(baseX - wallThickness, baseY - wallThickness, TILE * 2 + wallThickness * 2, wallThickness);
-                ctx.fillRect(baseX - wallThickness, baseY, wallThickness, TILE * 1.5);
-                ctx.fillRect(baseX + TILE * 2, baseY, wallThickness, TILE * 1.5);
+                // Energy shield around base
+                const shieldPulse = Math.sin(Date.now() * 0.005) * 0.3 + 0.7;
+                ctx.strokeStyle = `rgba(0, 200, 255, ${shieldPulse * 0.8})`;
+                ctx.lineWidth = 3;
+                ctx.beginPath();
+                ctx.arc(baseX + TILE, baseY + TILE * 0.75, TILE * 1.8, 0, Math.PI * 2);
+                ctx.stroke();
+                
+                // Inner shield glow
+                ctx.strokeStyle = `rgba(100, 220, 255, ${shieldPulse * 0.4})`;
+                ctx.lineWidth = 8;
+                ctx.beginPath();
+                ctx.arc(baseX + TILE, baseY + TILE * 0.75, TILE * 1.6, 0, Math.PI * 2);
+                ctx.stroke();
                 
                 // Draw topic title above base
                 ctx.fillStyle = '#ffffff';
-                ctx.font = 'bold 36px Inter, sans-serif';
+                ctx.font = 'bold 28px Inter, sans-serif';
                 ctx.textAlign = 'center';
-                ctx.fillText(currentTopic.toUpperCase(), canvas.width / 2, baseY - 40);
+                ctx.fillText(currentTopic.toUpperCase(), canvas.width / 2, baseY - 30);
                 
                 // Base
                 ctx.fillStyle = '#8b5cf6';
                 ctx.beginPath();
-                ctx.roundRect(baseX, baseY, TILE * 2, TILE * 1.5, 10);
+                ctx.roundRect(baseX, baseY, TILE * 2, TILE * 1.5, 8);
                 ctx.fill();
                 
                 // Draw logo if loaded
                 if (imagesRef.current.logo) {
-                    ctx.drawImage(imagesRef.current.logo, baseX + 15, baseY + 10, TILE * 2 - 30, TILE * 1.5 - 20);
+                    ctx.drawImage(imagesRef.current.logo, baseX + 10, baseY + 8, TILE * 2 - 20, TILE * 1.5 - 16);
                 }
             }
 

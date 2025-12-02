@@ -37,7 +37,7 @@ export default function Games() {
                     <p className="text-gray-500">Gamified Learning</p>
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div className="grid grid-cols-2 gap-6">
                   {/* Space Battle Game Card */}
                   <div className="bg-white rounded-2xl p-6 border border-gray-200 shadow-sm text-center flex flex-col">
                       <div className="w-16 h-16 bg-gradient-to-br from-cyan-500 to-blue-600 rounded-xl flex items-center justify-center mx-auto mb-4">

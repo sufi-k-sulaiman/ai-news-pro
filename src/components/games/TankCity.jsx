@@ -73,8 +73,9 @@ export default function TankCity({ onExit }) {
             loadImage(PLAYER_TANK),
             loadImage(ENEMY_TANK_1),
             loadImage(ENEMY_TANK_2),
-        ]).then(([player, enemy1, enemy2]) => {
-            imagesRef.current = { player, enemy1, enemy2 };
+            loadImage(LOGO_URL),
+        ]).then(([player, enemy1, enemy2, logo]) => {
+            imagesRef.current = { player, enemy1, enemy2, logo };
         });
     }, []);
 
@@ -221,7 +222,7 @@ export default function TankCity({ onExit }) {
         const state = {
             player: {
                 x: canvas.width / 2 - TILE / 2,
-                y: canvas.height - TILE * 3,
+                y: canvas.height - TILE * 5,
                 dir: 0,
                 speed: 4,
                 shootTimer: 0,
@@ -506,10 +507,12 @@ export default function TankCity({ onExit }) {
                 // Smoothly rotate to target direction
                 enemy.dir = enemy.targetDir;
 
-                // Shoot occasionally
-                if (enemy.shootTimer <= 0) {
+                // Shoot occasionally - only forward or sideways (not backwards/up)
+                if (enemy.shootTimer <= 0 && enemy.dir !== 0) {
                     shoot(enemy, false);
                     enemy.shootTimer = 80 + Math.random() * 60;
+                } else if (enemy.shootTimer <= 0) {
+                    enemy.shootTimer = 30; // Reset timer if facing up
                 }
 
                 // Move in current direction
@@ -614,7 +617,7 @@ export default function TankCity({ onExit }) {
                             state.gameOver = true;
                         } else {
                             state.player.x = canvas.width / 2 - TILE / 2;
-                            state.player.y = canvas.height - TILE * 3;
+                            state.player.y = canvas.height - TILE * 5;
                             state.player.dir = 0;
                         }
                         return false;
@@ -704,24 +707,29 @@ export default function TankCity({ onExit }) {
                 ctx.fillText(brick.word.toUpperCase(), brick.x + brick.width/2, brick.y + brick.height/2);
             }
 
-            // Draw base
+            // Draw base with logo
             if (!state.baseDestroyed) {
                 const baseX = (baseTileX - 1) * TILE;
                 const baseY = (baseTileY - 1) * TILE;
                 ctx.fillStyle = '#ffd700';
                 ctx.shadowBlur = 20;
                 ctx.shadowColor = '#ffd700';
-                ctx.fillRect(baseX + 10, baseY + 10, TILE * 2 - 20, TILE * 2 - 20);
-                ctx.fillStyle = '#ff4500';
-                ctx.beginPath();
-                ctx.arc(baseX + TILE, baseY + TILE, 15, 0, Math.PI * 2);
-                ctx.fill();
+                ctx.fillRect(baseX + 5, baseY + 5, TILE * 2 - 10, TILE * 2 - 10);
                 ctx.shadowBlur = 0;
                 
-                ctx.fillStyle = '#fff';
-                ctx.font = 'bold 12px Inter';
-                ctx.textAlign = 'center';
-                ctx.fillText('BASE', baseX + TILE, baseY + TILE + 4);
+                // Draw logo if loaded
+                if (imagesRef.current.logo) {
+                    ctx.drawImage(imagesRef.current.logo, baseX + 10, baseY + 10, TILE * 2 - 20, TILE * 2 - 20);
+                } else {
+                    ctx.fillStyle = '#ff4500';
+                    ctx.beginPath();
+                    ctx.arc(baseX + TILE, baseY + TILE, 15, 0, Math.PI * 2);
+                    ctx.fill();
+                    ctx.fillStyle = '#fff';
+                    ctx.font = 'bold 10px Inter';
+                    ctx.textAlign = 'center';
+                    ctx.fillText('BASE', baseX + TILE, baseY + TILE + 4);
+                }
             }
 
             // Draw tanks

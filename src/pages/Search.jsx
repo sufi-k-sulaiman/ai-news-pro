@@ -1,46 +1,80 @@
 import React, { useState, useEffect } from 'react';
 import { base44 } from '@/api/base44Client';
-import { Search, Loader2, FileText, Lightbulb, ExternalLink, Brain, Map, BookOpen, Newspaper, Headphones, ChevronRight } from 'lucide-react';
+import { Search, Loader2, FileText, Lightbulb, ExternalLink, Brain, Map, BookOpen, Newspaper, Headphones, ChevronRight, Globe, ListTodo, Plus } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
 import { menuItems } from '@/components/NavigationConfig';
 
 // In-app content definitions for searchable pages
 const IN_APP_CONTENT = {
-    Qwirey: {
-        name: 'Qwirey',
-        icon: Brain,
-        color: '#8B5CF6',
-        description: 'AI-powered research and Q&A assistant',
-        keywords: ['ai', 'research', 'questions', 'answers', 'assistant', 'chat', 'query', 'intelligence']
+    SearchPods: {
+        name: 'SearchPods',
+        icon: Headphones,
+        color: '#EC4899',
+        description: 'AI-generated audio podcasts on any topic',
+        keywords: ['podcast', 'audio', 'listen', 'episodes', 'voice', 'speech', 'tts', 'motivation', 'inspiration'],
+        canCreate: true,
+        createLabel: 'Create a Pod'
     },
     MindMap: {
         name: 'MindMap',
-        icon: Map,
+        icon: Brain,
         color: '#10B981',
         description: 'Visual mind mapping and brainstorming tool',
-        keywords: ['mindmap', 'brainstorm', 'ideas', 'visual', 'diagram', 'nodes', 'connections', 'thinking']
-    },
-    Learning: {
-        name: 'Learning',
-        icon: BookOpen,
-        color: '#F59E0B',
-        description: 'Interactive learning courses and educational content',
-        keywords: ['learn', 'courses', 'education', 'study', 'knowledge', 'skills', 'training', 'lessons']
+        keywords: ['mindmap', 'brainstorm', 'ideas', 'visual', 'diagram', 'nodes', 'connections', 'thinking'],
+        canCreate: true,
+        createLabel: 'Create MindMap'
     },
     News: {
         name: 'News',
         icon: Newspaper,
         color: '#EF4444',
         description: 'Latest news and current events',
-        keywords: ['news', 'headlines', 'current', 'events', 'articles', 'updates', 'breaking', 'world']
+        keywords: ['news', 'headlines', 'current', 'events', 'articles', 'updates', 'breaking', 'world'],
+        canCreate: false
     },
-    SearchPods: {
-        name: 'SearchPods',
-        icon: Headphones,
-        color: '#EC4899',
-        description: 'AI-generated audio podcasts on any topic',
-        keywords: ['podcast', 'audio', 'listen', 'episodes', 'voice', 'speech', 'tts', 'motivation', 'inspiration']
+    Learning: {
+        name: 'Learning',
+        icon: BookOpen,
+        color: '#F59E0B',
+        description: 'Interactive learning courses and educational content',
+        keywords: ['learn', 'courses', 'education', 'study', 'knowledge', 'skills', 'training', 'lessons'],
+        canCreate: true,
+        createLabel: 'Start Learning'
+    },
+    Geospatial: {
+        name: 'Geospatial',
+        icon: Globe,
+        color: '#3B82F6',
+        description: 'Interactive maps and geographic analysis',
+        keywords: ['maps', 'geography', 'location', 'spatial', 'earth', 'countries', 'regions', 'mapping'],
+        canCreate: true,
+        createLabel: 'Explore Map'
+    },
+    Intelligence: {
+        name: 'Intelligence',
+        icon: Lightbulb,
+        color: '#8B5CF6',
+        description: 'AI-powered intelligence and knowledge exploration',
+        keywords: ['intelligence', 'knowledge', 'ai', 'science', 'explore', 'discover', 'facts', 'research'],
+        canCreate: true,
+        createLabel: 'Explore Topics'
+    },
+    Tasks: {
+        name: 'Tasks',
+        icon: ListTodo,
+        color: '#A855F7',
+        description: 'Task management and productivity',
+        keywords: ['tasks', 'todo', 'productivity', 'manage', 'organize', 'projects', 'work'],
+        canCreate: true,
+        createLabel: 'Create Task'
+    },
+    Qwirey: {
+        name: 'Qwirey',
+        icon: Map,
+        color: '#7C3AED',
+        description: 'AI-powered research and Q&A assistant',
+        keywords: ['ai', 'research', 'questions', 'answers', 'assistant', 'chat', 'query']
     }
 };
 
@@ -192,23 +226,34 @@ export default function SearchPage() {
                             {inAppResults.map((item) => {
                                 const Icon = item.icon;
                                 return (
-                                    <Link
-                                        key={item.page}
-                                        to={createPageUrl(item.page)}
-                                        className="flex items-center gap-4 p-4 bg-white rounded-xl border border-gray-200 hover:border-purple-300 hover:shadow-md transition-all group"
-                                    >
-                                        <div 
-                                            className="w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0"
-                                            style={{ backgroundColor: `${item.color}15` }}
+                                    <div key={item.page} className="bg-white rounded-xl border border-gray-200 hover:border-purple-300 hover:shadow-md transition-all overflow-hidden">
+                                        <Link
+                                            to={createPageUrl(item.page)}
+                                            className="flex items-center gap-4 p-4 group"
                                         >
-                                            <Icon className="w-6 h-6" style={{ color: item.color }} />
-                                        </div>
-                                        <div className="flex-1 min-w-0">
-                                            <h4 className="font-semibold text-gray-900 group-hover:text-purple-600 transition-colors">{item.name}</h4>
-                                            <p className="text-sm text-gray-500 truncate">{item.description}</p>
-                                        </div>
-                                        <ChevronRight className="w-5 h-5 text-gray-400 group-hover:text-purple-500 group-hover:translate-x-1 transition-all flex-shrink-0" />
-                                    </Link>
+                                            <div 
+                                                className="w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0"
+                                                style={{ backgroundColor: `${item.color}15` }}
+                                            >
+                                                <Icon className="w-6 h-6" style={{ color: item.color }} />
+                                            </div>
+                                            <div className="flex-1 min-w-0">
+                                                <h4 className="font-semibold text-gray-900 group-hover:text-purple-600 transition-colors">{item.name}</h4>
+                                                <p className="text-sm text-gray-500 truncate">{item.description}</p>
+                                            </div>
+                                            <ChevronRight className="w-5 h-5 text-gray-400 group-hover:text-purple-500 group-hover:translate-x-1 transition-all flex-shrink-0" />
+                                        </Link>
+                                        {item.canCreate && (
+                                            <Link 
+                                                to={createPageUrl(item.page)}
+                                                className="flex items-center gap-2 px-4 py-2.5 border-t border-gray-100 text-sm font-medium hover:bg-purple-50 transition-colors"
+                                                style={{ color: item.color }}
+                                            >
+                                                <Plus className="w-4 h-4" />
+                                                {item.createLabel}
+                                            </Link>
+                                        )}
+                                    </div>
                                 );
                             })}
                         </div>

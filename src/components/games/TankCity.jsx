@@ -260,9 +260,17 @@ export default function TankCity({ onExit }) {
         }
     };
 
+    // Track game instance to prevent re-initialization
+    const gameInstanceRef = useRef(null);
+
     // Game logic
     useEffect(() => {
         if (screen !== 'game' || !canvasRef.current || wordData.length === 0) return;
+        
+        // Prevent re-initialization if already running with same data
+        const gameKey = `${level}-${wordData.length}`;
+        if (gameInstanceRef.current === gameKey) return;
+        gameInstanceRef.current = gameKey;
 
         const canvas = canvasRef.current;
         const ctx = canvas.getContext('2d');
@@ -873,99 +881,111 @@ export default function TankCity({ onExit }) {
                 }
             }
 
-            // Draw base with 3-layer shield and topic title
+            // Draw base with solar system
             if (!state.baseDestroyed) {
                 const shieldPulse = Math.sin(Date.now() * 0.005) * 0.3 + 0.7;
                 const shieldColors = ['#ff4444', '#ffaa00', '#00ddff'];
+                const centerX = baseX + TILE;
+                const centerY = baseY + TILE * 0.75;
+                const rotation = Date.now() * 0.001;
                 
                 // Draw shield layers based on health
                 for (let i = 0; i < state.shieldHealth; i++) {
-                    const radius = TILE * 1.8 - i * 8;
-                    const alpha = shieldPulse * (0.6 - i * 0.15);
+                    const radius = TILE * 2.5 - i * 10;
+                    const alpha = shieldPulse * (0.5 - i * 0.12);
                     
                     ctx.strokeStyle = shieldColors[2 - i];
                     ctx.globalAlpha = alpha;
-                    ctx.lineWidth = 4 - i;
+                    ctx.lineWidth = 3 - i;
                     ctx.beginPath();
-                    ctx.arc(baseX + TILE, baseY + TILE * 0.75, radius, 0, Math.PI * 2);
+                    ctx.arc(centerX, centerY, radius, 0, Math.PI * 2);
                     ctx.stroke();
                 }
                 ctx.globalAlpha = 1;
                 
-
-                
                 // Shield health indicator
                 ctx.font = '12px Inter, sans-serif';
+                ctx.textAlign = 'center';
                 ctx.fillStyle = '#00ddff';
-                ctx.fillText(`SHIELD: ${state.shieldHealth}/3`, canvas.width / 2, baseY - 8);
+                ctx.fillText(`SHIELD: ${state.shieldHealth}/3`, centerX, baseY - 50);
                 
-                // Base - draw spinning Earth
-                const centerX = baseX + TILE;
-                const centerY = baseY + TILE * 0.75;
-                const radius = TILE * 0.7;
-                const rotation = Date.now() * 0.001; // Slow spin
+                // Solar system - Sun in center
+                const sunRadius = TILE * 0.5;
+                const sunGradient = ctx.createRadialGradient(centerX, centerY, 0, centerX, centerY, sunRadius);
+                sunGradient.addColorStop(0, '#fff7ed');
+                sunGradient.addColorStop(0.3, '#fbbf24');
+                sunGradient.addColorStop(0.7, '#f97316');
+                sunGradient.addColorStop(1, '#ea580c');
                 
-                // Earth circle with gradient
-                const earthGradient = ctx.createRadialGradient(centerX - radius * 0.3, centerY - radius * 0.3, 0, centerX, centerY, radius);
-                earthGradient.addColorStop(0, '#4ade80');
-                earthGradient.addColorStop(0.5, '#22c55e');
-                earthGradient.addColorStop(1, '#166534');
-                
-                ctx.fillStyle = earthGradient;
+                ctx.fillStyle = sunGradient;
                 ctx.beginPath();
-                ctx.arc(centerX, centerY, radius, 0, Math.PI * 2);
+                ctx.arc(centerX, centerY, sunRadius, 0, Math.PI * 2);
                 ctx.fill();
                 
-                // Ocean blue base
-                const oceanGradient = ctx.createRadialGradient(centerX - radius * 0.3, centerY - radius * 0.3, 0, centerX, centerY, radius);
-                oceanGradient.addColorStop(0, '#60a5fa');
-                oceanGradient.addColorStop(0.5, '#3b82f6');
-                oceanGradient.addColorStop(1, '#1e40af');
-                
-                ctx.fillStyle = oceanGradient;
+                // Sun glow
+                ctx.shadowBlur = 30;
+                ctx.shadowColor = '#fbbf24';
                 ctx.beginPath();
-                ctx.arc(centerX, centerY, radius, 0, Math.PI * 2);
+                ctx.arc(centerX, centerY, sunRadius * 0.8, 0, Math.PI * 2);
                 ctx.fill();
+                ctx.shadowBlur = 0;
                 
-                // Draw rotating continents (simplified)
-                ctx.fillStyle = '#22c55e';
-                ctx.save();
-                ctx.translate(centerX, centerY);
+                // Planet definitions: [orbitRadius, planetRadius, speed, color, hasRings]
+                const planets = [
+                    [sunRadius + 18, 4, 4.5, '#94a3b8', false],      // Mercury
+                    [sunRadius + 30, 6, 3.5, '#fcd34d', false],      // Venus
+                    [sunRadius + 44, 7, 2.8, '#3b82f6', false],      // Earth
+                    [sunRadius + 58, 5, 2.2, '#ef4444', false],      // Mars
+                    [sunRadius + 76, 12, 1.5, '#f59e0b', false],     // Jupiter
+                    [sunRadius + 96, 10, 1.1, '#fbbf24', true],      // Saturn
+                ];
                 
-                // Continent 1 - rotating blob
-                const c1x = Math.cos(rotation) * radius * 0.3;
-                const c1y = Math.sin(rotation * 0.5) * radius * 0.2;
-                ctx.beginPath();
-                ctx.ellipse(c1x, c1y - radius * 0.2, radius * 0.35, radius * 0.25, rotation * 0.3, 0, Math.PI * 2);
-                ctx.fill();
+                // Draw orbits
+                ctx.strokeStyle = 'rgba(255, 255, 255, 0.15)';
+                ctx.lineWidth = 1;
+                for (const [orbitR] of planets) {
+                    ctx.beginPath();
+                    ctx.arc(centerX, centerY, orbitR, 0, Math.PI * 2);
+                    ctx.stroke();
+                }
                 
-                // Continent 2
-                const c2x = Math.cos(rotation + Math.PI) * radius * 0.4;
-                const c2y = Math.sin(rotation * 0.5 + 1) * radius * 0.15;
-                ctx.beginPath();
-                ctx.ellipse(c2x, c2y + radius * 0.15, radius * 0.25, radius * 0.2, -rotation * 0.2, 0, Math.PI * 2);
-                ctx.fill();
-                
-                // Continent 3 - small island
-                const c3x = Math.cos(rotation + Math.PI/2) * radius * 0.5;
-                ctx.beginPath();
-                ctx.arc(c3x, radius * 0.3, radius * 0.12, 0, Math.PI * 2);
-                ctx.fill();
-                
-                ctx.restore();
-                
-                // Atmosphere glow
-                ctx.strokeStyle = 'rgba(96, 165, 250, 0.5)';
-                ctx.lineWidth = 3;
-                ctx.beginPath();
-                ctx.arc(centerX, centerY, radius + 3, 0, Math.PI * 2);
-                ctx.stroke();
-                
-                // Specular highlight
-                ctx.fillStyle = 'rgba(255, 255, 255, 0.3)';
-                ctx.beginPath();
-                ctx.ellipse(centerX - radius * 0.3, centerY - radius * 0.3, radius * 0.2, radius * 0.15, -0.5, 0, Math.PI * 2);
-                ctx.fill();
+                // Draw planets
+                for (let i = 0; i < planets.length; i++) {
+                    const [orbitR, planetR, speed, color, hasRings] = planets[i];
+                    const angle = rotation * speed + (i * Math.PI / 3);
+                    const px = centerX + Math.cos(angle) * orbitR;
+                    const py = centerY + Math.sin(angle) * orbitR;
+                    
+                    // Saturn's rings
+                    if (hasRings) {
+                        ctx.strokeStyle = 'rgba(251, 191, 36, 0.6)';
+                        ctx.lineWidth = 3;
+                        ctx.beginPath();
+                        ctx.ellipse(px, py, planetR * 1.8, planetR * 0.5, angle * 0.1, 0, Math.PI * 2);
+                        ctx.stroke();
+                    }
+                    
+                    // Planet
+                    const planetGradient = ctx.createRadialGradient(px - planetR * 0.3, py - planetR * 0.3, 0, px, py, planetR);
+                    planetGradient.addColorStop(0, color);
+                    planetGradient.addColorStop(1, '#1f2937');
+                    
+                    ctx.fillStyle = planetGradient;
+                    ctx.beginPath();
+                    ctx.arc(px, py, planetR, 0, Math.PI * 2);
+                    ctx.fill();
+                    
+                    // Earth's moon
+                    if (i === 2) {
+                        const moonAngle = rotation * 8;
+                        const moonX = px + Math.cos(moonAngle) * 12;
+                        const moonY = py + Math.sin(moonAngle) * 12;
+                        ctx.fillStyle = '#9ca3af';
+                        ctx.beginPath();
+                        ctx.arc(moonX, moonY, 2, 0, Math.PI * 2);
+                        ctx.fill();
+                    }
+                }
             }
 
             // Draw tanks
@@ -1172,6 +1192,7 @@ export default function TankCity({ onExit }) {
 
         return () => {
             gameRunning = false;
+            gameInstanceRef.current = null;
             window.removeEventListener('resize', resize);
             window.removeEventListener('keydown', handleKeyDown);
             window.removeEventListener('keyup', handleKeyUp);

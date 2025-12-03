@@ -325,7 +325,7 @@ export default function TetrisGalaxy({ onExit }) {
             ctx.fill();
         };
 
-        // Draw word and definition next to falling piece
+        // Draw word and definition next to falling piece - no background
         const drawPieceWord = (piece, offsetX, offsetY, cellSize) => {
             if (!piece.word) return;
             
@@ -345,56 +345,26 @@ export default function TetrisGalaxy({ onExit }) {
             const pieceRightX = offsetX + (piece.x + maxX + 1) * cellSize;
             const pieceCenterY = offsetY + (piece.y + (minY + maxY + 1) / 2) * cellSize;
 
-            // Position text box to the right of the piece
-            const textBoxX = pieceRightX + 20;
-            const textBoxWidth = 220;
+            // Position text to the right of the piece
+            const textX = pieceRightX + 25;
             
-            // Wrap definition into lines
-            const wrapText = (text, maxWidth) => {
-                const words = (text || '').split(' ');
-                const lines = [];
-                let currentLine = '';
-                ctx.font = '16px Arial';
-                
-                for (const word of words) {
-                    const testLine = currentLine ? currentLine + ' ' + word : word;
-                    const metrics = ctx.measureText(testLine);
-                    if (metrics.width > maxWidth && currentLine) {
-                        lines.push(currentLine);
-                        currentLine = word;
-                    } else {
-                        currentLine = testLine;
-                    }
-                }
-                if (currentLine) lines.push(currentLine);
-                return lines.slice(0, 3); // Max 3 lines
-            };
-
-            const defLines = wrapText(piece.definition, textBoxWidth - 24);
-            const textBoxHeight = 45 + defLines.length * 22;
-
-            // Background matching piece color
-            ctx.fillStyle = 'rgba(0,0,0,0.85)';
-            ctx.beginPath();
-            ctx.roundRect(textBoxX, pieceCenterY - textBoxHeight/2, textBoxWidth, textBoxHeight, 12);
-            ctx.fill();
-            ctx.strokeStyle = piece.color;
-            ctx.lineWidth = 3;
-            ctx.stroke();
-
-            // Word - matching piece color
-            ctx.font = 'bold 24px Arial';
+            // Word with glow effect - matching piece color
+            ctx.shadowColor = piece.color;
+            ctx.shadowBlur = 12;
+            ctx.font = 'bold 26px Arial';
             ctx.textAlign = 'left';
-            ctx.textBaseline = 'top';
-            ctx.fillStyle = piece.glow;
-            ctx.fillText(piece.word, textBoxX + 14, pieceCenterY - textBoxHeight/2 + 10);
-
-            // Definition lines - larger
-            ctx.font = '16px Arial';
+            ctx.textBaseline = 'middle';
             ctx.fillStyle = '#fff';
-            defLines.forEach((line, i) => {
-                ctx.fillText(line, textBoxX + 14, pieceCenterY - textBoxHeight/2 + 42 + i * 22);
-            });
+            ctx.fillText(piece.word, textX, pieceCenterY - 12);
+            ctx.shadowBlur = 0;
+
+            // Definition - white with subtle shadow
+            ctx.shadowColor = 'rgba(0,0,0,0.5)';
+            ctx.shadowBlur = 4;
+            ctx.font = '16px Arial';
+            ctx.fillStyle = '#e9d5ff';
+            ctx.fillText(piece.definition, textX, pieceCenterY + 14);
+            ctx.shadowBlur = 0;
         };
 
         const shadeColor = (color, percent) => {
@@ -816,50 +786,50 @@ export default function TetrisGalaxy({ onExit }) {
     };
 
     return (
-        <div className="fixed inset-0 bg-gradient-to-b from-slate-900 via-purple-900 to-indigo-950 z-[9999] overflow-auto p-4">
-            <Button onClick={onExit} variant="ghost" className="absolute top-2 right-2 text-purple-300 hover:text-white hover:bg-purple-800/50">
+        <div className="fixed inset-0 bg-gradient-to-b from-gray-50 via-purple-50 to-indigo-100 z-[9999] overflow-auto p-4">
+            <Button onClick={onExit} variant="ghost" className="absolute top-2 right-2 text-gray-500 hover:text-purple-600 hover:bg-purple-100">
                 <X className="w-5 h-5" />
             </Button>
 
             <div className="max-w-6xl mx-auto">
                 <div className="text-center mb-6">
                     <div className="relative inline-block">
-                        <div className="absolute inset-0 blur-xl bg-purple-500/30 rounded-full"></div>
-                        <img src={LOGO_URL} alt="Logo" className="w-16 h-16 mx-auto mb-3 rounded-xl relative" />
+                        <div className="absolute inset-0 blur-xl bg-purple-300/40 rounded-full"></div>
+                        <img src={LOGO_URL} alt="Logo" className="w-16 h-16 mx-auto mb-3 rounded-xl relative shadow-lg" />
                     </div>
-                    <h1 className="text-4xl font-black bg-gradient-to-r from-purple-400 via-pink-400 to-indigo-400 bg-clip-text text-transparent mb-2">TETRIS GALAXY</h1>
-                    <p className="text-purple-300">Stack Words • Learn Vocabulary • Explore the Cosmos</p>
+                    <h1 className="text-4xl font-black bg-gradient-to-r from-purple-600 via-violet-600 to-indigo-600 bg-clip-text text-transparent mb-2">TETRIS GALAXY</h1>
+                    <p className="text-purple-500">Stack Words • Learn Vocabulary • Explore the Cosmos</p>
                 </div>
 
-                <div className="bg-white/10 backdrop-blur-lg rounded-2xl border border-purple-500/30 p-4 mb-6 shadow-2xl">
+                <div className="bg-white rounded-2xl border border-purple-200 p-4 mb-6 shadow-xl">
                     <div className="flex gap-3">
                         <div className="flex-1 relative">
-                            <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-purple-300" />
+                            <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-purple-400" />
                             <Input 
                                 placeholder="Enter any topic to learn..." 
                                 value={searchQuery} 
                                 onChange={(e) => setSearchQuery(e.target.value)}
                                 onKeyPress={(e) => { if (e.key === 'Enter' && searchQuery.trim()) handleStartGame('custom'); }}
-                                className="pl-12 h-12 bg-white/10 border-purple-500/30 text-white placeholder:text-purple-300/50 rounded-xl focus:border-purple-400 focus:ring-purple-400/30" 
+                                className="pl-12 h-12 bg-purple-50 border-purple-200 text-gray-800 placeholder:text-purple-300 rounded-xl focus:border-purple-400 focus:ring-purple-300" 
                             />
                         </div>
                         <Button 
                             onClick={() => searchQuery.trim() && handleStartGame('custom')} 
                             disabled={!searchQuery.trim() || loading}
-                            className="h-12 px-6 bg-gradient-to-r from-purple-500 to-indigo-600 hover:from-purple-600 hover:to-indigo-700 text-white font-semibold rounded-xl shadow-lg shadow-purple-500/25"
+                            className="h-12 px-6 bg-gradient-to-r from-purple-500 to-violet-600 hover:from-purple-600 hover:to-violet-700 text-white font-semibold rounded-xl shadow-lg shadow-purple-300"
                         >
                             <Play className="w-4 h-4 mr-2" /> Launch
                         </Button>
                     </div>
                 </div>
 
-                <div className="bg-white/5 backdrop-blur-lg rounded-2xl border border-purple-500/20 p-5 mb-6 shadow-xl">
+                <div className="bg-white rounded-2xl border border-purple-100 p-5 mb-6 shadow-lg">
                     <div className="flex flex-wrap gap-2 mb-5">
                         {TABS.map(tab => (
                             <Button 
                                 key={tab.id} 
                                 onClick={() => handleTabClick(tab.id)}
-                                className={`px-5 py-2 rounded-full text-sm font-medium transition-all ${activeTab === tab.id ? `bg-gradient-to-r ${tab.color} text-white shadow-lg` : 'bg-white/10 hover:bg-white/20 text-purple-200'}`}
+                                className={`px-5 py-2 rounded-full text-sm font-medium transition-all ${activeTab === tab.id ? `bg-gradient-to-r ${tab.color} text-white shadow-md` : 'bg-purple-50 hover:bg-purple-100 text-purple-600'}`}
                             >
                                 {tab.label}
                             </Button>
@@ -868,8 +838,8 @@ export default function TetrisGalaxy({ onExit }) {
 
                     {loadingTopics && !generatedTopics[activeTab]?.length ? (
                         <div className="text-center py-10">
-                            <Loader2 className="w-10 h-10 animate-spin mx-auto mb-3 text-purple-400" />
-                            <p className="text-purple-300">Loading topics...</p>
+                            <Loader2 className="w-10 h-10 animate-spin mx-auto mb-3 text-purple-500" />
+                            <p className="text-purple-400">Loading topics...</p>
                         </div>
                     ) : (
                         <div className="grid grid-cols-3 gap-4">
@@ -881,11 +851,11 @@ export default function TetrisGalaxy({ onExit }) {
                                     <button 
                                         key={topic.id || i} 
                                         onClick={() => handleStartGame(topic)} 
-                                        className={`h-32 text-left py-4 px-5 rounded-xl bg-gradient-to-br ${tabInfo?.color || 'from-purple-500 to-indigo-600'} hover:opacity-90 text-white transition-all hover:scale-[1.03] hover:shadow-xl hover:shadow-purple-500/20`}
+                                        className="h-32 text-left py-4 px-5 rounded-xl bg-white border-2 border-purple-200 hover:border-purple-400 hover:shadow-lg hover:shadow-purple-200 transition-all hover:scale-[1.02]"
                                     >
-                                        <TopicIcon className="w-6 h-6 text-white/80 mb-2" />
-                                        <div className="text-sm font-bold line-clamp-2">{topic.label}</div>
-                                        <div className="text-xs text-white/70 line-clamp-1 mt-1">{topic.description}</div>
+                                        <TopicIcon className="w-6 h-6 text-purple-500 mb-2" />
+                                        <div className="text-sm font-bold text-gray-800 line-clamp-2">{topic.label}</div>
+                                        <div className="text-xs text-purple-400 line-clamp-1 mt-1">{topic.description}</div>
                                     </button>
                                 );
                             })}
@@ -895,16 +865,16 @@ export default function TetrisGalaxy({ onExit }) {
 
                 <div className="grid grid-cols-3 gap-4">
                     {[
-                        { icon: Target, title: 'Word Blocks', desc: 'Each piece shows a vocabulary word', gradient: 'from-purple-500/20 to-purple-600/10', iconBg: 'bg-purple-500/30', iconColor: 'text-purple-300' },
-                        { icon: Brain, title: 'Learn Definitions', desc: 'See meanings when lines clear', gradient: 'from-indigo-500/20 to-indigo-600/10', iconBg: 'bg-indigo-500/30', iconColor: 'text-indigo-300' },
-                        { icon: TrendingUp, title: 'Level Up', desc: 'Speed increases as you progress', gradient: 'from-pink-500/20 to-pink-600/10', iconBg: 'bg-pink-500/30', iconColor: 'text-pink-300' }
+                        { icon: Target, title: 'Word Blocks', desc: 'Each piece shows a vocabulary word', iconColor: 'text-purple-500', bgColor: 'bg-purple-100' },
+                        { icon: Brain, title: 'Learn Definitions', desc: 'See meanings when lines clear', iconColor: 'text-violet-500', bgColor: 'bg-violet-100' },
+                        { icon: TrendingUp, title: 'Level Up', desc: 'Speed increases as you progress', iconColor: 'text-indigo-500', bgColor: 'bg-indigo-100' }
                     ].map((item, i) => (
-                        <div key={i} className={`bg-gradient-to-br ${item.gradient} backdrop-blur border border-purple-500/20 rounded-xl p-5 text-center`}>
-                            <div className={`w-14 h-14 ${item.iconBg} rounded-xl mx-auto mb-3 flex items-center justify-center`}>
+                        <div key={i} className="bg-white border border-purple-100 rounded-xl p-5 text-center shadow-md">
+                            <div className={`w-14 h-14 ${item.bgColor} rounded-xl mx-auto mb-3 flex items-center justify-center`}>
                                 <item.icon className={`w-7 h-7 ${item.iconColor}`} />
                             </div>
-                            <h3 className="text-white font-semibold mb-1">{item.title}</h3>
-                            <p className="text-purple-300 text-sm">{item.desc}</p>
+                            <h3 className="text-gray-800 font-semibold mb-1">{item.title}</h3>
+                            <p className="text-purple-400 text-sm">{item.desc}</p>
                         </div>
                     ))}
                 </div>

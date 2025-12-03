@@ -901,7 +901,10 @@ export default function Intelligence() {
                     <ItemDetailView 
                         item={selectedItem} 
                         category={currentCategory} 
-                        onNavigateToTopic={(topic) => setSelectedItem(topic)}
+                        onNavigateToTopic={(topic) => {
+                            setSelectedItem(topic);
+                            updateUrl(selectedCategory, topic);
+                        }}
                     />
                 )}
             </div>

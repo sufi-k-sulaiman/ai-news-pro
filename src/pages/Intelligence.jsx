@@ -761,26 +761,58 @@ export default function Intelligence() {
         document.querySelector('meta[name="keywords"]')?.setAttribute('content', 'AI Intelligence, Intelligence');
     }, []);
 
-    const [selectedCategory, setSelectedCategory] = useState(null);
-    const [selectedItem, setSelectedItem] = useState(null);
+    // Parse URL params on mount
+    const getStateFromUrl = () => {
+        const urlParams = new URLSearchParams(window.location.search);
+        const category = urlParams.get('category');
+        const item = urlParams.get('item');
+        return { category, item };
+    };
+
+    const [selectedCategory, setSelectedCategory] = useState(() => getStateFromUrl().category);
+    const [selectedItem, setSelectedItem] = useState(() => getStateFromUrl().item);
+
+    // Update URL when state changes
+    const updateUrl = (category, item) => {
+        const params = new URLSearchParams();
+        if (category) params.set('category', category);
+        if (item) params.set('item', item);
+        const newUrl = params.toString() ? `?${params.toString()}` : window.location.pathname;
+        window.history.pushState({}, '', newUrl);
+    };
 
     const handleCategoryClick = (categoryKey) => {
         setSelectedCategory(categoryKey);
         setSelectedItem(null);
+        updateUrl(categoryKey, null);
     };
 
     const handleItemClick = (item) => {
         setSelectedItem(item);
+        updateUrl(selectedCategory, item);
     };
 
     const handleBreadcrumbNavigate = (index) => {
         if (index === 0) {
             setSelectedCategory(null);
             setSelectedItem(null);
+            updateUrl(null, null);
         } else if (index === 1) {
             setSelectedItem(null);
+            updateUrl(selectedCategory, null);
         }
     };
+
+    // Handle browser back/forward
+    useEffect(() => {
+        const handlePopState = () => {
+            const { category, item } = getStateFromUrl();
+            setSelectedCategory(category);
+            setSelectedItem(item);
+        };
+        window.addEventListener('popstate', handlePopState);
+        return () => window.removeEventListener('popstate', handlePopState);
+    }, []);
 
     const currentCategory = selectedCategory ? CATEGORIES[selectedCategory] : null;
 

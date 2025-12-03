@@ -1186,15 +1186,25 @@ export default function Qwirey() {
                                                     
                                                     {/* Notifications - Separate */}
                                                     {result.dashboardData.notifications?.length > 0 && (
-                                                        <NotificationList 
-                                                            title="Notifications"
-                                                            notifications={result.dashboardData.notifications.slice(0, 4).map(n => ({
-                                                                title: n.title,
-                                                                message: n.description,
-                                                                time: n.time,
-                                                                type: n.type || 'info'
-                                                            }))}
-                                                        />
+                                                        <div className="bg-white rounded-2xl border border-gray-200 p-6">
+                                                            <h3 className="font-semibold text-gray-900 mb-4">Notifications</h3>
+                                                            <div className="space-y-3">
+                                                                {result.dashboardData.notifications.slice(0, 4).map((n, i) => (
+                                                                    <div key={i} className={`p-3 rounded-lg border ${
+                                                                        n.type === 'success' ? 'bg-green-50 border-green-200' :
+                                                                        n.type === 'warning' ? 'bg-yellow-50 border-yellow-200' :
+                                                                        n.type === 'error' ? 'bg-red-50 border-red-200' :
+                                                                        'bg-blue-50 border-blue-200'
+                                                                    }`}>
+                                                                        <div className="flex justify-between items-start">
+                                                                            <p className="font-medium text-gray-900 text-sm">{n.title}</p>
+                                                                            <span className="text-xs text-gray-500">{n.time}</span>
+                                                                        </div>
+                                                                        <p className="text-sm text-gray-600 mt-1"><TextWithLinks text={n.description} /></p>
+                                                                    </div>
+                                                                ))}
+                                                            </div>
+                                                        </div>
                                                     )}
                                                 </>
                                             )}

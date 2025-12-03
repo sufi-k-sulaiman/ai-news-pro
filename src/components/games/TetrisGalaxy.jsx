@@ -476,15 +476,15 @@ export default function TetrisGalaxy({ onExit }) {
             const pieceCenterY = offsetY + (piece.y + (minY + maxY + 1) / 2) * cellSize;
 
             // Position text box to the right of the piece
-            const textBoxX = pieceRightX + 15;
-            const textBoxWidth = 180;
+            const textBoxX = pieceRightX + 20;
+            const textBoxWidth = 220;
             
             // Wrap definition into lines
             const wrapText = (text, maxWidth) => {
                 const words = (text || '').split(' ');
                 const lines = [];
                 let currentLine = '';
-                ctx.font = '13px Arial';
+                ctx.font = '16px Arial';
                 
                 for (const word of words) {
                     const testLine = currentLine ? currentLine + ' ' + word : word;
@@ -500,30 +500,30 @@ export default function TetrisGalaxy({ onExit }) {
                 return lines.slice(0, 3); // Max 3 lines
             };
 
-            const defLines = wrapText(piece.definition, textBoxWidth - 20);
-            const textBoxHeight = 30 + defLines.length * 18;
+            const defLines = wrapText(piece.definition, textBoxWidth - 24);
+            const textBoxHeight = 45 + defLines.length * 22;
 
-            // Background
-            ctx.fillStyle = 'rgba(0,0,0,0.8)';
+            // Background matching piece color
+            ctx.fillStyle = 'rgba(0,0,0,0.85)';
             ctx.beginPath();
-            ctx.roundRect(textBoxX, pieceCenterY - textBoxHeight/2, textBoxWidth, textBoxHeight, 10);
+            ctx.roundRect(textBoxX, pieceCenterY - textBoxHeight/2, textBoxWidth, textBoxHeight, 12);
             ctx.fill();
-            ctx.strokeStyle = '#4dd0e1';
-            ctx.lineWidth = 2;
+            ctx.strokeStyle = piece.color;
+            ctx.lineWidth = 3;
             ctx.stroke();
 
-            // Word
-            ctx.font = 'bold 18px Arial';
+            // Word - matching piece color
+            ctx.font = 'bold 24px Arial';
             ctx.textAlign = 'left';
             ctx.textBaseline = 'top';
-            ctx.fillStyle = '#4dd0e1';
-            ctx.fillText(piece.word, textBoxX + 12, pieceCenterY - textBoxHeight/2 + 8);
+            ctx.fillStyle = piece.glow;
+            ctx.fillText(piece.word, textBoxX + 14, pieceCenterY - textBoxHeight/2 + 10);
 
-            // Definition lines
-            ctx.font = '13px Arial';
+            // Definition lines - larger
+            ctx.font = '16px Arial';
             ctx.fillStyle = '#fff';
             defLines.forEach((line, i) => {
-                ctx.fillText(line, textBoxX + 12, pieceCenterY - textBoxHeight/2 + 30 + i * 18);
+                ctx.fillText(line, textBoxX + 14, pieceCenterY - textBoxHeight/2 + 42 + i * 22);
             });
         };
 
@@ -690,52 +690,103 @@ export default function TetrisGalaxy({ onExit }) {
                 drawPieceWord(currentPiece, offsetX, offsetY, CELL_SIZE);
             }
 
+            // Header with logo, title and topic
+            const headerY = 15;
+            
+            // Logo
+            const logoImg = new Image();
+            logoImg.src = 'https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/692729a5f5180fbd43f297e9/a1a505225_1cPublishing-logo.png';
+            ctx.drawImage(logoImg, 20, headerY, 50, 50);
+
             // Title
             ctx.fillStyle = '#fff';
-            ctx.font = 'bold 28px Arial';
-            ctx.textAlign = 'center';
+            ctx.font = 'bold 32px Arial';
+            ctx.textAlign = 'left';
             ctx.shadowColor = '#000';
             ctx.shadowBlur = 10;
-            ctx.fillText('TETRIS GALAXY', canvas.width / 2, 35);
+            ctx.fillText('TETRIS GALAXY', 80, headerY + 28);
             ctx.shadowBlur = 0;
 
-            // Stats bar
-            ctx.fillStyle = 'rgba(0,0,0,0.6)';
-            ctx.beginPath();
-            ctx.roundRect(offsetX, offsetY - 55, gameWidth, 45, 10);
-            ctx.fill();
-            ctx.fillStyle = '#fff';
-            ctx.font = 'bold 16px Arial';
-            ctx.textAlign = 'left';
-            ctx.fillText(`SCORE: ${gameScore}`, offsetX + 20, offsetY - 28);
-            ctx.textAlign = 'center';
-            ctx.fillText(`LINES: ${gameLines}  |  LEVEL: ${gameLevel}`, offsetX + gameWidth / 2, offsetY - 28);
-            ctx.textAlign = 'right';
-            ctx.fillText(currentTopic || '', offsetX + gameWidth - 20, offsetY - 28);
+            // Topic/Subject
+            ctx.fillStyle = '#4dd0e1';
+            ctx.font = 'bold 18px Arial';
+            ctx.fillText(`Topic: ${currentTopic || ''}`, 80, headerY + 52);
 
-            // Next piece
-            const previewX = offsetX + gameWidth + 20;
-            const previewY = offsetY;
-            ctx.fillStyle = 'rgba(0,0,0,0.6)';
+            // Right side panel
+            const panelX = offsetX + gameWidth + 20;
+            const panelY = offsetY;
+            const panelWidth = 130;
+
+            // Next piece box
+            ctx.fillStyle = 'rgba(0,0,0,0.7)';
             ctx.beginPath();
-            ctx.roundRect(previewX, previewY, 110, 110, 10);
+            ctx.roundRect(panelX, panelY, panelWidth, 120, 12);
             ctx.fill();
-            ctx.fillStyle = '#fff';
-            ctx.font = 'bold 14px Arial';
+            ctx.strokeStyle = '#4dd0e1';
+            ctx.lineWidth = 2;
+            ctx.stroke();
+
+            ctx.fillStyle = '#4dd0e1';
+            ctx.font = 'bold 16px Arial';
             ctx.textAlign = 'center';
-            ctx.fillText('NEXT', previewX + 55, previewY + 20);
+            ctx.fillText('NEXT', panelX + panelWidth/2, panelY + 22);
+
             if (nextPiece) {
-                const pSize = 22;
-                const px = previewX + 55 - (nextPiece.shape[0].length * pSize) / 2;
-                const py = previewY + 35;
+                const pSize = 20;
+                const px = panelX + panelWidth/2 - (nextPiece.shape[0].length * pSize) / 2;
+                const py = panelY + 35;
                 nextPiece.shape.forEach((row, dy) => {
                     row.forEach((value, dx) => {
                         if (value) draw3DBlock(px + dx * pSize, py + dy * pSize, pSize - 1, nextPiece.color, nextPiece.glow);
                     });
                 });
+                ctx.fillStyle = nextPiece.glow;
                 ctx.font = 'bold 12px Arial';
-                ctx.fillText(nextPiece.word, previewX + 55, previewY + 100);
+                ctx.fillText(nextPiece.word, panelX + panelWidth/2, panelY + 108);
             }
+
+            // Stats boxes below next piece
+            const statsY = panelY + 135;
+
+            // Score
+            ctx.fillStyle = 'rgba(0,0,0,0.7)';
+            ctx.beginPath();
+            ctx.roundRect(panelX, statsY, panelWidth, 55, 10);
+            ctx.fill();
+            ctx.strokeStyle = '#ffeb3b';
+            ctx.lineWidth = 2;
+            ctx.stroke();
+            ctx.fillStyle = '#ffeb3b';
+            ctx.font = 'bold 12px Arial';
+            ctx.fillText('SCORE', panelX + panelWidth/2, statsY + 18);
+            ctx.font = 'bold 24px Arial';
+            ctx.fillText(gameScore.toString(), panelX + panelWidth/2, statsY + 43);
+
+            // Lines
+            ctx.fillStyle = 'rgba(0,0,0,0.7)';
+            ctx.beginPath();
+            ctx.roundRect(panelX, statsY + 65, panelWidth, 55, 10);
+            ctx.fill();
+            ctx.strokeStyle = '#4caf50';
+            ctx.stroke();
+            ctx.fillStyle = '#4caf50';
+            ctx.font = 'bold 12px Arial';
+            ctx.fillText('LINES', panelX + panelWidth/2, statsY + 83);
+            ctx.font = 'bold 24px Arial';
+            ctx.fillText(gameLines.toString(), panelX + panelWidth/2, statsY + 108);
+
+            // Level
+            ctx.fillStyle = 'rgba(0,0,0,0.7)';
+            ctx.beginPath();
+            ctx.roundRect(panelX, statsY + 130, panelWidth, 55, 10);
+            ctx.fill();
+            ctx.strokeStyle = '#e91e63';
+            ctx.stroke();
+            ctx.fillStyle = '#e91e63';
+            ctx.font = 'bold 12px Arial';
+            ctx.fillText('LEVEL', panelX + panelWidth/2, statsY + 148);
+            ctx.font = 'bold 24px Arial';
+            ctx.fillText(gameLevel.toString(), panelX + panelWidth/2, statsY + 173);
 
             // Line clear message in center of screen
             if (lineClearMessage) {

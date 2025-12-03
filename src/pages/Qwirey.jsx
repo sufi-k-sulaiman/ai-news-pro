@@ -1014,10 +1014,29 @@ export default function Qwirey() {
                                                   </span>
                                               </div>
                                           </div>
-                                          <Button variant="outline" size="sm" onClick={handleAddToNotes} className="text-purple-600 gap-1.5">
-                                              {noteSaved ? <Check className="w-4 h-4 text-green-500" /> : <StickyNote className="w-4 h-4" />}
-                                              {noteSaved ? 'Saved' : 'Add to Notes'}
-                                          </Button>
+                                          <div className="flex items-center gap-2">
+                                              {responseFormat === 'long' && result.longData && (
+                                                  <div className="flex items-center gap-2">
+                                                      <Select value={writingStyle} onValueChange={handleStyleChange} disabled={styleLoading}>
+                                                          <SelectTrigger className="w-36 h-9">
+                                                              <SelectValue placeholder="Style" />
+                                                          </SelectTrigger>
+                                                          <SelectContent>
+                                                              <SelectItem value="default">Default</SelectItem>
+                                                              <SelectItem value="persuasive">Persuasive</SelectItem>
+                                                              <SelectItem value="technical">Technical</SelectItem>
+                                                              <SelectItem value="journalistic">Journalistic</SelectItem>
+                                                              <SelectItem value="creative">Creative</SelectItem>
+                                                          </SelectContent>
+                                                      </Select>
+                                                      {styleLoading && <Loader2 className="w-4 h-4 animate-spin text-purple-600" />}
+                                                  </div>
+                                              )}
+                                              <Button variant="outline" size="sm" onClick={handleAddToNotes} className="text-purple-600 gap-1.5">
+                                                  {noteSaved ? <Check className="w-4 h-4 text-green-500" /> : <StickyNote className="w-4 h-4" />}
+                                                  {noteSaved ? 'Saved' : 'Add to Notes'}
+                                              </Button>
+                                          </div>
                                       </div>
                                     
                                     {/* SHORT FORMAT */}
@@ -1041,27 +1060,10 @@ export default function Qwirey() {
                                     
                                     {/* LONG FORMAT */}
                                     {responseFormat === 'long' && result.longData && (
-                                        <div className="space-y-4">
-                                            <div className="flex items-center gap-3">
-                                                <Select value={writingStyle} onValueChange={handleStyleChange} disabled={styleLoading}>
-                                                    <SelectTrigger className="w-40">
-                                                        <SelectValue placeholder="Writing Style" />
-                                                    </SelectTrigger>
-                                                    <SelectContent>
-                                                        <SelectItem value="default">Default</SelectItem>
-                                                        <SelectItem value="persuasive">Persuasive</SelectItem>
-                                                        <SelectItem value="technical">Technical</SelectItem>
-                                                        <SelectItem value="journalistic">Journalistic</SelectItem>
-                                                        <SelectItem value="creative">Creative</SelectItem>
-                                                    </SelectContent>
-                                                </Select>
-                                                {styleLoading && <Loader2 className="w-4 h-4 animate-spin text-purple-600" />}
-                                            </div>
-                                            <div className="prose prose-sm max-w-none text-gray-700 space-y-6">
-                                                {result.longData.paragraphs?.map((para, i) => (
-                                                    <p key={i} className="text-gray-700 leading-relaxed"><TextWithLinks text={para} /></p>
-                                                ))}
-                                            </div>
+                                        <div className="prose prose-sm max-w-none text-gray-700 space-y-6">
+                                            {result.longData.paragraphs?.map((para, i) => (
+                                                <p key={i} className="text-gray-700 leading-relaxed"><TextWithLinks text={para} /></p>
+                                            ))}
                                         </div>
                                     )}
                                     

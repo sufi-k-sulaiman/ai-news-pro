@@ -47,9 +47,9 @@ const RANKS = [
 export default function Learning() {
     // Update URL for display only (aesthetic, not parsed)
     const updateUrl = (subjects) => {
-        const basePath = window.location.pathname;
+        const basePath = '/Learning';
         if (subjects.length > 0) {
-            const subjectSlugs = subjects.map(s => s.name.replace(/[^a-zA-Z0-9]/g, '-').toLowerCase()).join('/');
+            const subjectSlugs = subjects.map(s => s.name.replace(/[^a-zA-Z0-9]/g, '-').toLowerCase()).join('-');
             window.history.pushState({ subjectIds: subjects.map(s => s.id) }, '', `${basePath}/${subjectSlugs}`);
         } else {
             window.history.pushState({}, '', basePath);

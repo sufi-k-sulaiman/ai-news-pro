@@ -1095,7 +1095,7 @@ export default function Qwirey() {
                                     {responseFormat === 'dynamic' && (
                                         <div className="space-y-6">
                                             <div className="prose prose-sm max-w-none text-gray-700">
-                                                <ReactMarkdown>{result.text}</ReactMarkdown>
+                                                <TextWithLinks text={result.text} />
                                             </div>
                                             
                                             {result.type === 'qwirey' && result.dashboardData && (

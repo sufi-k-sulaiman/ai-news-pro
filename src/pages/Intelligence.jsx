@@ -39,6 +39,11 @@ const SourceLink = ({ source }) => {
         url = source.startsWith('http') ? source : `https://${source}`;
     }
     
+    // Clean up domain - remove www. and get just the main domain
+    if (domain) {
+        domain = domain.replace(/^www\./, '').split('/')[0];
+    }
+    
     if (!domain) return <span className="text-xs text-gray-400">{source}</span>;
     
     return (
@@ -46,11 +51,11 @@ const SourceLink = ({ source }) => {
             href={url} 
             target="_blank" 
             rel="noopener noreferrer"
-            className="inline-flex items-center gap-1 text-xs text-purple-600 hover:text-purple-800 hover:underline transition-colors"
+            className="inline-flex items-center gap-1.5 text-xs text-purple-600 hover:text-purple-800 transition-colors px-2 py-1 bg-purple-50 hover:bg-purple-100 rounded-md"
             title={url}
         >
-            <ExternalLink className="w-3 h-3" />
             {domain}
+            <ExternalLink className="w-3 h-3" />
         </a>
     );
 };

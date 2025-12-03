@@ -548,103 +548,65 @@ export default function TetrisGalaxy({ onExit }) {
             ctx.fillStyle = '#fff';
             ctx.font = 'bold 28px Arial';
             ctx.textAlign = 'center';
-            ctx.fillText('TETRIS GALAXY', canvas.width / 2, headerY + 25);
+            ctx.fillText('TETRIS GALAXY', canvas.width / 2, headerY + 22);
             ctx.shadowBlur = 0;
 
-            // Topic/Subject - centered below title
+            // Topic/Subject - centered below title with more spacing
             ctx.fillStyle = '#c4b5fd';
             ctx.font = 'bold 16px Arial';
-            ctx.fillText(`Topic: ${currentTopic || ''}`, canvas.width / 2, headerY + 48);
+            ctx.fillText(`Topic: ${currentTopic || ''}`, canvas.width / 2, headerY + 52);
 
             // Right side panel
             const panelX = offsetX + gameWidth + 20;
             const panelY = offsetY;
             const panelWidth = 130;
 
-            // Panel background with galaxy theme
-            const panelGrad = ctx.createLinearGradient(panelX, panelY, panelX, panelY + 380);
-            panelGrad.addColorStop(0, 'rgba(99, 102, 241, 0.3)');
-            panelGrad.addColorStop(1, 'rgba(139, 92, 246, 0.2)');
-            ctx.fillStyle = panelGrad;
-            ctx.beginPath();
-            ctx.roundRect(panelX - 5, panelY - 5, panelWidth + 10, 380, 15);
-            ctx.fill();
-            ctx.strokeStyle = 'rgba(167, 139, 250, 0.5)';
-            ctx.lineWidth = 1;
-            ctx.stroke();
-
-            // Next piece box - taller to fit word inside
-            ctx.fillStyle = 'rgba(30, 27, 75, 0.9)';
-            ctx.beginPath();
-            ctx.roundRect(panelX, panelY, panelWidth, 115, 12);
-            ctx.fill();
-            ctx.strokeStyle = '#a78bfa';
-            ctx.lineWidth = 2;
-            ctx.stroke();
-
+            // Next piece section - no box, just content
             ctx.fillStyle = '#a78bfa';
-            ctx.font = 'bold 14px Arial';
+            ctx.font = 'bold 16px Arial';
             ctx.textAlign = 'center';
-            ctx.fillText('NEXT', panelX + panelWidth/2, panelY + 18);
+            ctx.fillText('NEXT', panelX + panelWidth/2, panelY + 20);
 
             if (nextPiece) {
-                const pSize = 16;
+                // 2x bigger pieces
+                const pSize = 28;
                 const px = panelX + panelWidth/2 - (nextPiece.shape[0].length * pSize) / 2;
-                const py = panelY + 28;
+                const py = panelY + 35;
                 nextPiece.shape.forEach((row, dy) => {
                     row.forEach((value, dx) => {
                         if (value) draw3DBlock(px + dx * pSize, py + dy * pSize, pSize - 1, nextPiece.color, nextPiece.glow);
                     });
                 });
-                // Word inside the box
+                // 3x bigger word
                 ctx.fillStyle = nextPiece.glow;
-                ctx.font = 'bold 10px Arial';
-                const wordText = nextPiece.word.length > 14 ? nextPiece.word.substring(0, 12) + '...' : nextPiece.word;
-                ctx.fillText(wordText, panelX + panelWidth/2, panelY + 102);
+                ctx.font = 'bold 18px Arial';
+                const wordText = nextPiece.word.length > 12 ? nextPiece.word.substring(0, 10) + '...' : nextPiece.word;
+                ctx.fillText(wordText, panelX + panelWidth/2, panelY + 140);
             }
 
-            // Stats boxes below next piece - more spacing
-            const statsY = panelY + 125;
+            // Stats below next piece - no boxes, just text
+            const statsY = panelY + 170;
 
             // Score
-            ctx.fillStyle = 'rgba(30, 27, 75, 0.9)';
-            ctx.beginPath();
-            ctx.roundRect(panelX, statsY, panelWidth, 60, 10);
-            ctx.fill();
-            ctx.strokeStyle = '#fbbf24';
-            ctx.lineWidth = 2;
-            ctx.stroke();
             ctx.fillStyle = '#fbbf24';
-            ctx.font = 'bold 12px Arial';
-            ctx.fillText('SCORE', panelX + panelWidth/2, statsY + 20);
-            ctx.font = 'bold 22px Arial';
-            ctx.fillText(gameScore.toString(), panelX + panelWidth/2, statsY + 46);
+            ctx.font = 'bold 14px Arial';
+            ctx.fillText('SCORE', panelX + panelWidth/2, statsY);
+            ctx.font = 'bold 28px Arial';
+            ctx.fillText(gameScore.toString(), panelX + panelWidth/2, statsY + 30);
 
             // Lines
-            ctx.fillStyle = 'rgba(30, 27, 75, 0.9)';
-            ctx.beginPath();
-            ctx.roundRect(panelX, statsY + 70, panelWidth, 60, 10);
-            ctx.fill();
-            ctx.strokeStyle = '#34d399';
-            ctx.stroke();
             ctx.fillStyle = '#34d399';
-            ctx.font = 'bold 12px Arial';
-            ctx.fillText('LINES', panelX + panelWidth/2, statsY + 90);
-            ctx.font = 'bold 22px Arial';
-            ctx.fillText(gameLines.toString(), panelX + panelWidth/2, statsY + 116);
+            ctx.font = 'bold 14px Arial';
+            ctx.fillText('LINES', panelX + panelWidth/2, statsY + 70);
+            ctx.font = 'bold 28px Arial';
+            ctx.fillText(gameLines.toString(), panelX + panelWidth/2, statsY + 100);
 
             // Level
-            ctx.fillStyle = 'rgba(30, 27, 75, 0.9)';
-            ctx.beginPath();
-            ctx.roundRect(panelX, statsY + 140, panelWidth, 60, 10);
-            ctx.fill();
-            ctx.strokeStyle = '#f472b6';
-            ctx.stroke();
             ctx.fillStyle = '#f472b6';
-            ctx.font = 'bold 12px Arial';
-            ctx.fillText('LEVEL', panelX + panelWidth/2, statsY + 160);
-            ctx.font = 'bold 22px Arial';
-            ctx.fillText(gameLevel.toString(), panelX + panelWidth/2, statsY + 186);
+            ctx.font = 'bold 14px Arial';
+            ctx.fillText('LEVEL', panelX + panelWidth/2, statsY + 140);
+            ctx.font = 'bold 28px Arial';
+            ctx.fillText(gameLevel.toString(), panelX + panelWidth/2, statsY + 170);
 
             // Line clear message in center of screen
             if (lineClearMessage) {

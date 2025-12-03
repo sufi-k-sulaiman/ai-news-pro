@@ -509,7 +509,7 @@ export default function SearchPage() {
 
             sentencesRef.current = sentences;
 
-            const ttsResponse = await base44.functions.invoke('edgeTTS', {
+            const ttsResponse = await base44.functions.invoke('ttsWithFallback', {
                 text: cleanText,
                 lang: 'en-gb'
             });

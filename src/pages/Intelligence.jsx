@@ -635,7 +635,7 @@ function ItemDetailView({ item, category, onNavigateToTopic }) {
                                 <span className="w-8 h-8 rounded-full flex items-center justify-center text-white text-sm font-bold flex-shrink-0" style={{ backgroundColor: CHART_COLORS[i % CHART_COLORS.length] }}>
                                     {i + 1}
                                 </span>
-                                <p className="text-gray-700 text-sm">{fact}</p>
+                                <p className="text-gray-700 text-sm"><TextWithLinks text={fact} /></p>
                             </div>
                         ))}
                     </div>

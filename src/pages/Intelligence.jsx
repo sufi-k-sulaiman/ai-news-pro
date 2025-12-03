@@ -122,15 +122,9 @@ const CATEGORIES = {
         icon: Globe,
         color: "#3B82F6",
         gradient: "from-blue-500 to-cyan-500",
-        items: ["Earth", "Soil", "Water", "Air", "Fire", "Sunlight", "Moon", "Stars", "Sky", "Space", "Lightning", "Ice", "Climate", "Darkness"]
+        items: ["Earth", "Soil", "Water", "Air", "Fire", "Sunlight", "Moon", "Stars", "Sky", "Space", "Lightning", "Ice", "Climate", "Darkness", "Mountains", "Rivers", "Oceans", "Forests", "Deserts", "Islands", "Valleys", "Grasslands", "Polar Regions", "Caves", "Wetlands", "Plateaus", "Volcanoes", "Coral Reefs"]
     },
-    Natural_Landscapes_Features: {
-        name: "Natural Landscapes",
-        icon: Mountain,
-        color: "#10B981",
-        gradient: "from-emerald-500 to-teal-500",
-        items: ["Mountains", "Rivers", "Oceans", "Forests", "Deserts", "Islands", "Valleys", "Grasslands", "Polar Regions", "Caves", "Wetlands", "Plateaus", "Volcanoes", "Coral Reefs"]
-    },
+
     Living_Things: {
         name: "Living Things",
         icon: Leaf,

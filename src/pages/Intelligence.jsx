@@ -2,10 +2,57 @@ import React, { useState, useEffect } from 'react';
 import { 
     Brain, Loader2, ChevronRight, Sparkles,
     Globe, Mountain, Leaf, Zap, Star, Home,
-    Beaker, Calculator, FlaskConical, Users, Lightbulb, BookOpen, Atom
+    Beaker, Calculator, FlaskConical, Users, Lightbulb, BookOpen, Atom, ExternalLink
 } from 'lucide-react';
 import { base44 } from '@/api/base44Client';
 import { BarChart, Bar, PieChart, Pie, Cell, LineChart, Line, RadarChart, Radar, PolarGrid, PolarAngleAxis, ResponsiveContainer, XAxis, YAxis, Tooltip, Legend } from 'recharts';
+
+// Helper to extract domain from URL
+const extractDomain = (url) => {
+    if (!url) return null;
+    try {
+        const urlObj = new URL(url.startsWith('http') ? url : `https://${url}`);
+        return urlObj.hostname.replace('www.', '');
+    } catch {
+        // Try to extract domain from malformed URLs
+        const match = url.match(/(?:https?:\/\/)?(?:www\.)?([^\/\?\s]+)/);
+        return match ? match[1] : url;
+    }
+};
+
+// Component to display source link nicely
+const SourceLink = ({ source }) => {
+    if (!source) return null;
+    
+    // Extract URL from various formats like "[domain](url)" or just "url"
+    let url = source;
+    let domain = source;
+    
+    // Handle markdown-style links [text](url)
+    const markdownMatch = source.match(/\[([^\]]+)\]\(([^)]+)\)/);
+    if (markdownMatch) {
+        domain = markdownMatch[1];
+        url = markdownMatch[2];
+    } else {
+        domain = extractDomain(source);
+        url = source.startsWith('http') ? source : `https://${source}`;
+    }
+    
+    if (!domain) return <span className="text-xs text-gray-400">{source}</span>;
+    
+    return (
+        <a 
+            href={url} 
+            target="_blank" 
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-1 text-xs text-purple-600 hover:text-purple-800 hover:underline transition-colors"
+            title={url}
+        >
+            <ExternalLink className="w-3 h-3" />
+            {domain}
+        </a>
+    );
+};
 
 const CATEGORIES = {
     Elements_Environment: {
@@ -478,7 +525,9 @@ function ItemDetailView({ item, category, onNavigateToTopic }) {
                                 <div key={i} className="p-4 border border-gray-100 rounded-lg">
                                     <p className="text-sm text-gray-500 mb-1">{item.statistic}</p>
                                     <p className="text-2xl font-bold" style={{ color: category?.color }}>{item.value}</p>
-                                    <p className="text-xs text-gray-400 mt-1">Source: {item.source}</p>
+                                    <div className="mt-1">
+                                        <SourceLink source={item.source} />
+                                    </div>
                                 </div>
                             ))}
                         </div>

@@ -326,8 +326,6 @@ export default function SearchPage() {
         setActiveTab('news');
         
         // Reset embedded states
-        setPodPlayer({ isGenerating: false, isPlaying: false, currentPod: null, audio: null, script: null, progress: 0 });
-        setMindmapData(null);
         setLearningData(null);
         setQwireyResult(null);
         setQwireyPrompt(searchQuery);

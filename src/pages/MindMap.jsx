@@ -479,6 +479,11 @@ export default function MindMapPage() {
         if (!topic?.trim()) return;
         setLoading(true);
         setError(null);
+        
+        // Update URL with topic
+        const params = new URLSearchParams();
+        params.set('topic', topic);
+        window.history.pushState({}, '', `?${params.toString()}`);
 
         try {
             const response = await base44.integrations.Core.InvokeLLM({

@@ -45,13 +45,40 @@ const RANKS = [
 ];
 
 export default function Learning() {
+    // Parse URL params
+    const getSubjectsFromUrl = () => {
+        const urlParams = new URLSearchParams(window.location.search);
+        const subjectIds = urlParams.get('subjects')?.split(',').filter(Boolean) || [];
+        if (subjectIds.length > 0) {
+            const foundSubjects = subjectIds.map(id => SUBJECTS.find(s => s.id === id)).filter(Boolean);
+            return foundSubjects.length > 0 ? foundSubjects : [SUBJECTS[0]];
+        }
+        return [SUBJECTS[0]];
+    };
+
+    const updateUrl = (subjects) => {
+        const params = new URLSearchParams();
+        if (subjects.length > 0) {
+            params.set('subjects', subjects.map(s => s.id).join(','));
+        }
+        const newUrl = params.toString() ? `?${params.toString()}` : window.location.pathname;
+        window.history.pushState({}, '', newUrl);
+    };
+
     useEffect(() => {
         document.title = 'Smart Learning Archipelago';
         document.querySelector('meta[name="description"]')?.setAttribute('content', 'Learning Archipelago uses AI agents to create automated learning islands for growth on all subjects.');
         document.querySelector('meta[name="keywords"]')?.setAttribute('content', 'Learning Archipelago, Learning islands');
+        
+        // Handle browser back/forward
+        const handlePopState = () => {
+            setSelectedSubjects(getSubjectsFromUrl());
+        };
+        window.addEventListener('popstate', handlePopState);
+        return () => window.removeEventListener('popstate', handlePopState);
     }, []);
 
-    const [selectedSubjects, setSelectedSubjects] = useState([SUBJECTS[0]]); // Default to first subject
+    const [selectedSubjects, setSelectedSubjects] = useState(() => getSubjectsFromUrl());
     const [subTopics, setSubTopics] = useState([]);
     const [loadingTopics, setLoadingTopics] = useState(false);
     const [selectedTopic, setSelectedTopic] = useState(null);
@@ -82,11 +109,14 @@ export default function Learning() {
 
     const toggleSubject = (subject) => {
         const isSelected = selectedSubjects.some(s => s.id === subject.id);
+        let newSubjects;
         if (isSelected) {
-            setSelectedSubjects(selectedSubjects.filter(s => s.id !== subject.id));
+            newSubjects = selectedSubjects.filter(s => s.id !== subject.id);
         } else {
-            setSelectedSubjects([...selectedSubjects, subject]);
+            newSubjects = [...selectedSubjects, subject];
         }
+        setSelectedSubjects(newSubjects);
+        updateUrl(newSubjects);
     };
 
     const currentRank = RANKS.filter(r => totalXP >= r.minXP).pop() || RANKS[0];

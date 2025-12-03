@@ -238,14 +238,40 @@ const CATEGORIES = [
 ];
 
 export default function News() {
+    // Parse URL params on mount
+    const getStateFromUrl = () => {
+        const urlParams = new URLSearchParams(window.location.search);
+        return {
+            category: urlParams.get('category') || 'technology',
+            query: urlParams.get('query') || ''
+        };
+    };
+
+    const updateUrl = (category, query) => {
+        const params = new URLSearchParams();
+        if (category) params.set('category', category);
+        if (query) params.set('query', query);
+        const newUrl = params.toString() ? `?${params.toString()}` : window.location.pathname;
+        window.history.pushState({}, '', newUrl);
+    };
+
     useEffect(() => {
         document.title = 'News articles hub for around the world';
         document.querySelector('meta[name="description"]')?.setAttribute('content', 'Global hub for trusted news articles, delivering accurate reporting and insights worldwide.');
         document.querySelector('meta[name="keywords"]')?.setAttribute('content', 'News articles, news article');
+        
+        // Handle browser back/forward
+        const handlePopState = () => {
+            const { category, query } = getStateFromUrl();
+            setActiveCategory(category);
+            setSearchQuery(query);
+        };
+        window.addEventListener('popstate', handlePopState);
+        return () => window.removeEventListener('popstate', handlePopState);
     }, []);
 
-    const [searchQuery, setSearchQuery] = useState('');
-    const [activeCategory, setActiveCategory] = useState('technology');
+    const [searchQuery, setSearchQuery] = useState(() => getStateFromUrl().query);
+    const [activeCategory, setActiveCategory] = useState(() => getStateFromUrl().category);
     const [expandedCategory, setExpandedCategory] = useState(null);
     const [news, setNews] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -300,6 +326,7 @@ export default function News() {
     const handleSearch = (e) => {
         e.preventDefault();
         if (searchQuery.trim()) {
+            updateUrl(activeCategory, searchQuery.trim());
             fetchNews(searchQuery.trim());
         }
     };
@@ -308,6 +335,7 @@ export default function News() {
         setActiveCategory(categoryId);
         setSearchQuery('');
         setActiveSubtopic(null);
+        updateUrl(categoryId, '');
     };
 
     return (

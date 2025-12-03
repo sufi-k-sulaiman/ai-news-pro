@@ -398,68 +398,17 @@ function ItemDetailView({ item, category, onNavigateToTopic }) {
         setData(null);
         setError(false);
         try {
-            const response = await base44.integrations.Core.InvokeLLM({
-                prompt: `Provide comprehensive intelligence data about "${item}" in the context of ${category?.name || 'natural world'}. Include:
-1. Overview: A detailed description (3-4 sentences)
-2. Key Facts: 5 interesting and fun facts
-3. Significance: Why it matters to humans and the planet
-4. Related Topics: 4 related concepts to explore
-5. Current Research: Recent scientific discoveries or developments
-6. Physical Composition: 5 key physical properties/characteristics with descriptions
-7. Chemical Composition: 5 main chemical elements or compounds with percentages or descriptions
-8. Mathematical Illustrations: 3 mathematical formulas or equations related to this topic with explanations
-9. Research Data: 5 key statistics or research findings with numerical data
-10. Subject Matter Experts: 4 notable scientists or researchers who study this topic with their contributions
-11. Chart Data: Provide numerical data for visualization:
-    - distributionData: 5 items with name and value (percentage distribution)
-    - trendData: 6 data points showing trends over time (year and value)
-    - comparisonData: 4 items comparing different aspects (name, valueA, valueB)
-    - radarData: 5 attributes with scores (0-100) for a radar chart`,
-                add_context_from_internet: true,
-                response_json_schema: {
-                    type: "object",
-                    properties: {
-                        overview: { type: "string" },
-                        keyFacts: { type: "array", items: { type: "string" } },
-                        significance: { type: "string" },
-                        relatedTopics: { type: "array", items: { type: "string" } },
-                        currentResearch: { type: "string" },
-                        physicalComposition: { type: "array", items: { type: "object", properties: { property: { type: "string" }, description: { type: "string" } } } },
-                        chemicalComposition: { type: "array", items: { type: "object", properties: { element: { type: "string" }, percentage: { type: "string" }, description: { type: "string" } } } },
-                        mathematicalIllustrations: { type: "array", items: { type: "object", properties: { formula: { type: "string" }, name: { type: "string" }, explanation: { type: "string" } } } },
-                        researchData: { type: "array", items: { type: "object", properties: { statistic: { type: "string" }, value: { type: "string" }, source: { type: "string" } } } },
-                        subjectMatterExperts: { type: "array", items: { type: "object", properties: { name: { type: "string" }, field: { type: "string" }, contribution: { type: "string" } } } },
-                        distributionData: { type: "array", items: { type: "object", properties: { name: { type: "string" }, value: { type: "number" } } } },
-                        trendData: { type: "array", items: { type: "object", properties: { year: { type: "string" }, value: { type: "number" } } } },
-                        comparisonData: { type: "array", items: { type: "object", properties: { name: { type: "string" }, valueA: { type: "number" }, valueB: { type: "number" } } } },
-                        radarData: { type: "array", items: { type: "object", properties: { attribute: { type: "string" }, score: { type: "number" } } } }
-                    }
-                }
-            });
-            
-            // Validate response has proper data
-            if (!response || !response.overview || response.overview.length < 50 || 
-                !response.keyFacts || response.keyFacts.length < 3 ||
-                !response.distributionData || response.distributionData.length < 2) {
-                // Data is incomplete, retry once
-                console.log('Incomplete data received, retrying...');
-                const retryResponse = await base44.integrations.Core.InvokeLLM({
-                    prompt: `Provide comprehensive intelligence data about "${item}" in the context of ${category?.name || 'natural world'}. Include:
-1. Overview: A detailed description (3-4 sentences)
-2. Key Facts: 5 interesting and fun facts
-3. Significance: Why it matters to humans and the planet
-4. Related Topics: 4 related concepts to explore
-5. Current Research: Recent scientific discoveries or developments
-6. Physical Composition: 5 key physical properties/characteristics with descriptions
-7. Chemical Composition: 5 main chemical elements or compounds with percentages or descriptions
-8. Mathematical Illustrations: 3 mathematical formulas or equations related to this topic with explanations
-9. Research Data: 5 key statistics or research findings with numerical data
-10. Subject Matter Experts: 4 notable scientists or researchers who study this topic with their contributions
-11. Chart Data: Provide numerical data for visualization:
-    - distributionData: 5 items with name and value (percentage distribution)
-    - trendData: 6 data points showing trends over time (year and value)
-    - comparisonData: 4 items comparing different aspects (name, valueA, valueB)
-    - radarData: 5 attributes with scores (0-100) for a radar chart`,
+            // Split into two smaller API calls for reliability
+            const [basicResponse, chartsResponse] = await Promise.all([
+                base44.integrations.Core.InvokeLLM({
+                    prompt: `Provide intelligence data about "${item}" (${category?.name || 'general'}):
+1. Overview: 3-4 sentence description
+2. Key Facts: 5 interesting facts (short, under 100 chars each)
+3. Significance: Why it matters (2 sentences)
+4. Related Topics: 4 related concepts
+5. Current Research: Recent developments (2 sentences)
+6. Physical Properties: 3 key properties with brief descriptions
+7. Chemical Elements: 3 main elements/compounds with percentages`,
                     add_context_from_internet: true,
                     response_json_schema: {
                         type: "object",
@@ -470,21 +419,33 @@ function ItemDetailView({ item, category, onNavigateToTopic }) {
                             relatedTopics: { type: "array", items: { type: "string" } },
                             currentResearch: { type: "string" },
                             physicalComposition: { type: "array", items: { type: "object", properties: { property: { type: "string" }, description: { type: "string" } } } },
-                            chemicalComposition: { type: "array", items: { type: "object", properties: { element: { type: "string" }, percentage: { type: "string" }, description: { type: "string" } } } },
-                            mathematicalIllustrations: { type: "array", items: { type: "object", properties: { formula: { type: "string" }, name: { type: "string" }, explanation: { type: "string" } } } },
-                            researchData: { type: "array", items: { type: "object", properties: { statistic: { type: "string" }, value: { type: "string" }, source: { type: "string" } } } },
-                            subjectMatterExperts: { type: "array", items: { type: "object", properties: { name: { type: "string" }, field: { type: "string" }, contribution: { type: "string" } } } },
+                            chemicalComposition: { type: "array", items: { type: "object", properties: { element: { type: "string" }, percentage: { type: "string" } } } }
+                        }
+                    }
+                }),
+                base44.integrations.Core.InvokeLLM({
+                    prompt: `For "${item}", provide numerical chart data:
+- distributionData: 4 items with name and value (numbers adding to 100)
+- trendData: 5 data points with year (2020-2024) and value (numbers)
+- radarData: 4 attributes with score (0-100)`,
+                    response_json_schema: {
+                        type: "object",
+                        properties: {
                             distributionData: { type: "array", items: { type: "object", properties: { name: { type: "string" }, value: { type: "number" } } } },
                             trendData: { type: "array", items: { type: "object", properties: { year: { type: "string" }, value: { type: "number" } } } },
-                            comparisonData: { type: "array", items: { type: "object", properties: { name: { type: "string" }, valueA: { type: "number" }, valueB: { type: "number" } } } },
                             radarData: { type: "array", items: { type: "object", properties: { attribute: { type: "string" }, score: { type: "number" } } } }
                         }
                     }
-                });
-                setData(retryResponse);
-            } else {
-                setData(response);
-            }
+                })
+            ]);
+            
+            // Merge responses
+            const mergedData = {
+                ...basicResponse,
+                ...chartsResponse
+            };
+            
+            setData(mergedData);
         } catch (error) {
             console.error('Failed to fetch item data:', error);
             setError(true);

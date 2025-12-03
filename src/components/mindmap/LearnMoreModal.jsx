@@ -343,7 +343,7 @@ For each document, provide the actual URL where it can be found.`,
                                                 )}
                                             </div>
 
-                                            <p className="text-gray-700 text-sm md:text-lg leading-relaxed">{data?.overview?.description || 'Loading description...'}</p>
+                                            <p className="text-gray-700 text-sm md:text-lg leading-relaxed"><TextWithLinks text={data?.overview?.description} /> {!data?.overview?.description && 'Loading description...'}</p>
                                             
                                             {data?.overview && (
                                                 <>

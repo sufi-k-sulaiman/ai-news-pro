@@ -491,9 +491,9 @@ export default function SearchPage() {
 
             sentencesRef.current = sentences;
 
-            const ttsResponse = await base44.functions.invoke('elevenlabsTTS', {
+            const ttsResponse = await base44.functions.invoke('edgeTTS', {
                 text: cleanText,
-                voice_id: 'EXAVITQu4vr4xnSDxMaL'
+                lang: 'en-gb'
             });
 
             setGenerationProgress(75);

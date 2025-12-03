@@ -329,9 +329,9 @@ export default function SearchPods() {
             // Generate audio using ElevenLabs TTS
             let ttsResponse;
             try {
-                ttsResponse = await base44.functions.invoke('elevenlabsTTS', {
+                ttsResponse = await base44.functions.invoke('edgeTTS', {
                     text: cleanText,
-                    voice_id: selectedVoice
+                    lang: 'en-gb'
                 });
                 console.log('TTS response received:', ttsResponse?.data ? 'has data' : 'no data', ttsResponse?.data?.error || 'no error');
             } catch (ttsError) {

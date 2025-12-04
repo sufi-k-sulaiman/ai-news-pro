@@ -65,9 +65,11 @@ export default function Games() {
             <div className="max-w-6xl mx-auto">
                 <div className="text-center mb-8">
                     <div className="inline-flex items-center gap-3 mb-4">
-                        <h1 className="text-2xl md:text-3xl font-bold text-gray-900">Game Arcade</h1>
+                        <h1 className="text-2xl md:text-3xl font-bold text-gray-900">Gamified Education</h1>
                     </div>
-                    <p className="text-gray-500">Gamified Learning</p>
+                    <p className="text-gray-500">Game Arcade transforms learning into play by merging education with immersive, AI‑powered
+games. Instead of traditional study methods, it gamifies knowledge so every challenge feels
+like fun.</p>
                 </div>
 
                 <div className="grid grid-cols-2 gap-6">

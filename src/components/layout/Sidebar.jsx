@@ -1,5 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
+import { createPageUrl } from '@/utils';
 import { menuItems, LOGO_URL } from '../NavigationConfig';
 
 export default function Sidebar({ isOpen, activePage, onClose }) {

@@ -1050,24 +1050,29 @@ export default function TankCity({ onExit }) {
             }
             ctx.globalAlpha = 1;
 
-            // HUD
+            // HUD - responsive
+            const isMobileView = w < 768;
+            const fontSize = isMobileView ? 14 : 24;
+            const padding = isMobileView ? 10 : 20;
+            const lineHeight = isMobileView ? 22 : 30;
+            
             ctx.fillStyle = '#ffffff';
-            ctx.font = 'bold 24px Inter';
+            ctx.font = `bold ${fontSize}px Inter`;
             ctx.textAlign = 'left';
             ctx.shadowBlur = 5;
             ctx.shadowColor = '#000';
-            ctx.fillText(`SCORE: ${state.score}`, 20, 40);
-            ctx.fillText(`WORDS: ${state.wordsDestroyed}/${state.totalWords}`, 20, 70);
+            ctx.fillText(`SCORE: ${state.score}`, padding, isMobileView ? 25 : 40);
+            ctx.fillText(`WORDS: ${state.wordsDestroyed}/${state.totalWords}`, padding, isMobileView ? 25 + lineHeight : 70);
             ctx.fillStyle = '#f59e0b';
-            ctx.fillText(`LEVEL: ${level}`, 20, 100);
+            ctx.fillText(`LEVEL: ${level}`, padding, isMobileView ? 25 + lineHeight * 2 : 100);
             
             ctx.textAlign = 'right';
             ctx.fillStyle = '#ef4444';
             for (let i = 0; i < state.lives; i++) {
-                ctx.fillText('❤️', w - 20 - i * 40, 40);
+                ctx.fillText('❤️', w - padding - i * (isMobileView ? 25 : 40), isMobileView ? 25 : 40);
             }
             ctx.fillStyle = '#3b82f6';
-            ctx.fillText(`ENEMIES: ${state.enemiesLeft}`, w - 20, 70);
+            ctx.fillText(`ENEMIES: ${state.enemiesLeft}`, w - padding, isMobileView ? 50 : 70);
             ctx.shadowBlur = 0;
         };
 

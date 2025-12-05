@@ -475,13 +475,18 @@ export default function WordShooter({ onExit }) {
         if (sw.life <= 0) state.shockwave = null;
       }
       
-      ctx.fillStyle = '#ffffff'; ctx.font = 'bold 28px Inter'; ctx.textAlign = 'left'; ctx.shadowBlur = 5; ctx.shadowColor = '#000';
-      ctx.fillText(`SCORE: ${state.score}`, 30, 40);
-      ctx.fillText(`COMBO: x${state.combo}`, 30, 80);
-      ctx.fillText(`WORDS: ${state.wordsCompleted}/${state.totalWords}`, 30, 120);
-      ctx.textAlign = 'right'; ctx.fillStyle = '#ef4444'; ctx.font = '32px Inter';
-      for(let i=0; i<state.playerHealth; i++) ctx.fillText('❤️', w - 30 - i * 45, 45);
-      ctx.fillStyle = '#8b5cf6'; ctx.font = 'bold 24px Inter'; ctx.fillText(`💣 x${state.bombs}`, w - 30, 90);
+      const isMobileView = w < 768;
+      const fontSize = isMobileView ? 16 : 28;
+      const smallFontSize = isMobileView ? 14 : 24;
+      const padding = isMobileView ? 15 : 30;
+      
+      ctx.fillStyle = '#ffffff'; ctx.font = `bold ${fontSize}px Inter`; ctx.textAlign = 'left'; ctx.shadowBlur = 5; ctx.shadowColor = '#000';
+      ctx.fillText(`SCORE: ${state.score}`, padding, isMobileView ? 25 : 40);
+      ctx.fillText(`COMBO: x${state.combo}`, padding, isMobileView ? 50 : 80);
+      ctx.fillText(`WORDS: ${state.wordsCompleted}/${state.totalWords}`, padding, isMobileView ? 75 : 120);
+      ctx.textAlign = 'right'; ctx.fillStyle = '#ef4444'; ctx.font = `${isMobileView ? 20 : 32}px Inter`;
+      for(let i=0; i<state.playerHealth; i++) ctx.fillText('❤️', w - padding - i * (isMobileView ? 28 : 45), isMobileView ? 28 : 45);
+      ctx.fillStyle = '#8b5cf6'; ctx.font = `bold ${smallFontSize}px Inter`; ctx.fillText(`💣 x${state.bombs}`, w - padding, isMobileView ? 55 : 90);
       ctx.shadowBlur = 0;
       
       ctx.restore();

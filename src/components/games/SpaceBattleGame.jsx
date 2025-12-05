@@ -869,7 +869,10 @@ export default function SpaceBattleGame({ onExit }) {
         };
 
         const drawHUD = (ctx, canvas, state) => {
-            // Radar (bottom left)
+            const isMobileView = canvas.width < 768;
+            
+            // Radar (bottom left) - hide on mobile
+            if (!isMobileView) {
             const radarX = 120;
             const radarY = canvas.height - 120;
             const radarR = 80;
@@ -910,8 +913,10 @@ export default function SpaceBattleGame({ onExit }) {
             ctx.lineTo(radarX + 6, radarY - 4);
             ctx.closePath();
             ctx.fill();
+            } // end radar
 
-            // Compass (top right)
+            // Compass (top right) - hide on mobile
+            if (!isMobileView) {
             const compassX = canvas.width - 100;
             const compassY = 100;
             const compassR = 60;
@@ -950,45 +955,49 @@ export default function SpaceBattleGame({ onExit }) {
             ctx.lineTo(compassX + 5, compassY - 15);
             ctx.closePath();
             ctx.fill();
+            } // end compass
 
-            // Level progress display (top right, next to compass)
-            const scoreX = canvas.width - 220;
+            // Level progress display (top right on mobile, next to compass on desktop)
+            const scoreX = isMobileView ? canvas.width - 60 : canvas.width - 220;
+            const scoreY = isMobileView ? 60 : 100;
+            const scoreRadius = isMobileView ? 40 : 50;
+            
             ctx.strokeStyle = 'rgba(100, 150, 200, 0.5)';
             ctx.lineWidth = 2;
             ctx.beginPath();
-            ctx.arc(scoreX, compassY, 50, 0, Math.PI * 2);
+            ctx.arc(scoreX, scoreY, scoreRadius, 0, Math.PI * 2);
             ctx.stroke();
             
             // Level progress arc
             const progressPercent = Math.min(1, state.levelScore / state.levelTarget);
             ctx.strokeStyle = '#00ff88';
-            ctx.lineWidth = 4;
+            ctx.lineWidth = isMobileView ? 3 : 4;
             ctx.beginPath();
-            ctx.arc(scoreX, compassY, 45, -Math.PI/2, -Math.PI/2 + progressPercent * Math.PI * 2);
+            ctx.arc(scoreX, scoreY, scoreRadius - 5, -Math.PI/2, -Math.PI/2 + progressPercent * Math.PI * 2);
             ctx.stroke();
             
             ctx.fillStyle = '#fff';
-            ctx.font = '10px monospace';
+            ctx.font = `${isMobileView ? '8px' : '10px'} monospace`;
             ctx.textAlign = 'center';
-            ctx.fillText(`LEVEL ${currentLevel}`, scoreX, compassY - 15);
+            ctx.fillText(`LEVEL ${currentLevel}`, scoreX, scoreY - 12);
             
             ctx.fillStyle = '#00ff88';
-            ctx.font = 'bold 16px monospace';
-            ctx.fillText(state.aliensKilled, scoreX, compassY + 5);
+            ctx.font = `bold ${isMobileView ? '14px' : '16px'} monospace`;
+            ctx.fillText(state.aliensKilled, scoreX, scoreY + 5);
             ctx.fillStyle = 'rgba(255,255,255,0.5)';
-            ctx.font = '10px monospace';
-            ctx.fillText(`/ ${state.minAliensToKill} kills`, scoreX, compassY + 20);
+            ctx.font = `${isMobileView ? '8px' : '10px'} monospace`;
+            ctx.fillText(`/ ${state.minAliensToKill}`, scoreX, scoreY + 18);
 
             // Health (hearts) top left
             ctx.fillStyle = '#fff';
-            ctx.font = 'bold 16px monospace';
+            ctx.font = `bold ${isMobileView ? '12px' : '16px'} monospace`;
             ctx.textAlign = 'left';
-            ctx.fillText('HEALTH', 30, 35);
+            ctx.fillText('HEALTH', isMobileView ? 15 : 30, isMobileView ? 25 : 35);
             for (let i = 0; i < 3; i++) {
                 ctx.fillStyle = i < state.player.health ? '#ff4444' : 'rgba(255,255,255,0.2)';
                 ctx.beginPath();
-                const hx = 30 + i * 30;
-                const hy = 55;
+                const hx = (isMobileView ? 15 : 30) + i * (isMobileView ? 22 : 30);
+                const hy = isMobileView ? 40 : 55;
                 ctx.moveTo(hx + 10, hy + 5);
                 ctx.bezierCurveTo(hx + 10, hy, hx, hy, hx, hy + 5);
                 ctx.bezierCurveTo(hx, hy + 10, hx + 10, hy + 15, hx + 10, hy + 20);
@@ -997,7 +1006,8 @@ export default function SpaceBattleGame({ onExit }) {
                 ctx.fill();
             }
 
-            // Awards display (top center)
+            // Awards display (top center) - hide on mobile
+            if (!isMobileView) {
             ctx.fillStyle = '#00d4ff';
             ctx.font = 'bold 14px monospace';
             ctx.textAlign = 'center';
@@ -1030,24 +1040,25 @@ export default function SpaceBattleGame({ onExit }) {
                     ctx.fill();
                 }
             });
+            }
 
             // Bombs display (bottom right)
             ctx.fillStyle = '#fff';
-            ctx.font = 'bold 14px monospace';
+            ctx.font = `bold ${isMobileView ? '10px' : '14px'} monospace`;
             ctx.textAlign = 'right';
-            ctx.fillText('BOMBS', canvas.width - 30, canvas.height - 60);
+            ctx.fillText('BOMBS', canvas.width - (isMobileView ? 15 : 30), canvas.height - (isMobileView ? 40 : 60));
             for (let i = 0; i < 3; i++) {
                 ctx.fillStyle = i < state.bombs ? '#fbbf24' : 'rgba(255,255,255,0.2)';
                 ctx.beginPath();
-                ctx.arc(canvas.width - 30 - i * 30, canvas.height - 35, 10, 0, Math.PI * 2);
+                ctx.arc(canvas.width - (isMobileView ? 15 : 30) - i * (isMobileView ? 20 : 30), canvas.height - (isMobileView ? 20 : 35), isMobileView ? 7 : 10, 0, Math.PI * 2);
                 ctx.fill();
             }
 
-            // Controls hint
+            // Controls hint - simplified on mobile
             ctx.fillStyle = 'rgba(255,255,255,0.4)';
-            ctx.font = '12px monospace';
+            ctx.font = `${isMobileView ? '10px' : '12px'} monospace`;
             ctx.textAlign = 'center';
-            ctx.fillText('MOUSE/ARROWS to aim • SPACE to fire • B for bomb', canvas.width / 2, canvas.height - 20);
+            ctx.fillText(isMobileView ? 'Touch & drag to aim • Auto-fire' : 'MOUSE/ARROWS to aim • SPACE to fire • B for bomb', canvas.width / 2, canvas.height - (isMobileView ? 8 : 20));
         };
 
         gameLoop();

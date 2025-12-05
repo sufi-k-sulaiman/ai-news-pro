@@ -152,8 +152,9 @@ export default function TetrisGalaxy({ onExit }) {
         window.addEventListener('resize', updateSize);
 
         const getCellSize = () => {
-            const maxHeight = canvas.height - 120;
-            const maxWidth = canvas.width * 0.7;
+            const isMobile = canvas.width < 768;
+            const maxHeight = canvas.height - (isMobile ? 150 : 120);
+            const maxWidth = isMobile ? canvas.width - 20 : canvas.width * 0.7;
             return Math.floor(Math.min(maxHeight / BOARD_HEIGHT, maxWidth / BOARD_WIDTH));
         };
 
@@ -586,12 +587,55 @@ export default function TetrisGalaxy({ onExit }) {
             ctx.font = 'bold 16px Arial';
             ctx.fillText(`Topic: ${currentTopic || ''}`, canvas.width / 2, headerY + 52);
 
-            // Right side panel
-            const panelX = offsetX + gameWidth + 20;
-            const panelY = offsetY;
-            const panelWidth = 130;
+            // Right side panel - responsive positioning
+            const isMobileView = canvas.width < 768;
+            const panelX = isMobileView ? 10 : offsetX + gameWidth + 20;
+            const panelY = isMobileView ? offsetY + gameHeight + 10 : offsetY;
+            const panelWidth = isMobileView ? canvas.width - 20 : 130;
 
-            // Next piece section - no box, just content
+            // Mobile: horizontal layout at bottom, Desktop: vertical on right
+            if (isMobileView) {
+                // Horizontal stats bar at bottom
+                const statWidth = panelWidth / 4;
+                ctx.textAlign = 'center';
+                
+                // Score
+                ctx.fillStyle = '#fbbf24';
+                ctx.font = 'bold 12px Arial';
+                ctx.fillText('SCORE', panelX + statWidth/2, panelY + 15);
+                ctx.font = 'bold 20px Arial';
+                ctx.fillText(gameScore.toString(), panelX + statWidth/2, panelY + 38);
+                
+                // Lines
+                ctx.fillStyle = '#34d399';
+                ctx.font = 'bold 12px Arial';
+                ctx.fillText('LINES', panelX + statWidth * 1.5, panelY + 15);
+                ctx.font = 'bold 20px Arial';
+                ctx.fillText(gameLines.toString(), panelX + statWidth * 1.5, panelY + 38);
+                
+                // Level
+                ctx.fillStyle = '#f472b6';
+                ctx.font = 'bold 12px Arial';
+                ctx.fillText('LEVEL', panelX + statWidth * 2.5, panelY + 15);
+                ctx.font = 'bold 20px Arial';
+                ctx.fillText(gameLevel.toString(), panelX + statWidth * 2.5, panelY + 38);
+                
+                // Next piece preview
+                if (nextPiece) {
+                    ctx.fillStyle = '#a78bfa';
+                    ctx.font = 'bold 12px Arial';
+                    ctx.fillText('NEXT', panelX + statWidth * 3.5, panelY + 15);
+                    const pSize = 14;
+                    const px = panelX + statWidth * 3.5 - (nextPiece.shape[0].length * pSize) / 2;
+                    const py = panelY + 22;
+                    nextPiece.shape.forEach((row, dy) => {
+                        row.forEach((value, dx) => {
+                            if (value) draw3DBlock(px + dx * pSize, py + dy * pSize, pSize - 1, nextPiece.color, nextPiece.glow);
+                        });
+                    });
+                }
+            } else {
+            // Desktop: vertical layout
             ctx.fillStyle = '#a78bfa';
             ctx.font = 'bold 16px Arial';
             ctx.textAlign = 'center';
@@ -637,6 +681,7 @@ export default function TetrisGalaxy({ onExit }) {
             ctx.fillText('LEVEL', panelX + panelWidth/2, statsY + 140);
             ctx.font = 'bold 28px Arial';
             ctx.fillText(gameLevel.toString(), panelX + panelWidth/2, statsY + 170);
+            }
 
             // Draw explosion particles
             const CELL_SIZE_FOR_PARTICLES = getCellSize();

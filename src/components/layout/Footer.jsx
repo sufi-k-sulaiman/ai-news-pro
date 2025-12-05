@@ -1,4 +1,6 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
+import { createPageUrl } from '@/utils';
 import { LOGO_URL, footerLinks } from '../NavigationConfig';
 
 export default function Footer() {

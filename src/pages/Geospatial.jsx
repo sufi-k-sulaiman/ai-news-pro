@@ -269,7 +269,7 @@ export default function Geospatial() {
                 <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
                     <Tabs value={activeMapTab} onValueChange={setActiveMapTab}>
                         <div className="border-b border-gray-200 px-4 pt-4">
-                            <TabsList className="bg-gray-100 p-1">
+                            <TabsList className="bg-gray-100 p-1 flex flex-wrap h-auto gap-1">
                                 {MAP_TABS.map(tab => {
                                     const TabIcon = tab.icon;
                                     return (

@@ -323,7 +323,7 @@ CRITICAL: Do NOT embed URLs or markdown links like [text](url) in any text field
                     </div>
                     <button 
                         onClick={() => onClose(false)}
-                        className="w-8 h-8 rounded-lg hover:bg-gray-100 flex items-center justify-center text-gray-400 hover:text-gray-600"
+                        className="w-8 h-8 rounded-lg bg-purple-600 hover:bg-purple-700 flex items-center justify-center text-white"
                     >
                         <X className="w-5 h-5" />
                     </button>

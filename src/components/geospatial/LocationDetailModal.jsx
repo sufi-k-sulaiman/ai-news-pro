@@ -194,9 +194,9 @@ Be specific with real numbers, avoid generic statements. Use actual statistics w
                 </div>
                 <button 
                     onClick={onClose}
-                    className="p-1 hover:bg-gray-100 rounded-full transition-colors"
+                    className="w-7 h-7 rounded-lg bg-purple-600 hover:bg-purple-700 flex items-center justify-center text-white transition-colors"
                 >
-                    <X className="w-4 h-4 text-gray-500" />
+                    <X className="w-4 h-4" />
                 </button>
             </div>
 

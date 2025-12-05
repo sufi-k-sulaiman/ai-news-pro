@@ -995,16 +995,15 @@ export default function SearchPods() {
 
             {/* Player Modal */}
             <Dialog open={showPlayer} onOpenChange={closePlayer}>
-                <DialogContent className="max-w-lg p-0 bg-white border-gray-200 overflow-hidden" aria-describedby={undefined}>
+                <DialogContent className="max-w-lg p-0 bg-white border-gray-200 max-h-[90vh] overflow-y-auto [&>button]:hidden" aria-describedby={undefined}>
                     <DialogTitle className="sr-only">Now Playing</DialogTitle>
                     <div className="p-6">
                         {/* Header */}
                         <div className="flex justify-between items-center mb-6">
-                            <button onClick={closePlayer} className="text-gray-400 hover:text-gray-600">
-                                <X className="w-6 h-6" />
-                            </button>
                             <span className="text-gray-500 text-sm uppercase tracking-wider">Now Playing</span>
-                            <div className="w-6" />
+                            <button onClick={closePlayer} className="w-10 h-10 rounded-full bg-purple-600 hover:bg-purple-700 flex items-center justify-center transition-colors">
+                                <X className="w-5 h-5 text-white" />
+                            </button>
                         </div>
 
                         {/* Album Art */}

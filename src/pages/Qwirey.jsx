@@ -663,7 +663,8 @@ If exact reviews aren't available, find user opinions, comments, or discussions 
                 persuasive: 'Rewrite this content in a persuasive, compelling style that convinces the reader. Use emotional appeals, strong arguments, and call-to-action language.',
                 technical: 'Rewrite this content in a technical, precise style with accurate terminology, data-focused language, and professional tone.',
                 journalistic: 'Rewrite this content in a journalistic style with an inverted pyramid structure, objective tone, and clear factual reporting.',
-                creative: 'Rewrite this content in a creative, engaging style with vivid imagery, storytelling elements, and dynamic language.'
+                creative: 'Rewrite this content in a creative, engaging style with vivid imagery, storytelling elements, and dynamic language.',
+                editorial: 'Rewrite this content in an editorial style with opinion-based analysis that interprets or critiques events, issues, or trends. Include clear perspective, persuasive arguments, and thoughtful commentary while maintaining credibility.'
             };
             
             const originalText = result.longData.paragraphs.join('\n\n');

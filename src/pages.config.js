@@ -21,6 +21,7 @@ import TermsOfUse from './pages/TermsOfUse';
 import ContactUs from './pages/ContactUs';
 import News from './pages/News';
 import NotFound from './pages/NotFound';
+import Privacy from './pages/Privacy';
 import __Layout from './Layout.jsx';
 
 
@@ -48,6 +49,7 @@ export const PAGES = {
     "ContactUs": ContactUs,
     "News": News,
     "NotFound": NotFound,
+    "Privacy": Privacy,
 }
 
 export const pagesConfig = {

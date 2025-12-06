@@ -1,5 +1,5 @@
 
-import { Globe, Sparkles, BarChart3, Gamepad2, Settings, Radio, Brain, FileText, GraduationCap, ListTodo, StickyNote, Lightbulb, ScrollText, Newspaper } from 'lucide-react';
+import { Globe, Sparkles, BarChart3, Gamepad2, Settings, Radio, Brain, FileText, GraduationCap, ListTodo, StickyNote, Lightbulb, ScrollText, Newspaper, Shield } from 'lucide-react';
 import { createPageUrl } from '@/utils';
 
 export const LOGO_URL = 'https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/692729a5f5180fbd43f297e9/a1a505225_1cPublishing-logo.png';
@@ -19,6 +19,7 @@ export const menuItems = [
     { label: 'ResumePro', icon: FileText, href: createPageUrl('ResumeBuilder') },
     { label: 'Settings', icon: Settings, href: createPageUrl('Settings') },
     { label: 'Terms of Use', icon: ScrollText, href: createPageUrl('TermsOfUse') },
+    { label: 'Privacy Policy', icon: Shield, href: createPageUrl('PrivacyPolicy') },
 ];
 
 export const NAVIGATION_ITEMS = menuItems.map(item => ({
@@ -28,5 +29,6 @@ export const NAVIGATION_ITEMS = menuItems.map(item => ({
 
 export const footerLinks = [
     { label: 'Terms of Use', href: '/TermsOfUse' },
+    { label: 'Privacy Policy', href: '/PrivacyPolicy' },
     { label: 'Contact Us', href: '/ContactUs' },
 ];

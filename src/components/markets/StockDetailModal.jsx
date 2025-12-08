@@ -66,6 +66,7 @@ export default function StockDetailModal({ stock, isOpen, onClose }) {
     const [yearsToHold, setYearsToHold] = useState(5);
     const [expectedReturn, setExpectedReturn] = useState(12);
     const [activeReportTab, setActiveReportTab] = useState('annual');
+    const [priceChartPeriod, setPriceChartPeriod] = useState('36M');
 
     useEffect(() => {
         if (isOpen && stock) {
@@ -506,9 +507,17 @@ Base on actual market conditions and company specifics.`;
                         const price = stock.price * (0.7 + randomWalk + (monthProgress * trend));
                         return { month: `M${i + 1}`, price: Math.max(price * trendEffect, stock.price * 0.5) };
                     });
-                const startPrice = priceData[0]?.price || stock.price * 0.8;
-                const highPrice = Math.max(...priceData.map(p => p.price));
-                const lowPrice = Math.min(...priceData.map(p => p.price));
+                const periodMap = {
+                    '36M': 36, '24M': 24, '12M': 12, '6M': 6, '3M': 3,
+                    '1W': 0.23, '72H': 0.01, '24H': 0.003
+                };
+                const periodMonths = periodMap[priceChartPeriod] || 36;
+                const filteredPriceData = priceChartPeriod === '36M' ? priceData : 
+                    priceData.slice(-Math.ceil(periodMonths)) || priceData;
+                
+                const startPrice = filteredPriceData[0]?.price || stock.price * 0.8;
+                const highPrice = Math.max(...filteredPriceData.map(p => p.price));
+                const lowPrice = Math.min(...filteredPriceData.map(p => p.price));
                 const currentPrice = stock.price;
                 
                 return (
@@ -545,14 +554,28 @@ Base on actual market conditions and company specifics.`;
                             <div className="flex items-center justify-between mb-4">
                                 <div className="flex items-center gap-2">
                                     <LineChart className="w-5 h-5 text-purple-600" />
-                                    <h3 className="font-semibold text-gray-900">36-Month Price History</h3>
+                                    <h3 className="font-semibold text-gray-900">Price History</h3>
                                 </div>
-                                <span className="text-sm text-gray-500">Hover for details</span>
+                                <div className="flex flex-wrap gap-1">
+                                    {['24H', '72H', '1W', '3M', '6M', '12M', '24M', '36M'].map(period => (
+                                        <button
+                                            key={period}
+                                            onClick={() => setPriceChartPeriod(period)}
+                                            className={`px-2 py-1 text-xs rounded-lg font-medium transition-colors ${
+                                                priceChartPeriod === period 
+                                                    ? 'bg-purple-600 text-white' 
+                                                    : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                                            }`}
+                                        >
+                                            {period}
+                                        </button>
+                                    ))}
+                                </div>
                             </div>
-                            {priceData.length > 0 && (
+                            {filteredPriceData.length > 0 && (
                             <div className="h-56 md:h-72 overflow-x-auto">
                             <ResponsiveContainer width="100%" height="100%" minWidth={300}>
-                                <AreaChart data={priceData}>
+                                <AreaChart data={filteredPriceData}>
                                         <defs>
                                             <linearGradient id="priceGradientOverview" x1="0" y1="0" x2="0" y2="1">
                                                 <stop offset="5%" stopColor="#8B5CF6" stopOpacity={0.3}/>

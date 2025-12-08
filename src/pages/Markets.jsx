@@ -957,30 +957,53 @@ export default function Markets() {
     const [filters, setFilters] = useState({ market: 'All Markets', sector: 'All Sectors', industry: 'All Industries', moat: 'Any', roe: 'Any', pe: 'Any', zscore: 'Any' });
     const [selectedStock, setSelectedStock] = useState(null);
     const [showStockModal, setShowStockModal] = useState(false);
-    const [loading, setLoading] = useState(true);
+    const [loading, setLoading] = useState(false);
+    const [loadingMore, setLoadingMore] = useState(false);
+    const [hasMore, setHasMore] = useState(true);
     const [chartFilter, setChartFilter] = useState({ type: null, value: null });
 
-    useEffect(() => { fetchStockData(); }, []);
+    useEffect(() => { loadInitialStocks(); }, []);
 
-
-
-    const fetchStockData = async () => {
+    const loadInitialStocks = async () => {
         setLoading(true);
+        await loadMoreStocks(true);
+        setLoading(false);
+    };
+
+    const loadMoreStocks = async (initial = false) => {
+        if (!initial && (!hasMore || loadingMore)) return;
+        
+        if (!initial) setLoadingMore(true);
+        
         try {
-            // Get a random batch of 30 stocks to fetch real data for
-            const stockBatch = STOCK_DATA.sort(() => Math.random() - 0.5).slice(0, 30);
-            const tickers = stockBatch.map(s => s.ticker).join(', ');
+            const currentCount = stocks.length;
+            const batch = STOCK_DATA.slice(currentCount, currentCount + 20);
+            
+            if (batch.length === 0) {
+                setHasMore(false);
+                if (!initial) setLoadingMore(false);
+                return;
+            }
+
+            const tickers = batch.map(s => s.ticker).join(', ');
             
             const response = await base44.integrations.Core.InvokeLLM({
-                prompt: `Provide current stock market data for these tickers: ${tickers}
+                prompt: `Provide REAL, CURRENT stock market data for these ${batch.length} tickers: ${tickers}
 
-For each stock, provide realistic current market data including:
-- Current price (realistic based on recent trading)
-- Daily change percentage (-5% to +5% typical range)
+For EACH ticker, provide accurate real-time data:
+- Current trading price (actual market price)
+- Today's change percentage
 - Trading volume
-- Key financial metrics: MOAT score (0-100), ROE %, P/E ratio, Z-Score, EPS, Dividend yield
+- MOAT score (0-100, economic moat strength)
+- ROE % (return on equity)
+- P/E ratio (price to earnings)
+- Z-Score (financial health, 0-5)
+- EPS (earnings per share)
+- Dividend yield %
+- Sales growth rate %
+- Beta (volatility measure)
 
-Return data for all ${stockBatch.length} stocks.`,
+Use real market data. Return ALL ${batch.length} stocks.`,
                 add_context_from_internet: true,
                 response_json_schema: {
                     type: "object",
@@ -1000,7 +1023,8 @@ Return data for all ${stockBatch.length} stocks.`,
                                     zscore: { type: "number" },
                                     eps: { type: "number" },
                                     dividend: { type: "number" },
-                                    sgr: { type: "number" }
+                                    sgr: { type: "number" },
+                                    beta: { type: "number" }
                                 }
                             }
                         }
@@ -1008,53 +1032,48 @@ Return data for all ${stockBatch.length} stocks.`,
                 }
             });
 
-            // Merge LLM data with our stock info
             const llmStocks = response?.stocks || [];
-            const updatedStocks = STOCK_DATA.map(stock => {
+            const newStocks = batch.map(stock => {
                 const llmData = llmStocks.find(s => s.ticker === stock.ticker);
                 if (llmData) {
-                    const history = [];
-                    let price = llmData.price * 0.9;
-                    for (let i = 0; i < 20; i++) { 
-                        price = price * (1 + (Math.random() - 0.48) * 0.02); 
-                        history.push(Math.round(price * 100) / 100); 
-                    }
                     return {
                         ...stock,
                         price: llmData.price,
                         change: llmData.change,
-                        volume: llmData.volume || `${(Math.random() * 50 + 5).toFixed(1)}M`,
-                        moat: llmData.moat || 50 + Math.floor(Math.random() * 40),
-                        roe: llmData.roe || 10 + Math.floor(Math.random() * 25),
-                        roic: (llmData.roe || 15) - 2 + Math.floor(Math.random() * 5),
-                        roa: Math.floor((llmData.roe || 15) * 0.6),
-                        pe: llmData.pe || 15 + Math.floor(Math.random() * 25),
-                        peg: Math.round(((llmData.pe || 20) / (llmData.sgr || 10)) * 100) / 100,
-                        zscore: llmData.zscore || 2 + Math.random() * 2,
-                        eps: llmData.eps || 1 + Math.random() * 10,
-                        dividend: llmData.dividend || Math.random() * 3,
-                        sgr: llmData.sgr || 5 + Math.floor(Math.random() * 20),
-                        beta: Math.round((0.7 + Math.random() * 0.8) * 100) / 100,
-                        fcf: Math.floor(Math.random() * 5000) + 500,
+                        volume: llmData.volume,
+                        moat: llmData.moat,
+                        roe: llmData.roe,
+                        roic: llmData.roe - 2,
+                        roa: Math.floor(llmData.roe * 0.6),
+                        pe: llmData.pe,
+                        peg: Math.round((llmData.pe / llmData.sgr) * 100) / 100,
+                        zscore: llmData.zscore,
+                        eps: llmData.eps,
+                        dividend: llmData.dividend,
+                        sgr: llmData.sgr,
+                        beta: llmData.beta,
+                        fcf: 500 + Math.floor(Math.random() * 4500),
                         eva: 40 + Math.floor(Math.random() * 50),
-                        aiRating: 55 + Math.floor(Math.random() * 40),
-                        history
+                        aiRating: 55 + Math.floor(Math.random() * 40)
                     };
                 }
-                return generateStockData(stock);
+                return stock;
             });
 
-            setStocks(updatedStocks);
+            setStocks(prev => [...prev, ...newStocks]);
+            setHasMore(currentCount + batch.length < STOCK_DATA.length);
         } catch (error) {
-            console.error('Error fetching stock data:', error);
-            // Fallback to generated data
-            setStocks(STOCK_DATA.map(generateStockData));
+            console.error('Error loading stocks:', error);
         } finally {
-            setLoading(false);
+            if (!initial) setLoadingMore(false);
         }
     };
 
-    const refreshStocks = () => fetchStockData();
+    const refreshStocks = async () => {
+        setStocks([]);
+        setHasMore(true);
+        await loadInitialStocks();
+    };
     const handleStockClick = (stock) => { 
         setSelectedStock(stock); 
         setShowStockModal(true); 
@@ -1230,11 +1249,32 @@ Return data for all ${stockBatch.length} stocks.`,
             </div>
 
             {loading ? (
-                <LoadingState message="Fetching latest market data..." size="large" />
+                <LoadingState message="Loading market data..." size="large" />
             ) : (
-                <div className="flex flex-col gap-3 md:grid md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 md:gap-4">
-                    {filteredStocks.map((stock, i) => (<StockCard key={stock.ticker || i} stock={stock} onClick={handleStockClick} />))}
-                </div>
+                <>
+                    <div className="flex flex-col gap-3 md:grid md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 md:gap-4">
+                        {filteredStocks.map((stock, i) => (<StockCard key={stock.ticker || i} stock={stock} onClick={handleStockClick} />))}
+                    </div>
+                    
+                    {hasMore && !loading && (
+                        <div className="flex justify-center mt-8">
+                            <Button
+                                onClick={() => loadMoreStocks()}
+                                disabled={loadingMore}
+                                className="px-8 py-3 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white rounded-xl"
+                            >
+                                {loadingMore ? (
+                                    <>
+                                        <RefreshCw className="w-4 h-4 mr-2 animate-spin" />
+                                        Loading...
+                                    </>
+                                ) : (
+                                    `Load More Stocks (${Math.min(20, STOCK_DATA.length - stocks.length)} more available)`
+                                )}
+                            </Button>
+                        </div>
+                    )}
+                </>
             )}
 
             {!loading && filteredStocks.length === 0 && (

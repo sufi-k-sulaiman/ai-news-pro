@@ -99,16 +99,29 @@ export default function StockDetailModal({ stock, isOpen, onClose }) {
 
             switch (section) {
                 case 'overview':
-                    prompt = `Provide REAL, CURRENT data for ${stock.ticker} (${stock.name}):
+                    const periodDescriptions = {
+                        '24H': 'hourly price data for the last 24 hours (24 data points with labels like "00:00", "01:00", etc.)',
+                        '72H': 'hourly price data for the last 72 hours (72 data points with labels like "0h", "1h", "2h", etc.)',
+                        '1W': 'daily price data for the last 7 days (7 data points with labels like "Mon", "Tue", etc.)',
+                        '3M': 'weekly price data for the last 3 months (12-13 data points)',
+                        '6M': 'weekly price data for the last 6 months (24-26 data points)',
+                        '12M': 'monthly price data for the last 12 months (12 data points)',
+                        '24M': 'monthly price data for the last 24 months (24 data points)',
+                        '36M': 'monthly price data for the last 36 months (36 data points)'
+                    };
+                    const periodDesc = periodDescriptions[priceChartPeriod] || periodDescriptions['36M'];
+                    
+                    prompt = `Provide REAL, ACCURATE market data for ${stock.ticker} (${stock.name}):
 - Brief company description
 - Top 3 competitive advantages
 - Main revenue streams
 - Latest major news/developments
-- 36 monthly price data points (last 3 years, realistic prices)
+- CRITICAL: Real historical price data for the period "${priceChartPeriod}": ${periodDesc}
+  Use ACTUAL market prices for ${stock.ticker}. Current price is $${stock.price}.
 - MOAT analysis: brand power, switching costs, network effects, cost advantages, intangibles (0-100 each)
 - Investment thesis (2-3 sentences)
 
-Use real market data.`;
+IMPORTANT: Fetch REAL price history from financial data sources for ${stock.ticker}.`;
                     schema = {
                         type: "object",
                         properties: {
@@ -116,7 +129,7 @@ Use real market data.`;
                             advantages: { type: "array", items: { type: "string" } },
                             revenueStreams: { type: "array", items: { type: "string" } },
                             developments: { type: "array", items: { type: "string" } },
-                            priceHistory: { type: "array", items: { type: "object", properties: { month: { type: "string" }, price: { type: "number" } } } },
+                            priceHistory: { type: "array", items: { type: "object", properties: { time: { type: "string" }, price: { type: "number" } } } },
                             moatBreakdown: { type: "object", properties: { brandPower: { type: "number" }, switchingCosts: { type: "number" }, networkEffects: { type: "number" }, costAdvantages: { type: "number" }, intangibles: { type: "number" } } },
                             thesis: { type: "string" }
                         }

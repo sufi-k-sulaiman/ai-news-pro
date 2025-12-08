@@ -1064,19 +1064,24 @@ Base on actual market conditions and company specifics.`;
                                 <h3 className="font-semibold text-gray-900 mb-4 flex items-center gap-2 text-sm md:text-base">
                                     <TrendingUp className="w-4 h-4 text-green-600" /> Revenue & Profit Growth
                                 </h3>
-                                {revenueData.length > 0 && (
-                                <div className="h-44 md:h-52 overflow-x-auto">
-                                    <ResponsiveContainer width="100%" height="100%" minWidth={300}>
-                                        <BarChart data={revenueData}>
-                                            <XAxis dataKey="year" tick={{ fontSize: 11 }} />
-                                            <YAxis yAxisId="left" tick={{ fontSize: 10 }} tickFormatter={(v) => `${v}%`} />
-                                            <YAxis yAxisId="right" orientation="right" tick={{ fontSize: 10 }} tickFormatter={(v) => `$${v}B`} />
-                                            <Tooltip />
-                                            <Bar yAxisId="right" dataKey="revenue" fill="#8B5CF6" radius={[4, 4, 0, 0]} name="Revenue ($B)" />
-                                            <Bar yAxisId="left" dataKey="growth" fill="#10B981" radius={[4, 4, 0, 0]} name="Growth (%)" />
-                                        </BarChart>
-                                    </ResponsiveContainer>
-                                </div>
+                                {revenueData.length > 0 ? (
+                                    <div className="h-44 md:h-52 overflow-x-auto">
+                                        <ResponsiveContainer width="100%" height="100%" minWidth={300}>
+                                            <BarChart data={revenueData}>
+                                                <XAxis dataKey="year" tick={{ fontSize: 11 }} />
+                                                <YAxis yAxisId="left" tick={{ fontSize: 10 }} tickFormatter={(v) => `${v}%`} />
+                                                <YAxis yAxisId="right" orientation="right" tick={{ fontSize: 10 }} tickFormatter={(v) => `$${v}B`} />
+                                                <Tooltip />
+                                                <Bar yAxisId="right" dataKey="revenue" fill="#8B5CF6" radius={[4, 4, 0, 0]} name="Revenue ($B)" />
+                                                <Bar yAxisId="left" dataKey="growth" fill="#10B981" radius={[4, 4, 0, 0]} name="Growth (%)" />
+                                            </BarChart>
+                                        </ResponsiveContainer>
+                                    </div>
+                                ) : (
+                                    <div className="flex items-center justify-center h-52 text-gray-400">
+                                        <Loader2 className="w-6 h-6 animate-spin" />
+                                    </div>
+                                )}
                             </div>
                             
                             <div className="bg-white rounded-2xl border border-gray-200 p-6">

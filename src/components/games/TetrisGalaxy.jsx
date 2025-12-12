@@ -17,7 +17,7 @@ const TABS = [
     { id: 'history', label: 'History', color: 'from-amber-500 to-orange-600' },
 ];
 
-const BOARD_WIDTH = 20; // 2x wider
+const BOARD_WIDTH = 25; // 25% wider than before
 const BOARD_HEIGHT = 20;
 
 // Galaxy-themed vibrant colors matching app purple theme
@@ -158,14 +158,26 @@ export default function TetrisGalaxy({ onExit }) {
             return Math.floor(Math.min(maxHeight / BOARD_HEIGHT, maxWidth / BOARD_WIDTH));
         };
 
-        // Galaxy background
+        // Galaxy background - changes per level
         const drawGalaxyBackground = () => {
-            // Deep space gradient
+            // Level-based gradient themes
+            const levelThemes = [
+                { colors: ['#1e1b4b', '#312e81', '#4c1d95', '#0f0a1f'] }, // Level 1: Deep Purple
+                { colors: ['#0f172a', '#1e293b', '#3730a3', '#1e1b4b'] }, // Level 2: Midnight Blue
+                { colors: ['#14532d', '#166534', '#15803d', '#064e3b'] }, // Level 3: Emerald Forest
+                { colors: ['#701a75', '#86198f', '#a21caf', '#581c87'] }, // Level 4: Magenta Nebula
+                { colors: ['#7c2d12', '#9a3412', '#b91c1c', '#7f1d1d'] }, // Level 5: Red Giant
+                { colors: ['#0c4a6e', '#075985', '#0369a1', '#0e7490'] }, // Level 6: Ocean Deep
+                { colors: ['#4a044e', '#6b21a8', '#7e22ce', '#6b21a8'] }, // Level 7: Purple Cosmos
+                { colors: ['#831843', '#9f1239', '#be123c', '#881337'] }, // Level 8+: Rose Quartz
+            ];
+            const theme = levelThemes[Math.min(gameLevel - 1, levelThemes.length - 1)];
+            
             const grad = ctx.createLinearGradient(0, 0, 0, canvas.height);
-            grad.addColorStop(0, '#1e1b4b');
-            grad.addColorStop(0.3, '#312e81');
-            grad.addColorStop(0.6, '#4c1d95');
-            grad.addColorStop(1, '#0f0a1f');
+            grad.addColorStop(0, theme.colors[0]);
+            grad.addColorStop(0.3, theme.colors[1]);
+            grad.addColorStop(0.6, theme.colors[2]);
+            grad.addColorStop(1, theme.colors[3]);
             ctx.fillStyle = grad;
             ctx.fillRect(0, 0, canvas.width, canvas.height);
 
@@ -855,50 +867,49 @@ export default function TetrisGalaxy({ onExit }) {
     };
 
     return (
-        <div className="fixed inset-0 bg-gradient-to-b from-gray-50 via-purple-50 to-indigo-100 z-[9999] overflow-auto p-4">
-            <Button onClick={onExit} variant="ghost" className="absolute top-2 right-2 text-gray-500 hover:text-purple-600 hover:bg-purple-100">
+        <div className="fixed inset-0 bg-gradient-to-br from-purple-50 via-white to-indigo-50 z-[9999] overflow-auto p-4 md:p-6">
+            <Button onClick={onExit} variant="ghost" className="absolute top-4 right-4 text-gray-400 hover:text-purple-600 hover:bg-purple-100 rounded-lg">
                 <X className="w-5 h-5" />
             </Button>
 
-            <div className="max-w-6xl mx-auto">
-                <div className="text-center mb-6">
-                    <div className="relative inline-block">
-                        <div className="absolute inset-0 blur-xl bg-purple-300/40 rounded-full"></div>
-                        <img src={LOGO_URL} alt="Logo" className="w-16 h-16 mx-auto mb-3 rounded-xl relative shadow-lg" />
+            <div className="max-w-5xl mx-auto">
+                <div className="text-center mb-8">
+                    <div className="relative inline-block mb-4">
+                        <img src={LOGO_URL} alt="Logo" className="w-12 h-12 mx-auto rounded-lg shadow-md" />
                     </div>
-                    <h1 className="text-4xl font-black bg-gradient-to-r from-purple-600 via-violet-600 to-indigo-600 bg-clip-text text-transparent mb-2">TETRIS GALAXY</h1>
-                    <p className="text-purple-500">Stack Words • Learn Vocabulary • Explore the Cosmos</p>
+                    <h1 className="text-5xl font-bold bg-gradient-to-r from-purple-600 to-indigo-600 bg-clip-text text-transparent mb-2">TETRIS GALAXY</h1>
+                    <p className="text-purple-500 text-sm">Stack Words • Learn Vocabulary • Explore the Cosmos</p>
                 </div>
 
-                <div className="bg-white rounded-2xl border border-purple-200 p-4 mb-6 shadow-xl">
+                <div className="bg-white/80 backdrop-blur rounded-2xl border border-purple-200/60 shadow-lg p-5 mb-6">
                     <div className="flex gap-3">
                         <div className="flex-1 relative">
-                            <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-purple-400" />
+                            <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-purple-400" />
                             <Input 
                                 placeholder="Enter any topic to learn..." 
                                 value={searchQuery} 
                                 onChange={(e) => setSearchQuery(e.target.value)}
                                 onKeyPress={(e) => { if (e.key === 'Enter' && searchQuery.trim()) handleStartGame('custom'); }}
-                                className="pl-12 h-12 bg-purple-50 border-purple-200 text-gray-800 placeholder:text-purple-300 rounded-xl focus:border-purple-400 focus:ring-purple-300" 
+                                className="pl-11 h-11 bg-purple-50/50 border-purple-200/60 text-gray-700 placeholder:text-purple-400/70 rounded-xl focus:border-purple-400 focus:ring-purple-300/50" 
                             />
                         </div>
                         <Button 
                             onClick={() => searchQuery.trim() && handleStartGame('custom')} 
                             disabled={!searchQuery.trim() || loading}
-                            className="h-12 px-6 bg-gradient-to-r from-purple-500 to-violet-600 hover:from-purple-600 hover:to-violet-700 text-white font-semibold rounded-xl shadow-lg shadow-purple-300"
+                            className="h-11 px-6 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white font-medium rounded-xl shadow-md"
                         >
                             <Play className="w-4 h-4 mr-2" /> Launch
                         </Button>
                     </div>
                 </div>
 
-                <div className="bg-white rounded-2xl border border-purple-100 p-5 mb-6 shadow-lg">
+                <div className="bg-white/80 backdrop-blur rounded-2xl border border-gray-200/60 shadow-md p-5 mb-6">
                     <div className="flex flex-wrap gap-2 mb-5">
                         {TABS.map(tab => (
                             <Button 
                                 key={tab.id} 
                                 onClick={() => handleTabClick(tab.id)}
-                                className={`px-5 py-2 rounded-full text-sm font-medium transition-all ${activeTab === tab.id ? `bg-gradient-to-r ${tab.color} text-white shadow-md` : 'bg-purple-50 hover:bg-purple-100 text-purple-600'}`}
+                                className={`px-4 py-2 rounded-full text-sm font-medium transition-all ${activeTab === tab.id ? `bg-gradient-to-r ${tab.color} text-white shadow-md` : 'bg-gray-100 hover:bg-purple-100 text-gray-600 hover:text-purple-600'}`}
                             >
                                 {tab.label}
                             </Button>
@@ -906,12 +917,12 @@ export default function TetrisGalaxy({ onExit }) {
                     </div>
 
                     {loadingTopics && !generatedTopics[activeTab]?.length ? (
-                        <div className="text-center py-10">
-                            <Loader2 className="w-10 h-10 animate-spin mx-auto mb-3 text-purple-500" />
-                            <p className="text-purple-400">Loading topics...</p>
+                        <div className="text-center py-12">
+                            <Loader2 className="w-8 h-8 animate-spin mx-auto mb-3 text-purple-500" />
+                            <p className="text-gray-400">Loading topics...</p>
                         </div>
                     ) : (
-                        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                             {filteredTopics(generatedTopics[activeTab] || []).slice(0, 9).map((topic, i) => {
                                 const tabInfo = TABS.find(t => t.id === activeTab);
                                 const icons = [Sparkles, Globe, Cpu, Atom, Leaf, Brain, Lightbulb, TrendingUp, Target];
@@ -920,10 +931,10 @@ export default function TetrisGalaxy({ onExit }) {
                                     <button 
                                         key={topic.id || i} 
                                         onClick={() => handleStartGame(topic)} 
-                                        className="h-32 text-left py-4 px-5 rounded-xl bg-white border-2 border-purple-200 hover:border-purple-400 hover:shadow-lg hover:shadow-purple-200 transition-all hover:scale-[1.02]"
+                                        className="h-28 text-left py-4 px-4 rounded-xl bg-white border border-gray-200 hover:border-purple-400 hover:shadow-lg transition-all hover:scale-[1.02]"
                                     >
-                                        <TopicIcon className="w-6 h-6 text-purple-500 mb-2" />
-                                        <div className="text-sm font-bold text-gray-800 line-clamp-2">{topic.label}</div>
+                                        <TopicIcon className="w-5 h-5 text-purple-500 mb-2" />
+                                        <div className="text-sm font-bold text-gray-900 line-clamp-2">{topic.label}</div>
                                         <div className="text-xs text-purple-400 line-clamp-1 mt-1">{topic.description}</div>
                                     </button>
                                 );
@@ -934,16 +945,16 @@ export default function TetrisGalaxy({ onExit }) {
 
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                     {[
-                        { icon: Target, title: 'Word Blocks', desc: 'Each piece shows a vocabulary word', iconColor: 'text-purple-500', bgColor: 'bg-purple-100' },
-                        { icon: Brain, title: 'Learn Definitions', desc: 'See meanings when lines clear', iconColor: 'text-violet-500', bgColor: 'bg-violet-100' },
-                        { icon: TrendingUp, title: 'Level Up', desc: 'Speed increases as you progress', iconColor: 'text-indigo-500', bgColor: 'bg-indigo-100' }
+                        { icon: Target, title: 'Word Blocks', desc: 'Each piece shows a vocabulary word' },
+                        { icon: Brain, title: 'Learn Definitions', desc: 'See meanings when lines clear' },
+                        { icon: TrendingUp, title: 'Level Up', desc: 'Speed increases as you progress' }
                     ].map((item, i) => (
-                        <div key={i} className="bg-white border border-purple-100 rounded-xl p-5 text-center shadow-md">
-                            <div className={`w-14 h-14 ${item.bgColor} rounded-xl mx-auto mb-3 flex items-center justify-center`}>
-                                <item.icon className={`w-7 h-7 ${item.iconColor}`} />
+                        <div key={i} className="bg-white/70 backdrop-blur border border-gray-200/60 rounded-xl p-5 text-center shadow-sm">
+                            <div className="w-12 h-12 bg-purple-100 rounded-full mx-auto mb-3 flex items-center justify-center">
+                                <item.icon className="w-6 h-6 text-purple-600" />
                             </div>
-                            <h3 className="text-gray-800 font-semibold mb-1">{item.title}</h3>
-                            <p className="text-purple-400 text-sm">{item.desc}</p>
+                            <h3 className="text-gray-900 font-semibold mb-1">{item.title}</h3>
+                            <p className="text-purple-500 text-xs">{item.desc}</p>
                         </div>
                     ))}
                 </div>

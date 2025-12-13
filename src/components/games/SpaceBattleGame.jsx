@@ -1247,17 +1247,17 @@ export default function SpaceBattleGame({ onExit }) {
                 </div>
 
                 {/* Search bar */}
-                <div className="bg-white rounded-xl border border-purple-200 p-3 mb-4 shadow-sm">
-                    <div className="flex gap-3">
+                <div className="bg-white rounded-full border border-purple-200 p-2 mb-4 shadow-sm">
+                    <div className="flex gap-2 items-center">
                         <div className="relative flex-1">
                             <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
                             <Input placeholder="Search decks or enter custom topic..." value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)}
                                 onKeyPress={(e) => { if (e.key === 'Enter' && searchQuery.trim()) startGame('custom'); }}
-                                className="pl-12 h-12 bg-white border-gray-200 text-gray-900 placeholder:text-gray-400 rounded-xl" />
+                                className="pl-12 h-12 bg-transparent border-0 text-gray-900 placeholder:text-gray-400 focus:ring-0" />
                         </div>
                         <Button onClick={() => searchQuery.trim() ? startGame('custom') : startGame(generatedTopics[activeCategory]?.[0])} 
                             disabled={loading}
-                            className="h-12 px-6 bg-emerald-500 hover:bg-emerald-600 text-white font-semibold rounded-xl">
+                            className="h-12 px-6 bg-emerald-500 hover:bg-emerald-600 text-white font-semibold rounded-full shadow-md">
                             <Play className="w-4 h-4 mr-2" /> Start Game
                         </Button>
                     </div>

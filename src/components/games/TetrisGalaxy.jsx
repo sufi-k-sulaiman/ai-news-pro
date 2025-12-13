@@ -881,8 +881,8 @@ export default function TetrisGalaxy({ onExit }) {
                     <p className="text-purple-500 text-sm">Stack Words • Learn Vocabulary • Explore the Cosmos</p>
                 </div>
 
-                <div className="bg-white/80 backdrop-blur rounded-2xl border border-purple-200/60 shadow-lg p-5 mb-6">
-                    <div className="flex gap-3">
+                <div className="bg-white/80 backdrop-blur rounded-full border border-purple-200/60 shadow-lg p-2 mb-6">
+                    <div className="flex gap-2 items-center">
                         <div className="flex-1 relative">
                             <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-purple-400" />
                             <Input 
@@ -890,13 +890,13 @@ export default function TetrisGalaxy({ onExit }) {
                                 value={searchQuery} 
                                 onChange={(e) => setSearchQuery(e.target.value)}
                                 onKeyPress={(e) => { if (e.key === 'Enter' && searchQuery.trim()) handleStartGame('custom'); }}
-                                className="pl-11 h-11 bg-purple-50/50 border-purple-200/60 text-gray-700 placeholder:text-purple-400/70 rounded-xl focus:border-purple-400 focus:ring-purple-300/50" 
+                                className="pl-11 h-11 bg-transparent border-0 text-gray-700 placeholder:text-purple-400/70 focus:ring-0" 
                             />
                         </div>
                         <Button 
                             onClick={() => searchQuery.trim() && handleStartGame('custom')} 
                             disabled={!searchQuery.trim() || loading}
-                            className="h-11 px-6 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white font-medium rounded-xl shadow-md"
+                            className="h-11 px-6 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white font-medium rounded-full shadow-md"
                         >
                             <Play className="w-4 h-4 mr-2" /> Launch
                         </Button>

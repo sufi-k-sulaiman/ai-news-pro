@@ -816,29 +816,26 @@ export default function SpaceBattleGame({ onExit }) {
             const crossX = state.mouseX;
             const crossY = state.mouseY;
             
-            // Crosshair frame
+            // Circular crosshair frame
             ctx.beginPath();
-            ctx.moveTo(crossX - crossSize - 10, crossY - crossSize);
-            ctx.lineTo(crossX - crossSize, crossY - crossSize);
-            ctx.lineTo(crossX - crossSize, crossY - crossSize - 10);
+            ctx.arc(crossX, crossY, crossSize, 0, Math.PI * 2);
             ctx.stroke();
             
+            // Inner circle
             ctx.beginPath();
-            ctx.moveTo(crossX + crossSize + 10, crossY - crossSize);
-            ctx.lineTo(crossX + crossSize, crossY - crossSize);
-            ctx.lineTo(crossX + crossSize, crossY - crossSize - 10);
+            ctx.arc(crossX, crossY, crossSize - 8, 0, Math.PI * 2);
             ctx.stroke();
             
+            // Cross lines
             ctx.beginPath();
-            ctx.moveTo(crossX - crossSize - 10, crossY + crossSize);
-            ctx.lineTo(crossX - crossSize, crossY + crossSize);
-            ctx.lineTo(crossX - crossSize, crossY + crossSize + 10);
-            ctx.stroke();
-            
-            ctx.beginPath();
-            ctx.moveTo(crossX + crossSize + 10, crossY + crossSize);
-            ctx.lineTo(crossX + crossSize, crossY + crossSize);
-            ctx.lineTo(crossX + crossSize, crossY + crossSize + 10);
+            ctx.moveTo(crossX - crossSize - 5, crossY);
+            ctx.lineTo(crossX - crossSize + 5, crossY);
+            ctx.moveTo(crossX + crossSize - 5, crossY);
+            ctx.lineTo(crossX + crossSize + 5, crossY);
+            ctx.moveTo(crossX, crossY - crossSize - 5);
+            ctx.lineTo(crossX, crossY - crossSize + 5);
+            ctx.moveTo(crossX, crossY + crossSize - 5);
+            ctx.lineTo(crossX, crossY + crossSize + 5);
             ctx.stroke();
             
             // Center dot

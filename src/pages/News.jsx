@@ -69,6 +69,7 @@ const cleanHtmlFromText = (text) => {
 // Store for generated image URLs with category prefix
 const imageCache = new Map();
 let currentCacheKey = '';
+const updateCallbacks = new Set();
 
 const generateImagesInBackground = async (articles, cacheKey) => {
     currentCacheKey = cacheKey;
@@ -83,6 +84,8 @@ const generateImagesInBackground = async (articles, cacheKey) => {
             response.data.images.forEach((url, index) => {
                 if (url) {
                     imageCache.set(`${cacheKey}-${index}`, url);
+                    // Notify all cards that images are ready
+                    updateCallbacks.forEach(cb => cb());
                 }
             });
             console.log(`Generated ${response.data.images.filter(Boolean).length} images`);
@@ -95,6 +98,7 @@ const generateImagesInBackground = async (articles, cacheKey) => {
 const NewsCardSimple = ({ article, index, imageUrl: preloadedImageUrl, cacheKey }) => {
     const [imageUrl, setImageUrl] = useState(preloadedImageUrl || null);
     const [imageLoading, setImageLoading] = useState(index < 12 && !preloadedImageUrl);
+    const [, forceUpdate] = useState({});
     
     const cleanTitle = cleanHtmlFromText(article.title);
     const cleanDescription = cleanHtmlFromText(article.description);
@@ -116,10 +120,10 @@ const NewsCardSimple = ({ article, index, imageUrl: preloadedImageUrl, cacheKey 
             return;
         }
         
-        // Check cache periodically for batch-generated images using category-specific key
+        // Check cache and subscribe to updates
         const checkCache = () => {
             const cachedUrl = imageCache.get(`${cacheKey}-${index}`);
-            if (cachedUrl) {
+            if (cachedUrl && cachedUrl !== imageUrl) {
                 setImageUrl(cachedUrl);
                 setImageLoading(false);
                 return true;
@@ -127,25 +131,25 @@ const NewsCardSimple = ({ article, index, imageUrl: preloadedImageUrl, cacheKey 
             return false;
         };
         
+        // Initial check
         if (checkCache()) return;
         
-        const interval = setInterval(() => {
-            if (checkCache()) {
-                clearInterval(interval);
-            }
-        }, 500);
+        // Subscribe to cache updates
+        const updateCallback = () => {
+            checkCache();
+        };
+        updateCallbacks.add(updateCallback);
         
-        // Timeout after 30 seconds
+        // Timeout after 60 seconds
         const timeout = setTimeout(() => {
-            clearInterval(interval);
             setImageLoading(false);
-        }, 30000);
+        }, 60000);
         
         return () => {
-            clearInterval(interval);
+            updateCallbacks.delete(updateCallback);
             clearTimeout(timeout);
         };
-    }, [index, preloadedImageUrl, cacheKey]);
+    }, [index, preloadedImageUrl, cacheKey, imageUrl]);
 
     return (
         <a 

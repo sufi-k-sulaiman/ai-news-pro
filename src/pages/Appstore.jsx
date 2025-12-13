@@ -110,7 +110,7 @@ export default function Appstore() {
                                     >
                                         <Button className="w-full bg-purple-600 hover:bg-purple-700 text-white font-semibold py-2.5 sm:py-3 text-sm sm:text-base">
                                             <Download className="w-4 h-4 mr-2" />
-                                            Download on App Store
+                                            Download
                                             <ExternalLink className="w-4 h-4 ml-2" />
                                         </Button>
                                     </a>

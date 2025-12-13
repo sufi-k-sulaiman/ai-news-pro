@@ -75,9 +75,11 @@ like fun.</p>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                   {/* Space Battle Game Card */}
                   <div className="bg-white rounded-2xl p-6 border border-gray-200 shadow-sm text-center flex flex-col">
-                      <div className="w-16 h-16 bg-gradient-to-br from-cyan-500 to-blue-600 rounded-xl flex items-center justify-center mx-auto mb-4">
-                          <Rocket className="w-8 h-8 text-white" />
-                      </div>
+                      <img 
+                          src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/692729a5f5180fbd43f297e9/0e93be6bb_Space-Battle.png" 
+                          alt="Space Battle" 
+                          className="w-full h-40 object-cover rounded-xl mb-4"
+                      />
                       <h2 className="text-xl font-bold text-gray-900 mb-2">Space Battle</h2>
                       <p className="text-gray-500 text-sm mb-4 flex-grow">Destroy alien ships and test your knowledge!</p>
                       <Button onClick={() => selectGame('space-battle')} size="lg" className="w-full bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-600 hover:to-blue-700">
@@ -87,9 +89,11 @@ like fun.</p>
 
                   {/* Word Shooter Game Card */}
                   <div className="bg-white rounded-2xl p-6 border border-gray-200 shadow-sm text-center flex flex-col">
-                      <div className="w-16 h-16 bg-gradient-to-br from-purple-500 to-pink-600 rounded-xl flex items-center justify-center mx-auto mb-4">
-                          <Target className="w-8 h-8 text-white" />
-                      </div>
+                      <img 
+                          src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/692729a5f5180fbd43f297e9/73d9c14c2_Wordshooter.png" 
+                          alt="Word Shooter" 
+                          className="w-full h-40 object-cover rounded-xl mb-4"
+                      />
                       <h2 className="text-xl font-bold text-gray-900 mb-2">Word Shooter</h2>
                       <p className="text-gray-500 text-sm mb-4 flex-grow">Gamified vocabulary learning with AI-powered word sets.</p>
                       <Button onClick={() => selectGame('word-shooter')} size="lg" className="w-full bg-gradient-to-r from-purple-500 to-pink-600 hover:from-purple-600 hover:to-pink-700">
@@ -99,9 +103,11 @@ like fun.</p>
 
                   {/* Tank City Game Card */}
                   <div className="bg-white rounded-2xl p-6 border border-gray-200 shadow-sm text-center flex flex-col">
-                      <div className="w-16 h-16 bg-gradient-to-br from-green-500 to-emerald-600 rounded-xl flex items-center justify-center mx-auto mb-4">
-                          <Shield className="w-8 h-8 text-white" />
-                      </div>
+                      <img 
+                          src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/692729a5f5180fbd43f297e9/83bb1d7fa_CosmicTank.png" 
+                          alt="Cosmic Tank" 
+                          className="w-full h-40 object-cover rounded-xl mb-4"
+                      />
                       <h2 className="text-xl font-bold text-gray-900 mb-2">Cosmic Tank</h2>
                       <p className="text-gray-500 text-sm mb-4 flex-grow">Space tank battle - defend your base from enemies!</p>
                       <Button onClick={() => selectGame('tank-city')} size="lg" className="w-full bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700">
@@ -111,9 +117,11 @@ like fun.</p>
 
                   {/* Tetris Galaxy Game Card */}
                   <div className="bg-white rounded-2xl p-6 border border-gray-200 shadow-sm text-center flex flex-col">
-                      <div className="w-16 h-16 bg-gradient-to-br from-cyan-500 to-teal-600 rounded-xl flex items-center justify-center mx-auto mb-4">
-                          <Blocks className="w-8 h-8 text-white" />
-                      </div>
+                      <img 
+                          src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/692729a5f5180fbd43f297e9/ce10027d6_TetrisGalaxy.png" 
+                          alt="Tetris Galaxy" 
+                          className="w-full h-40 object-cover rounded-xl mb-4"
+                      />
                       <h2 className="text-xl font-bold text-gray-900 mb-2">Tetris Galaxy</h2>
                       <p className="text-gray-500 text-sm mb-4 flex-grow">Stack word blocks and learn vocabulary as you clear lines!</p>
                       <Button onClick={() => selectGame('tetris-galaxy')} size="lg" className="w-full bg-gradient-to-r from-cyan-500 to-teal-600 hover:from-cyan-600 hover:to-teal-700">

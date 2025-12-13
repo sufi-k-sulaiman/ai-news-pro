@@ -15,6 +15,7 @@ export default function Appstore() {
             tagline: 'AI-Powered Podcast Discovery',
             description: 'Transform the way you discover podcasts with AI-generated audio content on any topic. SearchPods uses advanced AI to create personalized podcast episodes tailored to your interests, delivering knowledge in an engaging audio format wherever you go.',
             thumbnail: 'https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/692729a5f5180fbd43f297e9/649241119_image.png',
+            logo: 'https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/692729a5f5180fbd43f297e9/438969435_Search-Pods-AppIcon1.png',
             link: 'https://apps.apple.com/app/searchpods/id6756348023',
             color: 'from-cyan-600 to-blue-600',
             features: ['AI-generated podcasts', 'Any topic on demand', 'Offline listening', 'Smart recommendations']
@@ -24,6 +25,7 @@ export default function Appstore() {
             tagline: 'Visual Knowledge Mapping',
             description: 'Organize your thoughts and ideas with AI-powered mind mapping. Neural MindMap helps you create beautiful, interactive mind maps that enhance learning, brainstorming, and project planning. Perfect for students, professionals, and creative thinkers.',
             thumbnail: 'https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/692729a5f5180fbd43f297e9/4020f05d1_image.png',
+            logo: 'https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/692729a5f5180fbd43f297e9/9dac35a9f_mindmap-AppIcon11.png',
             link: 'https://apps.apple.com/app/neural-mindmap/id6756198559',
             color: 'from-purple-600 to-pink-600',
             features: ['AI-powered suggestions', 'Beautiful visualizations', 'Real-time collaboration', 'Export & share']
@@ -33,6 +35,7 @@ export default function Appstore() {
             tagline: 'Smart Daily Operations',
             description: 'Streamline your daily routines and boost productivity with intelligent task management. RoutineOps combines AI insights with intuitive design to help you build better habits, manage tasks efficiently, and achieve your goals consistently.',
             thumbnail: 'https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/692729a5f5180fbd43f297e9/04ff8c071_image.png',
+            logo: 'https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/692729a5f5180fbd43f297e9/4034b8cf7_RoutineOPS-appicon.png',
             link: 'https://apps.apple.com/app/routineops/id6756257586',
             color: 'from-green-600 to-emerald-600',
             features: ['Smart scheduling', 'Habit tracking', 'AI productivity tips', 'Progress analytics']
@@ -62,8 +65,16 @@ export default function Appstore() {
                                 <img 
                                     src={app.thumbnail} 
                                     alt={`${app.name} screenshot`}
-                                    className="h-full w-auto object-contain"
+                                    className="w-full h-full object-cover"
                                 />
+                                {/* App Logo Overlay */}
+                                <div className="absolute top-4 left-4">
+                                    <img 
+                                        src={app.logo} 
+                                        alt={`${app.name} logo`}
+                                        className="w-16 h-16 rounded-2xl shadow-lg"
+                                    />
+                                </div>
                             </div>
 
                             {/* App Info */}

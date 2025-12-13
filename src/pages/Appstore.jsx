@@ -59,61 +59,58 @@ export default function Appstore() {
                 {/* Apps Grid */}
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-12">
                     {apps.map((app, index) => (
-                        <div key={index} className="bg-white rounded-2xl shadow-lg overflow-hidden border border-gray-200 hover:shadow-2xl transition-all duration-300">
-                            <div className="flex flex-col md:flex-row">
-                                {/* App Thumbnail - Left Side */}
-                                <div className={`md:w-1/3 h-64 md:h-auto bg-gradient-to-br ${app.color} flex items-center justify-center overflow-hidden`}>
+                        <div key={index} className="bg-white rounded-2xl shadow-lg border border-gray-200 hover:shadow-2xl transition-all duration-300 p-6 relative pt-32">
+                            {/* Floating Thumbnail */}
+                            <div className="absolute -top-6 left-6 right-6">
+                                <div className="rounded-3xl overflow-hidden shadow-2xl">
                                     <img 
                                         src={app.thumbnail} 
                                         alt={`${app.name} screenshot`}
-                                        className="w-full h-full object-cover"
+                                        className="w-full h-48 object-cover"
                                     />
                                 </div>
+                            </div>
 
-                                {/* App Info - Right Side */}
-                                <div className="md:w-2/3 p-6 flex flex-col">
-                                    {/* Logo and Title */}
-                                    <div className="flex items-start gap-4 mb-4">
-                                        <img 
-                                            src={app.logo} 
-                                            alt={`${app.name} logo`}
-                                            className="w-16 h-16 rounded-2xl shadow-md flex-shrink-0"
-                                        />
-                                        <div className="flex-1">
-                                            <h3 className="text-2xl font-bold text-gray-900">{app.name}</h3>
-                                            <p className="text-sm font-medium text-gray-500">{app.tagline}</p>
-                                        </div>
-                                    </div>
-
-                                    <p className="text-gray-600 mb-4 leading-relaxed flex-1">{app.description}</p>
-
-                                    {/* Features */}
-                                    <div className="mb-4">
-                                        <ul className="grid grid-cols-2 gap-2">
-                                            {app.features.map((feature, i) => (
-                                                <li key={i} className="flex items-center gap-2 text-sm text-gray-600">
-                                                    <Star className="w-3 h-3 text-purple-500 fill-purple-500 flex-shrink-0" />
-                                                    <span className="line-clamp-1">{feature}</span>
-                                                </li>
-                                            ))}
-                                        </ul>
-                                    </div>
-
-                                    {/* Download Button */}
-                                    <a 
-                                        href={app.link} 
-                                        target="_blank" 
-                                        rel="noopener noreferrer"
-                                        className="block"
-                                    >
-                                        <Button className="w-full bg-purple-600 hover:bg-purple-700 text-white font-semibold py-3">
-                                            <Download className="w-4 h-4 mr-2" />
-                                            Download on App Store
-                                            <ExternalLink className="w-4 h-4 ml-2" />
-                                        </Button>
-                                    </a>
+                            {/* Logo and Title */}
+                            <div className="flex items-start gap-4 mb-4">
+                                <img 
+                                    src={app.logo} 
+                                    alt={`${app.name} logo`}
+                                    className="w-16 h-16 rounded-2xl shadow-md flex-shrink-0"
+                                />
+                                <div className="flex-1">
+                                    <h3 className="text-2xl font-bold text-gray-900">{app.name}</h3>
+                                    <p className="text-sm font-medium text-gray-500">{app.tagline}</p>
                                 </div>
                             </div>
+
+                            <p className="text-gray-600 mb-4 leading-relaxed">{app.description}</p>
+
+                            {/* Features */}
+                            <div className="mb-4">
+                                <ul className="grid grid-cols-2 gap-2">
+                                    {app.features.map((feature, i) => (
+                                        <li key={i} className="flex items-center gap-2 text-sm text-gray-600">
+                                            <Star className="w-3 h-3 text-purple-500 fill-purple-500 flex-shrink-0" />
+                                            <span className="line-clamp-1">{feature}</span>
+                                        </li>
+                                    ))}
+                                </ul>
+                            </div>
+
+                            {/* Download Button */}
+                            <a 
+                                href={app.link} 
+                                target="_blank" 
+                                rel="noopener noreferrer"
+                                className="block"
+                            >
+                                <Button className="w-full bg-purple-600 hover:bg-purple-700 text-white font-semibold py-3">
+                                    <Download className="w-4 h-4 mr-2" />
+                                    Download on App Store
+                                    <ExternalLink className="w-4 h-4 ml-2" />
+                                </Button>
+                            </a>
                         </div>
                     ))}
                 </div>

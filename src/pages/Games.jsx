@@ -78,7 +78,7 @@ like fun.</p>
                       <img 
                           src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/692729a5f5180fbd43f297e9/0e93be6bb_Space-Battle.png" 
                           alt="Space Battle" 
-                          className="w-full h-40 object-cover rounded-xl mb-4"
+                          className="w-full h-52 object-cover rounded-xl mb-4"
                       />
                       <h2 className="text-xl font-bold text-gray-900 mb-2">Space Battle</h2>
                       <p className="text-gray-500 text-sm mb-4 flex-grow">Destroy alien ships and test your knowledge!</p>
@@ -92,7 +92,7 @@ like fun.</p>
                       <img 
                           src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/692729a5f5180fbd43f297e9/73d9c14c2_Wordshooter.png" 
                           alt="Word Shooter" 
-                          className="w-full h-40 object-cover rounded-xl mb-4"
+                          className="w-full h-52 object-cover rounded-xl mb-4"
                       />
                       <h2 className="text-xl font-bold text-gray-900 mb-2">Word Shooter</h2>
                       <p className="text-gray-500 text-sm mb-4 flex-grow">Gamified vocabulary learning with AI-powered word sets.</p>
@@ -106,7 +106,7 @@ like fun.</p>
                       <img 
                           src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/692729a5f5180fbd43f297e9/83bb1d7fa_CosmicTank.png" 
                           alt="Cosmic Tank" 
-                          className="w-full h-40 object-cover rounded-xl mb-4"
+                          className="w-full h-52 object-cover rounded-xl mb-4"
                       />
                       <h2 className="text-xl font-bold text-gray-900 mb-2">Cosmic Tank</h2>
                       <p className="text-gray-500 text-sm mb-4 flex-grow">Space tank battle - defend your base from enemies!</p>
@@ -120,7 +120,7 @@ like fun.</p>
                       <img 
                           src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/692729a5f5180fbd43f297e9/ce10027d6_TetrisGalaxy.png" 
                           alt="Tetris Galaxy" 
-                          className="w-full h-40 object-cover rounded-xl mb-4"
+                          className="w-full h-52 object-cover rounded-xl mb-4"
                       />
                       <h2 className="text-xl font-bold text-gray-900 mb-2">Tetris Galaxy</h2>
                       <p className="text-gray-500 text-sm mb-4 flex-grow">Stack word blocks and learn vocabulary as you clear lines!</p>

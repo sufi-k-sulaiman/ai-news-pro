@@ -24,7 +24,7 @@ export default function Appstore() {
             name: 'Neural MindMap',
             tagline: 'Visual Knowledge Mapping',
             description: 'Organize your thoughts and ideas with AI-powered mind mapping. Neural MindMap helps you create beautiful, interactive mind maps that enhance learning, brainstorming, and project planning. Perfect for students, professionals, and creative thinkers.',
-            thumbnail: 'https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/692729a5f5180fbd43f297e9/4020f05d1_image.png',
+            thumbnail: 'https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/692729a5f5180fbd43f297e9/364f2f68c_simulator_screenshot_2B094FB3-68CC-475D-BBE7-E9D329CC414F.png',
             logo: 'https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/692729a5f5180fbd43f297e9/9dac35a9f_mindmap-AppIcon11.png',
             link: 'https://apps.apple.com/app/neural-mindmap/id6756198559',
             color: 'from-purple-600 to-pink-600',

@@ -67,8 +67,8 @@ const cleanHtmlFromText = (text) => {
 };
 
 const MAX_IMAGES_TO_GENERATE = 12; // Only generate images for first 12 articles
-const BATCH_SIZE = 3; // Generate 3 images per batch
-const BATCH_DELAY = 5000; // 5 seconds between batches
+const BATCH_SIZE = 2; // Generate 2 images per batch
+const BATCH_DELAY = 4000; // 4 seconds between batches
 
 // Store for batch-generated image URLs with category prefix
 const imageCache = new Map();

@@ -81,36 +81,51 @@ const generateImageBatch = async (articles, cacheKey) => {
         batches.push(articles.slice(i, i + BATCH_SIZE));
     }
     
+    console.log(`Starting batch generation: ${batches.length} batches of ${BATCH_SIZE} images`);
+    
     for (let batchIndex = 0; batchIndex < batches.length; batchIndex++) {
-        const batch = batches[batchIndex];
-        
-        // Wait between batches (except first)
-        if (batchIndex > 0) {
-            await new Promise(resolve => setTimeout(resolve, BATCH_DELAY));
-        }
-        
-        // Generate all images in this batch in parallel
-        const promises = batch.map(async (article, idx) => {
-            const globalIndex = batchIndex * BATCH_SIZE + idx;
-            const cleanTitle = cleanHtmlFromText(article.title);
+        try {
+            const batch = batches[batchIndex];
             
-            try {
-                // Check if cache key still matches (topic hasn't changed)
-                if (currentCacheKey !== cacheKey) return;
-                
-                const result = await base44.integrations.Core.GenerateImage({
-                    prompt: `Professional news photography depicting: ${cleanTitle}. Photorealistic, editorial style, high quality, no text or words, no logos`
-                });
-                if (result?.url && currentCacheKey === cacheKey) {
-                    imageCache.set(`${cacheKey}-${globalIndex}`, result.url);
-                }
-            } catch (error) {
-                console.log(`Image ${globalIndex} skipped`);
+            // Wait between batches (except first)
+            if (batchIndex > 0) {
+                await new Promise(resolve => setTimeout(resolve, BATCH_DELAY));
             }
-        });
-        
-        await Promise.all(promises);
+            
+            console.log(`Processing batch ${batchIndex + 1}/${batches.length}`);
+            
+            // Generate all images in this batch in parallel
+            const promises = batch.map(async (article, idx) => {
+                const globalIndex = batchIndex * BATCH_SIZE + idx;
+                const cleanTitle = cleanHtmlFromText(article.title);
+                
+                try {
+                    // Check if cache key still matches (topic hasn't changed)
+                    if (currentCacheKey !== cacheKey) return null;
+                    
+                    const result = await base44.integrations.Core.GenerateImage({
+                        prompt: `Professional news photography depicting: ${cleanTitle}. Photorealistic, editorial style, high quality, no text or words, no logos`
+                    });
+                    if (result?.url && currentCacheKey === cacheKey) {
+                        imageCache.set(`${cacheKey}-${globalIndex}`, result.url);
+                        console.log(`Image ${globalIndex} generated successfully`);
+                        return result.url;
+                    }
+                    return null;
+                } catch (error) {
+                    console.log(`Image ${globalIndex} failed:`, error.message);
+                    return null;
+                }
+            });
+            
+            await Promise.all(promises);
+            console.log(`Batch ${batchIndex + 1} complete`);
+        } catch (error) {
+            console.error(`Batch ${batchIndex + 1} error:`, error);
+            // Continue to next batch even if this one fails
+        }
     }
+    console.log('All batches complete');
 };
 
 const NewsCardSimple = ({ article, index, imageUrl: preloadedImageUrl, cacheKey }) => {

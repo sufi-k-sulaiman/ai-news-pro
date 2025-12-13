@@ -20,14 +20,21 @@ const ARTICLES_PER_CATEGORY = 12;
 const NewsGrid = ({ news }) => {
     // RSS feeds provide real URLs - no validation needed
     const articles = news.slice(0, ARTICLES_PER_CATEGORY);
+    const [loadedImages, setLoadedImages] = useState(0);
 
     // Generate images in background when articles load
     const newsKey = JSON.stringify(news.map(a => a.title).slice(0, 3));
     useEffect(() => {
         imageCache.clear();
         currentCacheKey = newsKey;
+        setLoadedImages(0);
         if (articles.length > 0) {
+            const progressCallback = (loaded, total) => {
+                setLoadedImages(loaded);
+            };
+            progressCallbacks.add(progressCallback);
             generateImagesInBackground(articles, newsKey);
+            return () => progressCallbacks.delete(progressCallback);
         }
     }, [newsKey]);
 
@@ -42,11 +49,27 @@ const NewsGrid = ({ news }) => {
     }
 
     return (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {articles.map((article, index) => (
-                <NewsCardSimple key={`${newsKey}-${index}`} article={article} index={index} cacheKey={newsKey} />
-            ))}
-        </div>
+        <>
+            {loadedImages > 0 && loadedImages < 12 && (
+                <div className="mb-4 bg-white rounded-xl border border-gray-200 p-4">
+                    <div className="flex items-center justify-between">
+                        <span className="text-sm text-gray-600">Generating images...</span>
+                        <span className="text-sm font-semibold text-purple-600">{loadedImages} / 12 ready</span>
+                    </div>
+                    <div className="mt-2 h-2 bg-gray-100 rounded-full overflow-hidden">
+                        <div 
+                            className="h-full bg-gradient-to-r from-purple-600 to-pink-600 transition-all duration-500"
+                            style={{ width: `${(loadedImages / 12) * 100}%` }}
+                        />
+                    </div>
+                </div>
+            )}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                {articles.map((article, index) => (
+                    <NewsCardSimple key={`${newsKey}-${index}`} article={article} index={index} cacheKey={newsKey} />
+                ))}
+            </div>
+        </>
     );
 };
 
@@ -70,6 +93,7 @@ const cleanHtmlFromText = (text) => {
 const imageCache = new Map();
 let currentCacheKey = '';
 const updateCallbacks = new Map();
+const progressCallbacks = new Set();
 
 const generateImagesInBackground = async (articles, cacheKey) => {
     currentCacheKey = cacheKey;
@@ -86,6 +110,7 @@ const generateImagesInBackground = async (articles, cacheKey) => {
                     imageCache.set(`${cacheKey}-${index}`, url);
                     const callback = updateCallbacks.get(`${cacheKey}-${index}`);
                     if (callback) callback(url);
+                    progressCallbacks.forEach(cb => cb(index + 1, 12));
                 }
             });
             console.log(`Generated ${response.data.images.filter(Boolean).length} images`);

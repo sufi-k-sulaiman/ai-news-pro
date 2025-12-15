@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
-import { Sparkles, Radio, Settings, Brain, FileText, BarChart3, GraduationCap, ListTodo, Lightbulb, StickyNote, Newspaper, Gamepad2, Globe } from "lucide-react";
+import { Sparkles, Radio, Brain, BarChart3, GraduationCap, ListTodo, Lightbulb, StickyNote, Newspaper, Gamepad2, Globe, Smartphone } from "lucide-react";
 
 const pages = [
     { name: 'Qwirey', page: 'Qwirey', icon: Sparkles, description: 'Your all-in-one Ai assistant, powered by Qwirey', color: 'from-purple-600 to-indigo-600' },
@@ -12,11 +12,10 @@ const pages = [
     { name: 'Learning', page: 'Learning', icon: GraduationCap, description: 'Navigate knowledge islands with progress tracking', color: 'from-emerald-600 to-teal-600' },
     { name: 'Geospatial', page: 'Geospatial', icon: Globe, description: 'Global data intelligence across 18 domains', color: 'from-indigo-600 to-purple-600' },
     { name: 'Intelligence', page: 'Intelligence', icon: Lightbulb, description: 'AI predictive analytics and scenario modeling', color: 'from-indigo-600 to-purple-600' },
-    { name: 'ResumePro', page: 'ResumeBuilder', icon: FileText, description: 'AI-powered professional resume generator', color: 'from-green-600 to-emerald-600' },
+    { name: 'Games', page: 'Games', icon: Gamepad2, description: 'Learn while you play with educational games', color: 'from-purple-600 to-pink-600' },
+    { name: 'Appstore', page: 'Appstore', icon: Smartphone, description: 'Download our mobile apps for iOS', color: 'from-blue-600 to-purple-600' },
     { name: 'Tasks', page: 'Tasks', icon: ListTodo, description: 'Track initiatives across all departments', color: 'from-violet-600 to-purple-600' },
     { name: 'Notes', page: 'Notes', icon: StickyNote, description: 'Rich text notes with Ai assistance', color: 'from-pink-600 to-rose-600' },
-    { name: 'Games', page: 'Games', icon: Gamepad2, description: 'Learn while you play with Word Shooter', color: 'from-purple-600 to-pink-600' },
-    { name: 'Settings', page: 'Settings', icon: Settings, description: 'Customize your experience with accessibility options', color: 'from-gray-600 to-slate-600' },
 ];
 
 export default function HomePage() {

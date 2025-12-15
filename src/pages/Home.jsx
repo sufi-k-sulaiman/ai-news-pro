@@ -12,8 +12,8 @@ const pages = [
     { name: 'Learning', page: 'Learning', icon: GraduationCap, description: 'Navigate knowledge islands with progress tracking', color: 'from-emerald-600 to-teal-600' },
     { name: 'Geospatial', page: 'Geospatial', icon: Globe, description: 'Global data intelligence across 18 domains', color: 'from-indigo-600 to-purple-600' },
     { name: 'Intelligence', page: 'Intelligence', icon: Lightbulb, description: 'AI predictive analytics and scenario modeling', color: 'from-indigo-600 to-purple-600' },
-    { name: 'Games', page: 'Games', icon: Gamepad2, description: 'Learn while you play with educational games', color: 'from-purple-600 to-pink-600' },
-    { name: 'Appstore', page: 'Appstore', icon: Smartphone, description: 'Download our mobile apps for iOS', color: 'from-blue-600 to-purple-600' },
+    { name: 'Games', page: 'Games', icon: Gamepad2, description: 'Learn while you play with Word Shooter', color: 'from-purple-600 to-pink-600' },
+    { name: 'Appstore', page: 'Appstore', icon: Smartphone, description: 'Download our AI-powered mobile apps', color: 'from-blue-600 to-purple-600' },
     { name: 'Tasks', page: 'Tasks', icon: ListTodo, description: 'Track initiatives across all departments', color: 'from-violet-600 to-purple-600' },
     { name: 'Notes', page: 'Notes', icon: StickyNote, description: 'Rich text notes with Ai assistance', color: 'from-pink-600 to-rose-600' },
 ];

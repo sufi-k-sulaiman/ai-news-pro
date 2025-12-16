@@ -664,7 +664,8 @@ If exact reviews aren't available, find user opinions, comments, or discussions 
                 technical: 'Rewrite this content in a technical, precise style with accurate terminology, data-focused language, and professional tone.',
                 journalistic: 'Rewrite this content in a journalistic style with an inverted pyramid structure, objective tone, and clear factual reporting.',
                 creative: 'Rewrite this content in a creative, engaging style with vivid imagery, storytelling elements, and dynamic language.',
-                editorial: 'Rewrite this content in an editorial style with opinion-based analysis that interprets or critiques events, issues, or trends. Include clear perspective, persuasive arguments, and thoughtful commentary while maintaining credibility.'
+                editorial: 'Rewrite this content in an editorial style with opinion-based analysis that interprets or critiques events, issues, or trends. Include clear perspective, persuasive arguments, and thoughtful commentary while maintaining credibility.',
+                essay: 'CRITICAL: Transform this into an unbiased, comprehensive essay with a compelling title and approximately 1400 words. Structure as follows: 1) Engaging title (no brand names, no links). 2) 10-12 well-developed paragraphs covering the topic thoroughly from multiple perspectives. 3) Use formal academic tone. 4) Present balanced viewpoints without bias. 5) Avoid any brand names, product names, or promotional content. 6) NO hyperlinks or URLs. 7) Focus on concepts, theories, and general knowledge rather than specific products or companies. Make it educational and objective.'
             };
             
             const originalText = result.longData.paragraphs.join('\n\n');
@@ -1095,17 +1096,18 @@ I need 10 reviews with: title, intro, and reviews array (name, rating 1-10, text
                                               {responseFormat === 'long' && result.longData && (
                                                   <div className="flex items-center gap-2">
                                                       <Select value={writingStyle} onValueChange={handleStyleChange} disabled={styleLoading}>
-                                                          <SelectTrigger className="w-36 h-9">
-                                                              <SelectValue placeholder="Style" />
-                                                          </SelectTrigger>
-                                                          <SelectContent>
-                                                              <SelectItem value="default">Default</SelectItem>
-                                                              <SelectItem value="persuasive">Persuasive</SelectItem>
-                                                              <SelectItem value="technical">Technical</SelectItem>
-                                                              <SelectItem value="journalistic">Journalistic</SelectItem>
-                                                              <SelectItem value="creative">Creative</SelectItem>
-                                                              <SelectItem value="editorial">Editorial</SelectItem>
-                                                          </SelectContent>
+                                                         <SelectTrigger className="w-36 h-9">
+                                                             <SelectValue placeholder="Style" />
+                                                         </SelectTrigger>
+                                                         <SelectContent>
+                                                             <SelectItem value="default">Default</SelectItem>
+                                                             <SelectItem value="persuasive">Persuasive</SelectItem>
+                                                             <SelectItem value="technical">Technical</SelectItem>
+                                                             <SelectItem value="journalistic">Journalistic</SelectItem>
+                                                             <SelectItem value="creative">Creative</SelectItem>
+                                                             <SelectItem value="editorial">Editorial</SelectItem>
+                                                             <SelectItem value="essay">Essay</SelectItem>
+                                                         </SelectContent>
                                                       </Select>
                                                       {styleLoading && <Loader2 className="w-4 h-4 animate-spin text-purple-600" />}
                                                   </div>

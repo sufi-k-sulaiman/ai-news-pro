@@ -357,7 +357,21 @@ export default function Qwirey() {
                 } else if (responseFormat === 'long') {
                     apiCalls.push(
                         base44.integrations.Core.InvokeLLM({
-                            prompt: `For "${currentPrompt}", provide a DETAILED response with 6-8 well-developed paragraphs. Include thorough explanations and examples.`,
+                            prompt: `CRITICAL: Generate EXACTLY 1400-1500 words total for "${currentPrompt}".
+
+                Write EXACTLY 12 paragraphs. Each paragraph MUST be 120-130 words (count carefully!).
+
+                For EACH paragraph:
+                - Explore ONE distinct aspect in great depth
+                - Include multiple examples and explanations
+                - Add theoretical frameworks or historical context
+                - Provide comparative analysis where relevant
+                - Discuss implications and consequences
+                - Present different perspectives
+
+                Make each paragraph substantial and information-rich. Expand ideas thoroughly. Use formal academic tone. Focus on concepts and principles, not products or brands.
+
+                WORD COUNT IS CRITICAL: 1400-1500 words total. If unsure, write MORE detail rather than less.`,
                             add_context_from_internet: true,
                             response_json_schema: {
                                 type: "object",

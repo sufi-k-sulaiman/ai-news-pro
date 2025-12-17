@@ -866,27 +866,98 @@ export default function StockSectionContent({
 
         case 'legends':
             const legendaryFrameworks = [
-                { name: 'Warren Buffett', style: 'Value / MOAT', color: '#8B5CF6', score: stock.moat, verdict: stock.moat >= 70 ? 'Strong Buy' : 'Hold' },
-                { name: 'Peter Lynch', style: 'GARP', color: '#10B981', score: (stock.peg || 1.2) <= 1 ? 90 : 70, verdict: (stock.peg || 1.2) <= 1 ? 'Strong Buy' : 'Buy' },
-                { name: 'Benjamin Graham', style: 'Deep Value', color: '#14B8A6', score: stock.pe < 15 ? 85 : 60, verdict: stock.pe < 15 ? 'Value' : 'Not Cheap' },
-                { name: 'Joel Greenblatt', style: 'Magic Formula', color: '#3B82F6', score: (stock.roic || 18) >= 20 ? 85 : 70, verdict: (stock.roic || 18) >= 20 ? 'Top Quartile' : 'Above Avg' },
-                { name: 'Ray Dalio', style: 'Risk Parity', color: '#0EA5E9', score: 75, verdict: 'Portfolio Fit' },
-                { name: 'Cathie Wood', style: 'Innovation', color: '#6366F1', score: stock.sector === 'Technology' ? 85 : 50, verdict: stock.sector === 'Technology' ? 'Innovation' : 'Not Focus' },
-                { name: 'George Soros', style: 'Reflexivity', color: '#EF4444', score: 72, verdict: 'Trend Following' },
-                { name: 'David Dreman', style: 'Contrarian', color: '#A855F7', score: stock.pe < 15 ? 85 : 55, verdict: stock.pe < 15 ? 'Contrarian Buy' : 'Wait' },
+                { name: 'Warren Buffett', style: 'Value / MOAT', color: '#8B5CF6', metrics: [{ label: 'MOAT', value: stock.moat, max: 100, good: 70 }, { label: 'ROE', value: stock.roe, max: 40, good: 15 }], verdict: stock.moat >= 70 && stock.roe >= 15 ? 'Strong Buy' : stock.moat >= 50 ? 'Hold' : 'Avoid' },
+                { name: 'Peter Lynch', style: 'GARP', color: '#10B981', metrics: [{ label: 'PEG', value: stock.peg || 1.2, max: 3, good: 1, inverse: true }, { label: 'Growth', value: stock.sgr || 15, max: 40, good: 15 }], verdict: (stock.peg || 1.2) <= 1 ? 'Strong Buy' : (stock.peg || 1.2) <= 1.5 ? 'Buy' : 'Hold' },
+                { name: 'Benjamin Graham', style: 'Deep Value', color: '#14B8A6', metrics: [{ label: 'P/E', value: stock.pe, max: 40, good: 15, inverse: true }, { label: 'Margin', value: 18, max: 50, good: 25 }], verdict: stock.pe < 15 ? 'Graham Value' : 'Not Cheap' },
+                { name: 'Joel Greenblatt', style: 'Magic Formula', color: '#3B82F6', metrics: [{ label: 'ROIC', value: stock.roic || 18, max: 40, good: 15 }, { label: 'Yield', value: 8.5, max: 20, good: 8 }], verdict: (stock.roic || 18) >= 20 ? 'Top Quartile' : 'Above Avg' },
+                { name: 'Ray Dalio', style: 'Risk Parity', color: '#0EA5E9', metrics: [{ label: 'Diversification', value: 72, max: 100, good: 70 }, { label: 'Risk Balance', value: 78, max: 100, good: 70 }], verdict: 'Portfolio Fit' },
+                { name: 'Cathie Wood', style: 'Innovation', color: '#6366F1', metrics: [{ label: 'Innovation', value: stock.sector === 'Technology' ? 85 : 50, max: 100, good: 70 }, { label: 'TAM Growth', value: 85, max: 100, good: 60 }], verdict: stock.sector === 'Technology' ? 'Innovation' : 'Not Focus' },
+                { name: 'George Soros', style: 'Reflexivity', color: '#EF4444', metrics: [{ label: 'Psychology', value: 58, max: 100, good: 40 }, { label: 'Momentum', value: 72, max: 100, good: 60 }], verdict: 'Trend Following' },
+                { name: 'David Dreman', style: 'Contrarian', color: '#A855F7', metrics: [{ label: 'Low P/E', value: stock.pe < 15 ? 85 : 35, max: 100, good: 70 }, { label: 'Bias', value: 72, max: 100, good: 65 }], verdict: stock.pe < 15 ? 'Contrarian Buy' : 'Wait' },
+                { name: 'John Templeton', style: 'Global Contrarian', color: '#F59E0B', metrics: [{ label: 'Pessimism', value: 65, max: 100, good: 70 }, { label: 'Global Value', value: 72, max: 100, good: 60 }], verdict: 'Contrarian Buy' },
+                { name: 'Aswath Damodaran', style: 'Academic DCF', color: '#EC4899', metrics: [{ label: 'DCF Gap', value: 15, max: 50, good: 10 }, { label: 'WACC', value: 9.5, max: 15, good: 10, inverse: true }], verdict: 'Fairly Valued' },
+                { name: 'Stanley Druckenmiller', style: 'Macro Opportunism', color: '#84CC16', metrics: [{ label: 'Liquidity', value: 75, max: 100, good: 60 }, { label: 'Fed Policy', value: 62, max: 100, good: 50 }], verdict: 'Macro Favorable' },
+                { name: 'Carl Icahn', style: 'Activist', color: '#DC2626', metrics: [{ label: 'Governance', value: 68, max: 100, good: 60 }, { label: 'Unlock Value', value: 55, max: 100, good: 50 }], verdict: 'No Activism' },
+                { name: 'Seth Klarman', style: 'Deep Value', color: '#059669', metrics: [{ label: 'Cash Option', value: 65, max: 100, good: 60 }, { label: 'Patience', value: 80, max: 100, good: 75 }], verdict: 'Margin OK' },
+                { name: 'David Tepper', style: 'Distressed', color: '#EA580C', metrics: [{ label: 'Credit Cycle', value: 72, max: 100, good: 60 }, { label: 'Bold Risk', value: 65, max: 100, good: 55 }], verdict: 'Hold' },
+                { name: 'Jim Simons', style: 'Quantitative', color: '#7C3AED', metrics: [{ label: 'Stat Arb', value: 78, max: 100, good: 70 }, { label: 'Alpha', value: 71, max: 100, good: 65 }], verdict: 'Quant Neutral' },
+                { name: 'John Bogle', style: 'Index/Passive', color: '#64748B', metrics: [{ label: 'Cost Efficiency', value: 88, max: 100, good: 80 }, { label: 'Compound', value: 82, max: 100, good: 70 }], verdict: 'Index Component' },
             ];
+
+            const legendRadarData = [
+                { subject: 'Value', Buffett: 85, Lynch: 70, Greenblatt: 80, Graham: 90 },
+                { subject: 'Growth', Buffett: 60, Lynch: 85, Greenblatt: 70, Graham: 40 },
+                { subject: 'Quality', Buffett: 90, Lynch: 75, Greenblatt: 85, Graham: 70 },
+                { subject: 'Momentum', Buffett: 30, Lynch: 65, Greenblatt: 50, Graham: 20 },
+                { subject: 'Safety', Buffett: 85, Lynch: 60, Greenblatt: 75, Graham: 95 }
+            ];
+
+            const overallScores = legendaryFrameworks.map(l => ({
+                name: l.name.split(' ')[1] || l.name.split(' ')[0],
+                score: Math.round(l.metrics.reduce((sum, m) => sum + (m.inverse ? (m.max - m.value) / m.max * 100 : m.value / m.max * 100), 0) / l.metrics.length),
+                color: l.color
+            })).sort((a, b) => b.score - a.score);
+
             return (
                 <div className="min-h-[600px] space-y-6">
                     <div className="bg-gradient-to-r from-purple-600 to-indigo-600 rounded-2xl p-6 text-white">
-                        <div className="flex items-center gap-3">
+                        <div className="flex items-center gap-3 mb-4">
                             <Award className="w-8 h-8" />
                             <div>
                                 <h2 className="text-2xl font-bold">Legendary Frameworks</h2>
-                                <p className="text-white/80">Analyze {stock.ticker} through 8 investment philosophies</p>
+                                <p className="text-white/80">Analyze {stock.ticker} through 16 investment philosophies</p>
+                            </div>
+                        </div>
+                        <div className="grid grid-cols-4 gap-4">
+                            {overallScores.slice(0, 4).map((s, i) => (
+                                <div key={i} className="bg-white/20 rounded-xl p-4 backdrop-blur-sm">
+                                    <p className="text-sm text-white/80">#{i + 1} {s.name}</p>
+                                    <p className="text-3xl font-bold">{s.score}</p>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-6">
+                        <div className="bg-white rounded-2xl border border-gray-200 p-6">
+                            <h3 className="font-semibold text-gray-900 mb-4">Value vs Growth Comparison</h3>
+                            <div className="h-64">
+                                <ResponsiveContainer width="100%" height="100%">
+                                    <RadarChart data={legendRadarData}>
+                                        <PolarGrid />
+                                        <PolarAngleAxis dataKey="subject" tick={{ fontSize: 11 }} />
+                                        <PolarRadiusAxis angle={30} domain={[0, 100]} tick={{ fontSize: 9 }} />
+                                        <Radar name="Buffett" dataKey="Buffett" stroke="#8B5CF6" fill="#8B5CF6" fillOpacity={0.3} />
+                                        <Radar name="Lynch" dataKey="Lynch" stroke="#10B981" fill="#10B981" fillOpacity={0.2} />
+                                        <Radar name="Graham" dataKey="Graham" stroke="#14B8A6" fill="#14B8A6" fillOpacity={0.2} />
+                                    </RadarChart>
+                                </ResponsiveContainer>
+                            </div>
+                            <div className="flex justify-center gap-4 mt-2">
+                                <span className="flex items-center gap-1 text-xs"><div className="w-3 h-3 rounded-full bg-purple-500" /> Buffett</span>
+                                <span className="flex items-center gap-1 text-xs"><div className="w-3 h-3 rounded-full bg-green-500" /> Lynch</span>
+                                <span className="flex items-center gap-1 text-xs"><div className="w-3 h-3 rounded-full bg-teal-500" /> Graham</span>
+                            </div>
+                        </div>
+
+                        <div className="bg-white rounded-2xl border border-gray-200 p-6">
+                            <h3 className="font-semibold text-gray-900 mb-4">Framework Ranking</h3>
+                            <div className="h-64">
+                                <ResponsiveContainer width="100%" height="100%">
+                                    <BarChart data={overallScores.slice(0, 8)} layout="vertical">
+                                        <XAxis type="number" domain={[0, 100]} tick={{ fontSize: 10 }} />
+                                        <YAxis type="category" dataKey="name" tick={{ fontSize: 10 }} width={80} />
+                                        <Tooltip />
+                                        <Bar dataKey="score" radius={[0, 4, 4, 0]}>
+                                            {overallScores.slice(0, 8).map((entry, i) => <Cell key={i} fill={entry.color} />)}
+                                        </Bar>
+                                    </BarChart>
+                                </ResponsiveContainer>
                             </div>
                         </div>
                     </div>
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+
+                    <div className="grid grid-cols-4 gap-4">
                         {legendaryFrameworks.map((legend, i) => (
                             <div key={i} className="bg-white rounded-2xl border border-gray-200 p-4 hover:shadow-lg transition-shadow">
                                 <div className="flex items-center gap-2 mb-3">
@@ -898,19 +969,29 @@ export default function StockSectionContent({
                                         <p className="text-xs text-gray-500">{legend.style}</p>
                                     </div>
                                 </div>
-                                <div className="mb-3">
-                                    <div className="flex justify-between text-sm mb-1">
-                                        <span className="text-gray-600">Score</span>
-                                        <span className="font-bold text-gray-900">{legend.score}/100</span>
-                                    </div>
-                                    <div className="h-2 bg-gray-100 rounded-full overflow-hidden">
-                                        <div className="h-full rounded-full bg-gradient-to-r from-purple-500 to-green-500" style={{ width: `${legend.score}%` }} />
-                                    </div>
+                                <div className="space-y-2 mb-3">
+                                    {legend.metrics.map((m, j) => (
+                                        <div key={j}>
+                                            <div className="flex justify-between text-xs mb-1">
+                                                <span className="text-gray-600">{m.label}</span>
+                                                <span className="font-medium">{typeof m.value === 'number' ? m.value.toFixed(1) : m.value}</span>
+                                            </div>
+                                            <div className="h-1.5 bg-gray-100 rounded-full overflow-hidden">
+                                                <div 
+                                                    className="h-full rounded-full" 
+                                                    style={{ 
+                                                        width: `${Math.min((m.value / m.max) * 100, 100)}%`,
+                                                        backgroundColor: (m.inverse ? m.value < m.good : m.value >= m.good) ? '#10B981' : '#F59E0B'
+                                                    }} 
+                                                />
+                                            </div>
+                                        </div>
+                                    ))}
                                 </div>
                                 <div className="pt-2 border-t border-gray-100">
                                     <span className={`px-2 py-1 rounded text-xs font-medium ${
-                                        legend.verdict.includes('Buy') || legend.verdict.includes('Strong') ? 'bg-green-100 text-green-700' :
-                                        legend.verdict.includes('Hold') || legend.verdict.includes('Fit') ? 'bg-yellow-100 text-yellow-700' :
+                                        legend.verdict.includes('Buy') || legend.verdict.includes('Strong') || legend.verdict.includes('Top') ? 'bg-green-100 text-green-700' :
+                                        legend.verdict.includes('Hold') || legend.verdict.includes('OK') || legend.verdict.includes('Fit') ? 'bg-yellow-100 text-yellow-700' :
                                         'bg-gray-100 text-gray-700'
                                     }`}>
                                         {legend.verdict}
@@ -918,6 +999,26 @@ export default function StockSectionContent({
                                 </div>
                             </div>
                         ))}
+                    </div>
+
+                    <div className="bg-blue-50 rounded-2xl border border-blue-200 p-6">
+                        <h4 className="font-semibold text-blue-900 mb-3 flex items-center gap-2">
+                            <Info className="w-4 h-4" /> Framework Consensus
+                        </h4>
+                        <div className="grid grid-cols-3 gap-4">
+                            <div className="bg-white rounded-xl p-4 text-center">
+                                <p className="text-sm text-gray-600">Bullish</p>
+                                <p className="text-3xl font-bold text-green-600">{legendaryFrameworks.filter(l => l.verdict.includes('Buy') || l.verdict.includes('Strong')).length}</p>
+                            </div>
+                            <div className="bg-white rounded-xl p-4 text-center">
+                                <p className="text-sm text-gray-600">Neutral</p>
+                                <p className="text-3xl font-bold text-yellow-600">{legendaryFrameworks.filter(l => l.verdict.includes('Hold') || l.verdict.includes('OK') || l.verdict.includes('Fit')).length}</p>
+                            </div>
+                            <div className="bg-white rounded-xl p-4 text-center">
+                                <p className="text-sm text-gray-600">Bearish</p>
+                                <p className="text-3xl font-bold text-red-600">{legendaryFrameworks.filter(l => l.verdict.includes('Avoid') || l.verdict.includes('Not')).length}</p>
+                            </div>
+                        </div>
                     </div>
                 </div>
             );

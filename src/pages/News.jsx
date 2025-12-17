@@ -356,7 +356,7 @@ const CATEGORIES = [
 export default function News() {
     // Update URL for display only (aesthetic, not parsed)
     const updateUrl = (category, query) => {
-        const basePath = window.location.pathname;
+        const basePath = window.location.pathname.replace(/\/$/, '');
         let displayPath = basePath;
         if (category) {
             displayPath = `${basePath}/${category}`;
@@ -365,7 +365,11 @@ export default function News() {
                 displayPath = `${basePath}/${category}/${querySlug}`;
             }
         }
-        window.history.pushState({ category, query }, '', displayPath);
+        try {
+            window.history.pushState({ category, query }, '', displayPath);
+        } catch (e) {
+            console.warn('Failed to update URL:', e);
+        }
     };
 
     useEffect(() => {

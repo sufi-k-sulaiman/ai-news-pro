@@ -42,6 +42,24 @@ const NewsGrid = ({ news, currentPage, onPageChange }) => {
             return;
         }
         
+        // Try to load from localStorage first
+        const cachedImages = loadImagesFromLocalStorage(pageKey);
+        if (cachedImages) {
+            console.log('Loading images from cache for', pageKey);
+            cachedImages.forEach((url, index) => {
+                if (url) {
+                    const globalIndex = startIndex + index;
+                    imageCache.set(`${newsKey}-${globalIndex}`, url);
+                    const callback = updateCallbacks.get(`${newsKey}-${globalIndex}`);
+                    if (callback) callback(url);
+                }
+            });
+            setLoadedImages(ARTICLES_PER_PAGE);
+            setTimeRemaining(0);
+            setGeneratedPages(prev => new Set([...prev, pageKey]));
+            return;
+        }
+        
         setLoadedImages(0);
         setTimeRemaining(8);
         
@@ -52,7 +70,7 @@ const NewsGrid = ({ news, currentPage, onPageChange }) => {
         
         // Generate images for current page only
         const pageArticles = news.slice(startIndex, endIndex);
-        generateImagesInBackground(pageArticles, newsKey, startIndex);
+        generateImagesInBackground(pageArticles, newsKey, startIndex, pageKey);
         
         // Timer countdown
         const interval = setInterval(() => {
@@ -156,7 +174,36 @@ let currentCacheKey = '';
 const updateCallbacks = new Map();
 const progressCallbacks = new Set();
 
-const generateImagesInBackground = async (articles, cacheKey, startIndex = 0) => {
+// Load cached images from localStorage
+const loadImagesFromLocalStorage = (cacheKey) => {
+    try {
+        const cached = localStorage.getItem(`news-images-${cacheKey}`);
+        if (cached) {
+            const data = JSON.parse(cached);
+            // Check if cache is less than 24 hours old
+            if (Date.now() - data.timestamp < 24 * 60 * 60 * 1000) {
+                return data.images;
+            }
+        }
+    } catch (error) {
+        console.error('Error loading cached images:', error);
+    }
+    return null;
+};
+
+// Save images to localStorage
+const saveImagesToLocalStorage = (cacheKey, images) => {
+    try {
+        localStorage.setItem(`news-images-${cacheKey}`, JSON.stringify({
+            images,
+            timestamp: Date.now()
+        }));
+    } catch (error) {
+        console.error('Error saving images to cache:', error);
+    }
+};
+
+const generateImagesInBackground = async (articles, cacheKey, startIndex = 0, pageKey = '') => {
     currentCacheKey = cacheKey;
     
     try {
@@ -175,7 +222,13 @@ const generateImagesInBackground = async (articles, cacheKey, startIndex = 0) =>
                     progressCallbacks.forEach(cb => cb(index + 1));
                 }
             });
-            console.log(`Generated ${response.data.images.filter(Boolean).length} images`);
+            
+            // Save to localStorage
+            if (pageKey) {
+                saveImagesToLocalStorage(pageKey, response.data.images);
+            }
+            
+            console.log(`Generated and cached ${response.data.images.filter(Boolean).length} images`);
         }
     } catch (error) {
         console.error('Image generation failed:', error);

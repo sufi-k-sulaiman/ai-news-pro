@@ -583,7 +583,7 @@ export default function News() {
                                 </div>
 
                                 {/* Right - Refresh Button and Time */}
-                                <div className="absolute right-4 top-1/2 -translate-y-1/2 flex flex-col items-end gap-0.5">
+                                <div className="absolute right-4 top-1/2 -translate-y-1/2 flex flex-row items-center gap-3">
                                 {lastUpdated && (
                                 <span className="text-xs text-gray-500">
                                     {lastUpdated.toLocaleTimeString()}

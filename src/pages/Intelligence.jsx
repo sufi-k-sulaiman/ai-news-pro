@@ -905,10 +905,10 @@ function ItemDetailView({ item, category, onNavigateToTopic }) {
                         <p className="text-white/90 leading-relaxed">{data.futureOutlook}</p>
                     </div>
                 )}
-                </div>
-                </div>
-                );
-                }
+            </div>
+        </div>
+    );
+}
 
 export default function Intelligence() {
 

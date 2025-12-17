@@ -553,7 +553,7 @@ export default function News() {
                                     alt="Ai News Pro" 
                                     className="h-10 w-10 object-contain" 
                                 />
-                                <h1 className="text-base font-bold text-gray-900 whitespace-nowrap">Ai News Pro</h1>
+                                <h1 className="text-base font-bold text-gray-900 whitespace-nowrap">News Pro</h1>
                             </Link>
 
                             {/* Center - Search Bar */}

@@ -122,9 +122,8 @@ const NewsGrid = ({ news, currentPage, onPageChange }) => {
             
             {loadedImages < ARTICLES_PER_PAGE && (
                 <div className="mb-4 bg-gray-50 rounded-xl p-4">
-                    <div className="flex items-center justify-between mb-3">
+                    <div className="mb-3">
                         <span className="text-sm text-gray-600">Generating images for page {currentPage}...</span>
-                        <span className="text-sm font-semibold" style={{ color: '#6209e6' }}>{loadedImages} / {ARTICLES_PER_PAGE} ready</span>
                     </div>
                     {timeRemaining > 0 && (
                         <div className="flex items-center gap-3">

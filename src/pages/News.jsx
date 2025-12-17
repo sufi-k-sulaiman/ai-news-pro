@@ -560,7 +560,7 @@ export default function News() {
 
                             {/* Center - Search Bar */}
                             <div className="flex justify-center">
-                                <form onSubmit={handleSearch} className="w-full max-w-xl relative">
+                                <form onSubmit={handleSearch} className="w-full max-w-md relative">
                                 <div className="relative">
                                     <Input
                                         type="text"

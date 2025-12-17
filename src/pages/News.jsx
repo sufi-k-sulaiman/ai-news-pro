@@ -451,9 +451,9 @@ export default function News() {
                                 className={`px-4 py-2 rounded-full text-sm font-medium transition-all flex items-center gap-2 ${
                                     activeCategory === cat.id
                                         ? 'text-white shadow-md'
-                                        : 'hover:opacity-80 border'
+                                        : 'hover:opacity-80'
                                 }`}
-                                style={activeCategory === cat.id ? { backgroundColor: '#6209e6' } : { backgroundColor: '#f5f5f5', borderColor: '#6209e6', color: '#6209e6' }}
+                                style={activeCategory === cat.id ? { backgroundColor: '#6209e6' } : { background: 'linear-gradient(135deg, #e5e7eb 0%, #d1d5db 100%)', color: '#6209e6' }}
                             >
                                 <IconComponent className="w-4 h-4" />
                                 {cat.label}
@@ -476,12 +476,12 @@ export default function News() {
                                     updateUrl(activeCategory, subtopic);
                                     fetchNews(subtopic);
                                 }}
-                                className={`px-3 py-1.5 text-xs font-medium rounded-full border transition-colors ${
+                                className={`px-3 py-1.5 text-xs font-medium rounded-full transition-colors ${
                                     activeSubtopic === subtopic
                                         ? 'text-white'
                                         : 'hover:opacity-80'
                                 }`}
-                                style={activeSubtopic === subtopic ? { backgroundColor: '#6209e6', borderColor: '#6209e6' } : { backgroundColor: '#f5f5f5', borderColor: '#6209e6', color: '#6209e6' }}
+                                style={activeSubtopic === subtopic ? { backgroundColor: '#6209e6' } : { background: 'linear-gradient(135deg, #e5e7eb 0%, #d1d5db 100%)', color: '#6209e6' }}
                             >
                                 {subtopic}
                             </button>
@@ -498,8 +498,8 @@ export default function News() {
                         size="sm"
                         onClick={() => fetchNews(searchQuery || activeCategory)}
                         disabled={loading}
-                        className="gap-2 border hover:opacity-80"
-                        style={{ backgroundColor: '#f5f5f5', borderColor: '#6209e6', color: '#6209e6' }}
+                        className="gap-2 hover:opacity-80"
+                        style={{ background: 'linear-gradient(135deg, #e5e7eb 0%, #d1d5db 100%)', color: '#6209e6' }}
                     >
                         <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
                         Refresh
@@ -542,8 +542,8 @@ export default function News() {
                                         setCurrentPage(1);
                                         fetchNews(topic);
                                     }}
-                                    className="px-3 py-1.5 text-sm rounded-full transition-colors border hover:opacity-80"
-                                    style={{ backgroundColor: '#f5f5f5', borderColor: '#6209e6', color: '#6209e6' }}
+                                    className="px-3 py-1.5 text-sm rounded-full transition-colors hover:opacity-80"
+                                    style={{ background: 'linear-gradient(135deg, #e5e7eb 0%, #d1d5db 100%)', color: '#6209e6' }}
                                 >
                                     #{topic}
                                 </button>

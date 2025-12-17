@@ -172,11 +172,12 @@ const NewsCardSimple = ({ article, index, imageUrl: preloadedImageUrl, cacheKey 
             href={article.url}
             target="_blank"
             rel="noopener noreferrer"
-            className="block bg-white rounded-xl border border-gray-200 overflow-hidden hover:shadow-lg transition-shadow group"
+            className="block bg-white rounded-xl border overflow-hidden hover:shadow-lg transition-shadow group"
+            style={{ borderColor: '#6209e6' }}
         >
-            <div className="aspect-video bg-gray-100 relative overflow-hidden">
+            <div className="aspect-video bg-white relative overflow-hidden">
                 {imageLoading ? (
-                    <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-gray-100 to-gray-200">
+                    <div className="absolute inset-0 flex items-center justify-center bg-white">
                         <div className="flex flex-col items-center gap-3">
                             <div className="relative">
                                 <img 
@@ -186,7 +187,7 @@ const NewsCardSimple = ({ article, index, imageUrl: preloadedImageUrl, cacheKey 
                                     style={{ animation: 'pulse 1.5s ease-in-out infinite' }}
                                 />
                             </div>
-                            <span className="text-xs text-gray-400">Loading...</span>
+                            <span className="text-xs" style={{ color: '#6209e6', opacity: 0.6 }}>Loading...</span>
                         </div>
                     </div>
                 ) : imageUrl ? (
@@ -196,8 +197,8 @@ const NewsCardSimple = ({ article, index, imageUrl: preloadedImageUrl, cacheKey 
                         className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                     />
                 ) : (
-                    <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-red-50 to-orange-50">
-                        <Newspaper className="w-10 h-10 text-red-200" />
+                    <div className="absolute inset-0 flex items-center justify-center bg-white">
+                        <Newspaper className="w-10 h-10" style={{ color: '#6209e6', opacity: 0.2 }} />
                     </div>
                 )}
             </div>
@@ -373,11 +374,15 @@ export default function News() {
                             value={searchQuery}
                             onChange={(e) => setSearchQuery(e.target.value)}
                             placeholder="Search for any news topic..."
-                            className="w-full h-14 pl-6 pr-16 rounded-full border-gray-200 bg-white shadow-sm focus:border-red-300 focus:ring-2 focus:ring-red-100 text-lg"
+                            className="w-full h-14 pl-6 pr-16 rounded-full bg-white shadow-sm text-lg"
+                            style={{ borderColor: '#6209e6' }}
                         />
                         <button
                             type="submit"
-                            className="absolute right-2 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-red-600 hover:bg-red-700 flex items-center justify-center transition-colors"
+                            className="absolute right-2 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full flex items-center justify-center transition-colors"
+                            style={{ backgroundColor: '#6209e6' }}
+                            onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#5208c5'}
+                            onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#6209e6'}
                         >
                             <Search className="w-5 h-5 text-white" />
                         </button>
@@ -445,7 +450,8 @@ export default function News() {
                         size="sm"
                         onClick={() => fetchNews(searchQuery || activeCategory)}
                         disabled={loading}
-                        className="gap-2"
+                        className="gap-2 border hover:opacity-80"
+                        style={{ borderColor: '#6209e6', color: '#6209e6' }}
                     >
                         <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
                         Refresh

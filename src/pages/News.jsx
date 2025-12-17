@@ -511,12 +511,12 @@ export default function News() {
                                     <h1 className="text-sm font-bold text-gray-900">Ai News Pro</h1>
                                 </Link>
                                 <Button
-                                    variant="outline"
+                                    variant="ghost"
                                     size="sm"
                                     onClick={() => fetchNews(searchQuery || activeCategory)}
                                     disabled={loading}
                                     className="gap-1 h-8"
-                                    style={{ background: 'linear-gradient(135deg, #e5e7eb 0%, #d1d5db 100%)', color: '#6209e6' }}
+                                    style={{ color: '#6209e6' }}
                                 >
                                     <RefreshCw className={`w-3 h-3 ${loading ? 'animate-spin' : ''}`} />
                                     <span className="text-xs">Refresh</span>
@@ -590,12 +590,12 @@ export default function News() {
                                 </span>
                                 )}
                                 <Button
-                                variant="outline"
+                                variant="ghost"
                                 size="sm"
                                 onClick={() => fetchNews(searchQuery || activeCategory)}
                                 disabled={loading}
                                 className="gap-2 hover:opacity-80 h-9"
-                                style={{ background: 'linear-gradient(135deg, #e5e7eb 0%, #d1d5db 100%)', color: '#6209e6' }}
+                                style={{ color: '#6209e6' }}
                                 >
                                 <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
                                 Refresh

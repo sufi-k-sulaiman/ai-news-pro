@@ -559,6 +559,11 @@ export default function News() {
 
                         {/* Right - Refresh Button and Time */}
                         <div className="absolute right-4 top-1/2 -translate-y-1/2 flex flex-col items-end gap-0.5">
+                                                {lastUpdated && (
+                                <span className="text-xs text-gray-500">
+                                    {lastUpdated.toLocaleTimeString()}
+                                </span>
+                            )}
                             <Button
                                 variant="outline"
                                 size="sm"
@@ -570,11 +575,6 @@ export default function News() {
                                 <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
                                 Refresh
                             </Button>
-                            {lastUpdated && (
-                                <span className="text-xs text-gray-500">
-                                    {lastUpdated.toLocaleTimeString()}
-                                </span>
-                            )}
                         </div>
                     </div>
                 </div>

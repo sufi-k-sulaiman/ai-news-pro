@@ -134,7 +134,15 @@ export default function Header({ title, sidebarOpen, setSidebarOpen, children, c
                     </div>
                 )}
 
-                <div className="flex-shrink-0">
+                <div className="flex items-center gap-3 flex-shrink-0">
+                    <a 
+                        href="https://1cplatform.com/Onboarding" 
+                        target="_blank" 
+                        rel="noopener noreferrer"
+                        className="hidden sm:inline-flex items-center px-5 py-2.5 bg-purple-600 hover:bg-purple-700 text-white font-semibold rounded-full transition-colors shadow-sm hover:shadow-md"
+                    >
+                        Get Started
+                    </a>
                     {children}
                 </div>
             </div>

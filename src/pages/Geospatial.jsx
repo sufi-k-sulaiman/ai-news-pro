@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import PageMeta from '@/components/PageMeta';
 import { 
     Globe, Layers, Satellite, Map, Search, Compass,
     TreePine, Mountain, Cloud, Activity, TrendingUp, 
@@ -65,11 +66,6 @@ const USE_CASES = [
 
 
 export default function Geospatial() {
-    useEffect(() => {
-        document.title = 'Geospatial Intelligence Platform';
-        document.querySelector('meta[name="description"]')?.setAttribute('content', 'Geospatial intelligence platform with AI-powered spatial analytics, mapping, and visualization.');
-        document.querySelector('meta[name="keywords"]')?.setAttribute('content', 'Geospatial, GIS, mapping, spatial analysis, satellite imagery');
-    }, []);
 
     const [activeUseCases, setActiveUseCases] = useState(['carbon']);
     const [searchQuery, setSearchQuery] = useState('');
@@ -94,7 +90,13 @@ export default function Geospatial() {
     );
 
     return (
-        <div className="min-h-screen bg-gradient-to-b from-slate-50 to-slate-100">
+        <>
+            <PageMeta 
+                title="Geospatial Intelligence"
+                description="Geospatial intelligence platform with AI-powered spatial analytics, mapping, and environmental data visualization."
+                keywords="geospatial, GIS, mapping, spatial analysis, satellite imagery, environmental data"
+            />
+            <div className="min-h-screen bg-gradient-to-b from-slate-50 to-slate-100">
             {/* Top Row - Stats Left, Use Case Selector Right */}
             <div className="mx-4 md:mx-8 mt-4 flex flex-col lg:flex-row gap-4">
                 {/* Stats Panel - Left */}
@@ -341,6 +343,7 @@ export default function Geospatial() {
                     mapType={modalMap.mapType}
                 />
             )}
-        </div>
+            </div>
+        </>
     );
 }

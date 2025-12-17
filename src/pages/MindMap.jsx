@@ -1,5 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { base44 } from '@/api/base44Client';
+import PageMeta from '@/components/PageMeta';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Maximize2, Minimize2, Loader2, Search, Compass, BookOpen, Network, Download, Hand, Pencil, Type, Square, Circle, Eraser, Trash2 } from 'lucide-react';
@@ -153,11 +154,6 @@ function TreeNode({ node, colorIndex = 0, onExplore, onLearn, depth = 0, nodeRef
 }
 
 export default function MindMapPage() {
-    useEffect(() => {
-        document.title = 'Ai Neural MindMap application';
-        document.querySelector('meta[name="description"]')?.setAttribute('content', 'AI neural networks create interactive knowledge trees to explore knowledge.');
-        document.querySelector('meta[name="keywords"]')?.setAttribute('content', 'mind mapping, Ai MindMap');
-    }, []);
 
     const [searchTerm, setSearchTerm] = useState('');
     const [loading, setLoading] = useState(false);
@@ -535,10 +531,16 @@ export default function MindMapPage() {
     }, []);
 
     return (
-        <div
-            ref={containerRef}
-            className={`min-h-screen bg-gray-50 ${isFullscreen ? 'p-1 overflow-auto' : 'p-1'}`}
-        >
+        <>
+            <PageMeta 
+                title="Neural MindMap"
+                description="AI neural networks create interactive knowledge trees to explore and visualize complex topics."
+                keywords="mind mapping, AI MindMap, knowledge visualization, neural networks, interactive learning"
+            />
+            <div
+                ref={containerRef}
+                className={`min-h-screen bg-gray-50 ${isFullscreen ? 'p-1 overflow-auto' : 'p-1'}`}
+            >
             <div className={`${isFullscreen ? 'max-w-none' : 'max-w-[96rem] mx-auto'}`}>
                 {/* Mind Map Content */}
                 <div className={`bg-white rounded-xl border border-gray-200 ${isFullscreen ? 'h-[calc(100vh-8px)]' : 'h-[calc(100vh-16px)]'} overflow-hidden p-2`}>

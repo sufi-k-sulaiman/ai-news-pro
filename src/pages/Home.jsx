@@ -1,4 +1,5 @@
 import React, { useEffect } from 'react';
+import PageMeta from '@/components/PageMeta';
 import { Link } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
 import { Sparkles, Radio, Brain, BarChart3, GraduationCap, ListTodo, Lightbulb, StickyNote, Newspaper, Gamepad2, Globe, Smartphone } from "lucide-react";
@@ -45,6 +46,7 @@ export default function HomePage() {
                     ))}
                 </div>
             </div>
-        </div>
+            </div>
+        </>
     );
 }

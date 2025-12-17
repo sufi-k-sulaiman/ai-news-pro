@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import PageMeta from '@/components/PageMeta';
 
 const pulseAnimation = `
 @keyframes pulse {
@@ -251,9 +252,6 @@ export default function News() {
     };
 
     useEffect(() => {
-        document.title = 'News articles hub for around the world';
-        document.querySelector('meta[name="description"]')?.setAttribute('content', 'Global hub for trusted news articles, delivering accurate reporting and insights worldwide.');
-        document.querySelector('meta[name="keywords"]')?.setAttribute('content', 'News articles, news article');
         
         // Handle browser back/forward - restore from history state only
         const handlePopState = (event) => {
@@ -334,9 +332,15 @@ export default function News() {
     };
 
     return (
-        <div className="min-h-screen bg-gray-50 p-4 md:p-6">
-            <style>{pulseAnimation}</style>
-            <div className="max-w-[82rem] mx-auto">
+        <>
+            <PageMeta 
+                title="News - Global News Hub"
+                description="Global hub for trusted news articles, delivering accurate reporting and insights worldwide with AI-powered aggregation."
+                keywords="news articles, world news, breaking news, news aggregator, AI news"
+            />
+            <div className="min-h-screen bg-gray-50 p-4 md:p-6">
+                <style>{pulseAnimation}</style>
+                <div className="max-w-[82rem] mx-auto">
                 {/* Header */}
                 <div className="bg-gradient-to-r from-red-600 to-orange-600 rounded-2xl p-6 mb-6 text-white">
                     <div className="flex items-center justify-between flex-wrap gap-4">
@@ -483,7 +487,8 @@ export default function News() {
                         </div>
                     </div>
                 )}
-            </div>
-        </div>
-    );
-}
+                </div>
+                </div>
+                </>
+                );
+                }

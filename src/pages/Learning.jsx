@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { base44 } from '@/api/base44Client';
+import PageMeta from '@/components/PageMeta';
 import { 
     GraduationCap, Trophy, Zap, Star, Flame, Target, Award,
     Loader2, RefreshCw, Sparkles, Search, Check,
@@ -57,9 +58,6 @@ export default function Learning() {
     };
 
     useEffect(() => {
-        document.title = 'Smart Learning Archipelago';
-        document.querySelector('meta[name="description"]')?.setAttribute('content', 'Learning Archipelago uses AI agents to create automated learning islands for growth on all subjects.');
-        document.querySelector('meta[name="keywords"]')?.setAttribute('content', 'Learning Archipelago, Learning islands');
         
         // Handle browser back/forward - restore from history state only
         const handlePopState = (event) => {
@@ -245,7 +243,13 @@ export default function Learning() {
     };
 
     return (
-        <div className="min-h-screen bg-gradient-to-b from-indigo-50 via-white to-purple-50">
+        <>
+            <PageMeta 
+                title="Learning Archipelago"
+                description="Learning Archipelago uses AI agents to create automated learning islands for growth on all subjects with gamified progression."
+                keywords="Learning Archipelago, learning islands, AI education, gamified learning, online courses"
+            />
+            <div className="min-h-screen bg-gradient-to-b from-indigo-50 via-white to-purple-50">
             {/* Top Row - Header Left, Subject Selector Right */}
             <div className="mx-4 md:mx-8 mt-4 flex flex-col lg:flex-row gap-4">
                 {/* Hero Banner - Left */}
@@ -437,6 +441,7 @@ export default function Learning() {
                 topic={selectedTopic}
                 onComplete={handleCourseComplete}
             />
-        </div>
+            </div>
+        </>
     );
 }

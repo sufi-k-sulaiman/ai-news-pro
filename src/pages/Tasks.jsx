@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import PageMeta from '@/components/PageMeta';
 import { DragDropContext } from '@hello-pangea/dnd';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
@@ -31,11 +32,7 @@ const TasksPage = () => {
     }
   };
 
-  useEffect(() => {
-    document.title = 'Tasks manager for smarter workflows and productivity';
-    document.querySelector('meta[name="description"]')?.setAttribute('content', 'Tasks management software with Ai streamlines workflows, boosts productivity.');
-    document.querySelector('meta[name="keywords"]')?.setAttribute('content', 'Tasks management software, Tasks management');
-  }, []);
+
 
   const queryClient = useQueryClient();
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -126,8 +123,14 @@ const TasksPage = () => {
   const COLORS = ['#8b5cf6', '#3b82f6', '#f59e0b', '#10b981'];
 
   return (
-    <div className="min-h-screen bg-gray-50 p-4 md:p-6">
-      <div className="max-w-full mx-auto">
+    <>
+      <PageMeta 
+        title="Tasks - Project Management"
+        description="Tasks management software with AI that streamlines workflows and boosts productivity with smart organization."
+        keywords="tasks management software, project management, task tracking, productivity, workflow"
+      />
+      <div className="min-h-screen bg-gray-50 p-4 md:p-6">
+        <div className="max-w-full mx-auto">
         <div className="flex items-center justify-between mb-6">
             <div className="flex items-center gap-3">
                     <div>
@@ -248,8 +251,9 @@ const TasksPage = () => {
             task={selectedTask}
             categories={TASK_CATEGORIES}
         />
+        </div>
       </div>
-    </div>
+    </>
   );
 };
 

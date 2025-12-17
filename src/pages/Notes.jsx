@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import PageMeta from '@/components/PageMeta';
 import { 
     Plus, Search, FileText, Calendar, Tag, Trash2, 
     Save, X, Loader2, Maximize2, Minimize2, Sparkles, Image,
@@ -92,11 +93,7 @@ export default function Notes() {
         }
     };
 
-    useEffect(() => {
-        document.title = 'Smarter Writing with AI Powered Notes';
-        document.querySelector('meta[name="description"]')?.setAttribute('content', 'Notes helps organize ideas, streamline writing, and boost productivity effectively.');
-        document.querySelector('meta[name="keywords"]')?.setAttribute('content', 'Ai notes, Notes');
-    }, []);
+
 
     const [selectedNote, setSelectedNote] = useState(null);
     const [searchQuery, setSearchQuery] = useState('');
@@ -263,6 +260,11 @@ export default function Notes() {
 
     return (
         <>
+            <PageMeta 
+                title="Notes - AI Writing Assistant"
+                description="AI-powered notes help organize ideas, streamline writing, and boost productivity with smart templates and AI generation."
+                keywords="AI notes, note taking, smart notes, writing assistant, productivity notes"
+            />
             <div className="min-h-screen bg-gray-50 p-4 md:p-6">
                 <div className="max-w-7xl mx-auto">
                     {/* Header */}

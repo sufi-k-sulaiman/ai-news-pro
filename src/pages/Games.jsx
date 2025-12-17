@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import PageMeta from '@/components/PageMeta';
 import { Gamepad2, Rocket, Target, Shield, Blocks } from 'lucide-react';
 
 import WordShooter from '@/components/games/WordShooter';
@@ -19,9 +20,6 @@ export default function Games() {
     };
 
     useEffect(() => {
-        document.title = 'AI powered Gamification Games for smarter learning';
-        document.querySelector('meta[name="description"]')?.setAttribute('content', 'Space battle and Word shooters makes education engaging, interactive, and boosts learning.');
-        document.querySelector('meta[name="keywords"]')?.setAttribute('content', 'Gamification, educational games');
         
         // Handle browser back/forward - restore from history state only
         const handlePopState = (event) => {
@@ -61,8 +59,14 @@ export default function Games() {
     }
 
     return (
-        <div className="min-h-screen bg-gray-50 p-6">
-            <div className="max-w-6xl mx-auto">
+        <>
+            <PageMeta 
+                title="Gamified Education"
+                description="Space battle and word shooters make education engaging, interactive, and boost learning through AI-powered games."
+                keywords="gamification, educational games, learning games, AI games, vocabulary games"
+            />
+            <div className="min-h-screen bg-gray-50 p-6">
+                <div className="max-w-6xl mx-auto">
                 <div className="text-center mb-8">
                     <div className="inline-flex items-center gap-3 mb-4">
                         <h1 className="text-2xl md:text-3xl font-bold text-gray-900">Gamified Education</h1>
@@ -130,6 +134,6 @@ like fun.</p>
                   </div>
                 </div>
             </div>
-        </div>
+        </>
     );
 }

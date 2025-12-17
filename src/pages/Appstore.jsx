@@ -1,13 +1,9 @@
 import React from 'react';
+import PageMeta from '@/components/PageMeta';
 import { ExternalLink, Smartphone, Download, Star } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
 export default function Appstore() {
-    React.useEffect(() => {
-        document.title = 'App Store - Download Our Mobile Apps';
-        document.querySelector('meta[name="description"]')?.setAttribute('content', 'Download our AI-powered mobile applications for iOS. SearchPods, Neural MindMap, and RoutineOps.');
-        document.querySelector('meta[name="keywords"]')?.setAttribute('content', 'iOS apps, mobile apps, AI apps, SearchPods, MindMap, RoutineOps');
-    }, []);
 
     const apps = [
         {
@@ -43,8 +39,14 @@ export default function Appstore() {
     ];
 
     return (
-        <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 p-6">
-            <div className="max-w-7xl mx-auto">
+        <>
+            <PageMeta 
+                title="App Store - Mobile Apps"
+                description="Download our AI-powered mobile applications for iOS: SearchPods, Neural MindMap, and RoutineOps."
+                keywords="iOS apps, mobile apps, AI apps, SearchPods, MindMap, RoutineOps, app store"
+            />
+            <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 p-6">
+                <div className="max-w-7xl mx-auto">
                 {/* Header */}
                 <div className="text-center mb-12">
                     <div className="inline-flex items-center gap-2 mb-4">
@@ -141,7 +143,8 @@ export default function Appstore() {
                         <span>AI-powered features</span>
                     </div>
                 </div>
-            </div>
-        </div>
-    );
-}
+                </div>
+                </div>
+                </>
+                );
+                }

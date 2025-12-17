@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import PageMeta from '@/components/PageMeta';
 import { 
     Brain, Loader2, ChevronRight, Sparkles,
     Globe, Mountain, Leaf, Zap, Star, Home,
@@ -910,11 +911,6 @@ function ItemDetailView({ item, category, onNavigateToTopic }) {
                 }
 
 export default function Intelligence() {
-    useEffect(() => {
-        document.title = 'AI Intelligence for automated decision making';
-        document.querySelector('meta[name="description"]')?.setAttribute('content', 'Intelligence platform delivering automated insights and smarter decisions for growth.');
-        document.querySelector('meta[name="keywords"]')?.setAttribute('content', 'AI Intelligence, Intelligence');
-    }, []);
 
     const [selectedCategory, setSelectedCategory] = useState(null);
     const [selectedItem, setSelectedItem] = useState(null);
@@ -979,8 +975,14 @@ export default function Intelligence() {
     }
 
     return (
-        <div className="min-h-screen bg-gray-50 p-4 md:p-6">
-            <div className="max-w-6xl mx-auto">
+        <>
+            <PageMeta 
+                title="General Intelligence"
+                description="Intelligence platform delivering automated insights and smarter decisions for growth across all knowledge domains."
+                keywords="AI intelligence, knowledge base, general intelligence, automated insights, research data"
+            />
+            <div className="min-h-screen bg-gray-50 p-4 md:p-6">
+                <div className="max-w-6xl mx-auto">
                 {/* Header */}
                 <div className="bg-gradient-to-r from-purple-600 to-indigo-600 rounded-2xl p-6 mb-6 text-white">
                     <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">

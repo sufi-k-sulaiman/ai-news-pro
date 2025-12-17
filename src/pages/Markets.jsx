@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useMemo } from 'react';
+import PageMeta from '@/components/PageMeta';
 import { Search, RefreshCw, TrendingUp, TrendingDown, Shield, Zap, DollarSign, BarChart3, Activity, AlertTriangle } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -933,11 +934,7 @@ export default function Markets() {
         }
     };
 
-    useEffect(() => {
-        document.title = 'MarketsPro ai automated insights';
-        document.querySelector('meta[name="description"]')?.setAttribute('content', 'MarketsPro delivers automated insights with AI stock predictions to empower smarter trading decisions.');
-        document.querySelector('meta[name="keywords"]')?.setAttribute('content', 'MarketsPro, Ai stock predictions');
-    }, []);
+
 
     const [stocks, setStocks] = useState([]);
     const [searchQuery, setSearchQuery] = useState('');
@@ -1159,8 +1156,14 @@ Use real market data. Return ALL ${batch.length} stocks.`,
     };
 
     return (
-        <div className="p-3 md:p-6">
-            <div className="mb-3 md:mb-4 -mx-3 md:-mx-6 -mt-3 md:-mt-6"><StockTicker stocks={topMovers} /></div>
+        <>
+            <PageMeta 
+                title="MarketsPro - AI Stock Analysis"
+                description="MarketsPro delivers automated insights with AI stock predictions to empower smarter trading and investment decisions."
+                keywords="MarketsPro, AI stock predictions, stock analysis, trading insights, market intelligence"
+            />
+            <div className="p-3 md:p-6">
+                <div className="mb-3 md:mb-4 -mx-3 md:-mx-6 -mt-3 md:-mt-6"><StockTicker stocks={topMovers} /></div>
 
 
 
@@ -1283,6 +1286,7 @@ Use real market data. Return ALL ${batch.length} stocks.`,
             )}
 
             <StockDetailModal stock={selectedStock} isOpen={showStockModal} onClose={() => { setShowStockModal(false); updateUrl(null); }} />
-        </div>
+            </div>
+        </>
     );
 }

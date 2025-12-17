@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import PageMeta from '@/components/PageMeta';
 import { Switch } from "@/components/ui/switch";
 import { Slider } from "@/components/ui/slider";
 import { 
@@ -16,11 +17,6 @@ const speakText = (text) => {
 };
 
 export default function Settings() {
-    useEffect(() => {
-        document.title = 'Personalized control for 1cPublishing';
-        document.querySelector('meta[name="description"]')?.setAttribute('content', 'Personalized usability, simplify customization, and empower every user experience.');
-        document.querySelector('meta[name="keywords"]')?.setAttribute('content', 'usability, accessibility');
-    }, []);
 
     const [fontSize, setFontSize] = useState(() => localStorage.getItem('fontSize') || 'medium');
     const [cognitiveMode, setCognitiveMode] = useState(() => localStorage.getItem('cognitiveMode') || 'none');
@@ -147,7 +143,13 @@ export default function Settings() {
     );
 
     return (
-        <div className="p-4 md:p-8 max-w-3xl mx-auto">
+        <>
+            <PageMeta 
+                title="Settings - Preferences"
+                description="Personalized usability settings to simplify customization and empower every user experience with accessibility options."
+                keywords="settings, preferences, accessibility, usability, customization, theme settings"
+            />
+            <div className="p-4 md:p-8 max-w-3xl mx-auto">
             <h1 className="text-2xl font-bold text-gray-800 mb-1">Settings</h1>
             <p className="text-gray-500 mb-8">Preferences</p>
 
@@ -260,6 +262,7 @@ export default function Settings() {
                 : "flex items-center gap-2 px-5 py-2.5 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-xl font-medium transition-colors"}>
                 {uiStyle !== 'classic' && <RotateCcw className="w-4 h-4" />} Reset to Defaults
             </button>
-        </div>
+            </div>
+        </>
     );
 }

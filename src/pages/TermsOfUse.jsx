@@ -1,4 +1,5 @@
 import React, { useEffect } from 'react';
+import PageMeta from '@/components/PageMeta';
 import { FileText } from 'lucide-react';
 
 const Section = ({ number, title, children }) => (
@@ -11,15 +12,16 @@ const Section = ({ number, title, children }) => (
 );
 
 export default function TermsOfUse() {
-    useEffect(() => {
-        document.title = 'Terms of Use for 1cPublishing.com';
-        document.querySelector('meta[name="description"]')?.setAttribute('content', 'Terms of Use for 1cPublishing.com and all applications.');
-        document.querySelector('meta[name="keywords"]')?.setAttribute('content', '1cPublishing Terms of Use, 1cPublishing user agreement');
-    }, []);
 
     return (
-        <div className="min-h-screen bg-gray-50 p-4 md:p-8">
-            <div className="max-w-4xl mx-auto">
+        <>
+            <PageMeta 
+                title="Terms of Use"
+                description="Terms of Use for 1cPublishing.com and all applications. Review our user agreement and service terms."
+                keywords="1cPublishing Terms of Use, user agreement, terms and conditions, service terms"
+            />
+            <div className="min-h-screen bg-gray-50 p-4 md:p-8">
+                <div className="max-w-4xl mx-auto">
                 {/* Header */}
                 <div className="bg-gradient-to-r from-purple-600 to-indigo-600 rounded-2xl p-8 mb-8 text-white">
                     <div className="flex items-center gap-4 mb-4">
@@ -145,6 +147,7 @@ export default function TermsOfUse() {
 
 
             </div>
-        </div>
+            </div>
+        </>
     );
 }

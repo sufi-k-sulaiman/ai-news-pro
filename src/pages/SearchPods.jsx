@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { base44 } from '@/api/base44Client';
+import PageMeta from '@/components/PageMeta';
 import { 
     Play, Pause, SkipBack, SkipForward, Volume2, VolumeX, Music,
     Sparkles, Radio, Loader2, TrendingUp, Users, Mic, ChevronDown,
@@ -114,11 +115,6 @@ const AnimatedBars = ({ isPlaying = false, color = '#10B981' }) => {
 };
 
 export default function SearchPods() {
-    useEffect(() => {
-        document.title = 'Search and Ai generated Audio Podcasts';
-        document.querySelector('meta[name="description"]')?.setAttribute('content', 'SearchPods delivers AI generated audio podcasts, making discovery simple and productivity smarter.');
-        document.querySelector('meta[name="keywords"]')?.setAttribute('content', 'Ai Podcasts, SearchPods');
-    }, []);
 
     const [searchQuery, setSearchQuery] = useState('');
     const [categoryData, setCategoryData] = useState({});
@@ -816,8 +812,14 @@ export default function SearchPods() {
     };
 
     return (
-        <div className="min-h-screen bg-gray-50 pb-8">
-            <main className="max-w-7xl mx-auto px-4 md:px-6 pt-6 space-y-8">
+        <>
+            <PageMeta 
+                title="SearchPods - AI Podcasts"
+                description="SearchPods delivers AI-generated audio podcasts on any topic, making discovery simple and productivity smarter."
+                keywords="AI podcasts, SearchPods, generated podcasts, audio content, podcast discovery"
+            />
+            <div className="min-h-screen bg-gray-50 pb-8">
+                <main className="max-w-7xl mx-auto px-4 md:px-6 pt-6 space-y-8">
 
                 {/* Trending Section */}
                 <div className="bg-gradient-to-br from-purple-50 to-indigo-50 rounded-2xl border border-purple-100 p-6">
@@ -1322,7 +1324,8 @@ export default function SearchPods() {
                         </div>
                     )}
                 </DialogContent>
-            </Dialog>
-        </div>
-    );
-}
+                </Dialog>
+                </div>
+                </>
+                );
+                }

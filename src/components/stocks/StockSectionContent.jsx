@@ -766,63 +766,13 @@ export default function StockSectionContent({
                 </div>
             );
 
-        case 'reports':
-            return (
-                <div className="min-h-[600px] space-y-6">
-                    <div className="bg-white rounded-2xl border border-gray-200 p-6">
-                        <h3 className="font-semibold text-gray-900 mb-4">Annual Reports</h3>
-                        <div className="space-y-2">
-                            {(data.annualReports || []).length > 0 ? data.annualReports.map((r, i) => (
-                                <a key={i} href={`https://www.sec.gov/cgi-bin/browse-edgar?CIK=${stock.ticker}&type=10-K`} target="_blank" rel="noopener noreferrer" className="flex items-center justify-between p-4 bg-gray-50 rounded-xl hover:bg-purple-50">
-                                    <div>
-                                        <p className="font-medium text-gray-900">{r.title}</p>
-                                        <p className="text-sm text-gray-500">{r.date}</p>
-                                    </div>
-                                    <Download className="w-4 h-4 text-gray-400" />
-                                </a>
-                            )) : <p className="text-gray-500 text-center py-8">Loading reports data...</p>}
-                        </div>
-                    </div>
-                    <div className="bg-white rounded-2xl border border-gray-200 p-6">
-                        <h3 className="font-semibold text-gray-900 mb-4">Quarterly Reports</h3>
-                        <div className="space-y-2">
-                            {(data.quarterlyReports || []).length > 0 ? data.quarterlyReports.map((r, i) => (
-                                <div key={i} className="flex items-center justify-between p-4 bg-gray-50 rounded-xl">
-                                    <div>
-                                        <p className="font-medium text-gray-900">{r.title}</p>
-                                        <p className="text-sm text-gray-500">{r.date}</p>
-                                    </div>
-                                    <Download className="w-4 h-4 text-gray-400" />
-                                </div>
-                            )) : <p className="text-gray-500 text-center py-8">Loading reports data...</p>}
-                        </div>
-                    </div>
-                    {data.earningsReleases && data.earningsReleases.length > 0 && (
-                        <div className="bg-white rounded-2xl border border-gray-200 p-6">
-                            <h3 className="font-semibold text-gray-900 mb-4">Earnings Releases</h3>
-                            <div className="space-y-2">
-                                {data.earningsReleases.map((r, i) => (
-                                    <div key={i} className="flex items-center justify-between p-4 bg-gray-50 rounded-xl">
-                                        <div>
-                                            <p className="font-medium text-gray-900">{r.title}</p>
-                                            <p className="text-sm text-gray-500">{r.date}</p>
-                                        </div>
-                                        <span className="text-sm font-bold text-green-600">{r.eps}</span>
-                                    </div>
-                                ))}
-                            </div>
-                        </div>
-                    )}
-                </div>
-            );
-
-        case 'investor-relations':
+        case 'investor-reports':
             return (
                 <div className="min-h-[600px] space-y-6">
                     <div className="bg-white rounded-xl border border-gray-200 p-5">
                         <div className="flex items-center justify-between">
                             <div>
-                                <h2 className="text-lg font-bold text-gray-900">{stock.name} IR</h2>
+                                <h2 className="text-lg font-bold text-gray-900">{stock.name} Investor Reports</h2>
                                 <p className="text-sm text-gray-500">{stock.ticker}</p>
                             </div>
                             <div className="text-right">
@@ -832,6 +782,7 @@ export default function StockSectionContent({
                             </div>
                         </div>
                     </div>
+
                     {data.annualReports && data.annualReports.length > 0 ? (
                         <div className="bg-white rounded-xl border border-gray-200 p-6">
                             <h3 className="font-semibold text-gray-900 mb-4">Annual Reports</h3>
@@ -849,7 +800,64 @@ export default function StockSectionContent({
                                 ))}
                             </div>
                         </div>
-                    ) : <p className="text-gray-500 text-center py-12">Loading IR data...</p>}
+                    ) : <p className="text-gray-500 text-center py-12">Loading investor reports...</p>}
+
+                    {data.quarterlyReports && data.quarterlyReports.length > 0 && (
+                        <div className="bg-white rounded-xl border border-gray-200 p-6">
+                            <h3 className="font-semibold text-gray-900 mb-4">Quarterly Reports</h3>
+                            <div className="space-y-2">
+                                {data.quarterlyReports.map((r, i) => (
+                                    <div key={i} className="flex items-start gap-3 p-4 bg-gray-50 rounded-xl">
+                                        <FileText className="w-5 h-5 text-blue-600 mt-0.5" />
+                                        <div className="flex-1">
+                                            <p className="font-medium text-gray-900">{r.title}</p>
+                                            <p className="text-sm text-gray-500">{r.date}</p>
+                                            {r.description && <p className="text-xs text-gray-400 mt-1">{r.description}</p>}
+                                        </div>
+                                        <Download className="w-4 h-4 text-gray-400 mt-1" />
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                    )}
+
+                    {data.investorPresentations && data.investorPresentations.length > 0 && (
+                        <div className="bg-white rounded-xl border border-gray-200 p-6">
+                            <h3 className="font-semibold text-gray-900 mb-4">Investor Presentations</h3>
+                            <div className="space-y-2">
+                                {data.investorPresentations.map((r, i) => (
+                                    <div key={i} className="flex items-center justify-between p-4 bg-gray-50 rounded-xl">
+                                        <div className="flex items-center gap-2">
+                                            <Play className="w-4 h-4 text-indigo-600" />
+                                            <div>
+                                                <p className="font-medium text-gray-900">{r.title}</p>
+                                                <p className="text-sm text-gray-500">{r.date}</p>
+                                            </div>
+                                        </div>
+                                        <Download className="w-4 h-4 text-gray-400" />
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                    )}
+
+                    {data.earningsReleases && data.earningsReleases.length > 0 && (
+                        <div className="bg-white rounded-xl border border-gray-200 p-6">
+                            <h3 className="font-semibold text-gray-900 mb-4">Earnings Releases</h3>
+                            <div className="space-y-2">
+                                {data.earningsReleases.map((r, i) => (
+                                    <div key={i} className="flex items-center justify-between p-4 bg-gray-50 rounded-xl">
+                                        <div>
+                                            <p className="font-medium text-gray-900">{r.title}</p>
+                                            <p className="text-sm text-gray-500">{r.date}</p>
+                                        </div>
+                                        <span className="text-sm font-bold text-green-600">{r.eps}</span>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                    )}
+
                     {data.fiscalYearData && data.fiscalYearData.length > 0 && (
                         <div className="bg-white rounded-xl border border-gray-200 p-6">
                             <h3 className="font-semibold text-gray-900 mb-4">Fiscal Year Summary</h3>

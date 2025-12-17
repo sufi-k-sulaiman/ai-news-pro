@@ -566,7 +566,7 @@ export default function News() {
                                         ? 'text-white'
                                         : 'hover:opacity-80'
                                 }`}
-                                style={activeSubtopic === subtopic ? { backgroundColor: '#6209e6' } : { background: 'linear-gradient(135deg, #f3f4f6 0%, #e5e7eb 100%)', color: '#6209e6' }}
+                                style={activeSubtopic === subtopic ? { backgroundColor: '#6209e6' } : { background: 'linear-gradient(135deg, #f9fafb 0%, #f3f4f6 100%)', color: '#6209e6' }}
                             >
                                 {subtopic}
                             </button>

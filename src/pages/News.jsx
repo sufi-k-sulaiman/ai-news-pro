@@ -344,15 +344,15 @@ export default function News() {
                 {/* Top Header with Logo */}
                 <div className="sticky top-0 z-50 bg-white border-b border-gray-200 shadow-sm">
                     <div className="max-w-[82rem] mx-auto px-4 py-4 flex items-center justify-center">
-                        <div className="flex items-center gap-2">
+                        <div className="flex items-center gap-2.5">
                             <img 
                                 src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/692729a5f5180fbd43f297e9/a182b15e6_1c-logo.png" 
                                 alt="Ai News Pro" 
-                                className="h-7 w-7 object-contain" 
+                                className="h-9 w-9 object-contain" 
                             />
                             <div>
-                                <h1 className="text-sm font-bold text-gray-900">Ai News Pro</h1>
-                                <p className="text-xs" style={{ color: '#6209e6' }}>Real-time Global Intelligence</p>
+                                <h1 className="text-base font-bold text-gray-900">Ai News Pro</h1>
+                                <p className="text-sm" style={{ color: '#6209e6' }}>Real-time Global Intelligence</p>
                             </div>
                         </div>
                     </div>

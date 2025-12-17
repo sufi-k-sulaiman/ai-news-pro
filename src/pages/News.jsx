@@ -55,6 +55,24 @@ const NewsGrid = ({ news, currentPage, onPageChange }) => {
 
     return (
         <>
+            {/* Pagination */}
+            {totalPages > 1 && (
+                <div className="flex justify-center gap-2 mb-6">
+                    {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
+                        <button
+                            key={page}
+                            onClick={() => onPageChange(page)}
+                            className={`px-4 py-2 rounded-full text-sm font-medium transition-all ${
+                                currentPage === page ? 'text-white shadow-md' : 'hover:opacity-80 border'
+                            }`}
+                            style={currentPage === page ? { backgroundColor: '#6209e6' } : { backgroundColor: '#f5f5f5', borderColor: '#6209e6', color: '#6209e6' }}
+                        >
+                            {page}
+                        </button>
+                    ))}
+                </div>
+            )}
+            
             {loadedImages > 0 && loadedImages < ARTICLES_PER_PAGE && (
                 <div className="mb-4 bg-white rounded-xl border p-4" style={{ borderColor: '#6209e6' }}>
                     <div className="flex items-center justify-between">
@@ -74,24 +92,6 @@ const NewsGrid = ({ news, currentPage, onPageChange }) => {
                     <NewsCardSimple key={`${newsKey}-${startIndex + index}`} article={article} index={startIndex + index} cacheKey={newsKey} />
                 ))}
             </div>
-            
-            {/* Pagination */}
-            {totalPages > 1 && (
-                <div className="flex justify-center gap-2 mt-8">
-                    {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
-                        <button
-                            key={page}
-                            onClick={() => onPageChange(page)}
-                            className={`px-4 py-2 rounded-full text-sm font-medium transition-all ${
-                                currentPage === page ? 'text-white shadow-md' : 'hover:opacity-80 border'
-                            }`}
-                            style={currentPage === page ? { backgroundColor: '#6209e6' } : { backgroundColor: '#f5f5f5', borderColor: '#6209e6', color: '#6209e6' }}
-                        >
-                            {page}
-                        </button>
-                    ))}
-                </div>
-            )}
         </>
     );
 };

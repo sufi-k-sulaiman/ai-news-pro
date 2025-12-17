@@ -501,7 +501,7 @@ export default function News() {
                     <div className="max-w-[82rem] mx-auto px-2 sm:px-4 py-2 sm:py-3">
                         {/* Mobile Layout */}
                         <div className="flex flex-col gap-2 sm:hidden">
-                            <div className="flex items-center justify-between">
+                            <div className="flex items-center justify-between mb-2">
                                 <Link to={createPageUrl('News')} className="flex items-center gap-1 hover:opacity-80 transition-opacity">
                                     <img 
                                         src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/694319442a278f16b6d6cf50/46592a6af_newsai.png" 
@@ -511,12 +511,19 @@ export default function News() {
                                     />
                                     <h1 className="text-sm font-bold text-gray-900">News Pro</h1>
                                 </Link>
+                            </div>
+                            <div className="flex items-center justify-between">
+                                {lastUpdated && (
+                                    <span className="text-xs text-gray-500">
+                                        {lastUpdated.toLocaleTimeString()}
+                                    </span>
+                                )}
                                 <Button
                                     variant="ghost"
                                     size="sm"
                                     onClick={() => fetchNews(searchQuery || activeCategory)}
                                     disabled={loading}
-                                    className="gap-1 h-8"
+                                    className="gap-1 h-8 ml-auto"
                                     style={{ color: '#6209e6' }}
                                 >
                                     <RefreshCw className={`w-3 h-3 ${loading ? 'animate-spin' : ''}`} />

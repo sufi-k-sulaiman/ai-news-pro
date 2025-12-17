@@ -251,6 +251,17 @@ function deduplicateArticles(articles) {
 }
 
 Deno.serve(async (req) => {
+    // Add CORS headers for Apple devices
+    const corsHeaders = {
+        'Access-Control-Allow-Origin': '*',
+        'Access-Control-Allow-Methods': 'POST, OPTIONS',
+        'Access-Control-Allow-Headers': 'Content-Type',
+    };
+
+    if (req.method === 'OPTIONS') {
+        return new Response(null, { headers: corsHeaders });
+    }
+
     try {
         // No auth required - public endpoint for news
         const { query, category, limit = 30 } = await req.json();
@@ -267,7 +278,7 @@ Deno.serve(async (req) => {
                 error: rssError.message, 
                 success: false,
                 articles: [] 
-            }, { status: 200 });
+            }, { status: 200, headers: corsHeaders });
         }
         
         if (!liveArticles || liveArticles.length === 0) {
@@ -275,7 +286,7 @@ Deno.serve(async (req) => {
                 error: 'No articles found from Google News RSS', 
                 success: false,
                 articles: [] 
-            }, { status: 200 });
+            }, { status: 200, headers: corsHeaders });
         }
 
         return Response.json({
@@ -285,7 +296,7 @@ Deno.serve(async (req) => {
             query: query || null,
             category: category || null,
             articles: liveArticles.slice(0, limit),
-        });
+        }, { headers: corsHeaders });
 
     } catch (error) {
         console.error('fetchNews error:', error);
@@ -293,7 +304,7 @@ Deno.serve(async (req) => {
             error: error.message, 
             success: false,
             articles: [] 
-        }, { status: 200 });
+        }, { status: 200, headers: corsHeaders });
     }
 });
 

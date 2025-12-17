@@ -303,12 +303,29 @@ export default function StockDetail() {
                     break;
 
                 case 'legends':
-                    const investors = ['Warren Buffett', 'Peter Lynch', 'Benjamin Graham', 'Joel Greenblatt', 'Ray Dalio', 'Cathie Wood', 'George Soros', 'David Dreman', 'John Templeton', 'Aswath Damodaran', 'Stanley Druckenmiller', 'Carl Icahn', 'Seth Klarman', 'David Tepper', 'Jim Simons', 'John Bogle'];
+                    const frameworks = [
+                        { investor: 'Warren Buffett', framework: 'Value / Moat', color: '#10B981' },
+                        { investor: 'Peter Lynch', framework: 'GARP', color: '#F59E0B' },
+                        { investor: 'Benjamin Graham', framework: 'Magic Formula', color: '#3B82F6' },
+                        { investor: 'Joel Greenblatt', framework: 'Global Contrarian', color: '#EF4444' },
+                        { investor: 'Aswath Damodaran', framework: 'Academic DCF', color: '#8B5CF6' },
+                        { investor: 'Cathie Wood', framework: 'Disruptive Innovation', color: '#EC4899' },
+                        { investor: 'Ray Dalio', framework: 'Risk Parity', color: '#14B8A6' },
+                        { investor: 'David Dreman', framework: 'Contrarian Value', color: '#F97316' },
+                        { investor: 'John Templeton', framework: 'Value Investing', color: '#06B6D4' },
+                        { investor: 'Stanley Druckenmiller', framework: 'Macro Opportunism', color: '#84CC16' },
+                        { investor: 'George Soros', framework: 'Reflexivity Theory', color: '#22C55E' },
+                        { investor: 'Seth Klarman', framework: 'Deep Value', color: '#10B981' },
+                        { investor: 'Jim Simons', framework: 'Quantitative', color: '#A855F7' },
+                        { investor: 'Carl Icahn', framework: 'Activist Investing', color: '#EF4444' },
+                        { investor: 'David Tepper', framework: 'Distressed Debt', color: '#F59E0B' },
+                        { investor: 'John Bogle', framework: 'Index / Passive', color: '#6366F1' }
+                    ];
                     
                     const allFrameworks = [];
-                    for (const investor of investors) {
-                        const investorPrompt = `Analyze ${stock.ticker} from ${investor}'s perspective. Metrics: MOAT=${stock.moat}, ROE=${stock.roe}%, PE=${stock.pe}, PEG=${stock.peg}, Z=${stock.zscore}, Beta=${stock.beta}, Growth=${stock.sgr}%. Return: name, style, color, verdict, philosophy, approach, keyMetrics(3), metrics(2 with label/value/max/good/inverse).`;
-                        const investorSchema = {
+                    for (const {investor, framework, color} of frameworks) {
+                        const prompt = `Analyze ${stock.ticker} for ${investor}'s ${framework} framework. Stock data: MOAT=${stock.moat}, ROE=${stock.roe}%, PE=${stock.pe}, Z-Score=${stock.zscore}, Beta=${stock.beta}. Return JSON with: name="${investor}", style="${framework}", color="${color}", verdict (e.g. "Strong Buy", "Hold", "Top Quartile"), philosophy (1 sentence), approach (2 sentences), keyMetrics (3 strings), metrics (exactly 3 objects with label, value from stock data, max=100, good=target threshold, inverse=boolean).`;
+                        const schema = {
                             type: "object",
                             properties: {
                                 name: { type: "string" },
@@ -318,14 +335,14 @@ export default function StockDetail() {
                                 philosophy: { type: "string" },
                                 approach: { type: "string" },
                                 keyMetrics: { type: "array", items: { type: "string" } },
-                                metrics: { type: "array", items: { type: "object", properties: { label: { type: "string" }, value: { type: "number" }, max: { type: "number" }, good: { type: "number" }, inverse: { type: "boolean" } } } }
+                                metrics: { type: "array", minItems: 3, maxItems: 3, items: { type: "object", properties: { label: { type: "string" }, value: { type: "number" }, max: { type: "number" }, good: { type: "number" }, inverse: { type: "boolean" } } } }
                             }
                         };
-                        const framework = await base44.integrations.Core.InvokeLLM({
-                            prompt: investorPrompt,
-                            response_json_schema: investorSchema
+                        const result = await base44.integrations.Core.InvokeLLM({
+                            prompt,
+                            response_json_schema: schema
                         });
-                        allFrameworks.push(framework);
+                        allFrameworks.push(result);
                     }
                     setSectionData(prev => ({ ...prev, legends: { frameworks: allFrameworks } }));
                     setLoadingSection(null);

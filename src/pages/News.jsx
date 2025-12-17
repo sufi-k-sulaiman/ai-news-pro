@@ -343,7 +343,7 @@ export default function News() {
                 <style>{pulseAnimation}</style>
 
                 {/* Top Header with Logo */}
-                <div className="sticky top-0 z-50 bg-white border-b shadow-sm" style={{ borderColor: '#6209e6' }}>
+                <div className="sticky top-0 z-50 bg-white shadow-sm">
                     <div className="max-w-[82rem] mx-auto px-4 py-4 flex items-center justify-center">
                         <div className="flex items-center gap-2.5">
                             <img 
@@ -404,9 +404,9 @@ export default function News() {
                                 className={`px-4 py-2 rounded-full text-sm font-medium transition-all flex items-center gap-2 ${
                                     activeCategory === cat.id
                                         ? 'text-white shadow-md'
-                                        : 'bg-white hover:opacity-80 border'
+                                        : 'hover:opacity-80 border'
                                 }`}
-                                style={activeCategory === cat.id ? { backgroundColor: '#6209e6' } : { borderColor: '#6209e6', color: '#6209e6' }}
+                                style={activeCategory === cat.id ? { backgroundColor: '#6209e6' } : { backgroundColor: '#f5f5f5', borderColor: '#6209e6', color: '#6209e6' }}
                             >
                                 <IconComponent className="w-4 h-4" />
                                 {cat.label}
@@ -431,9 +431,9 @@ export default function News() {
                                 className={`px-3 py-1.5 text-xs font-medium rounded-full border transition-colors ${
                                     activeSubtopic === subtopic
                                         ? 'text-white'
-                                        : 'bg-white hover:opacity-80'
+                                        : 'hover:opacity-80'
                                 }`}
-                                style={activeSubtopic === subtopic ? { backgroundColor: '#6209e6', borderColor: '#6209e6' } : { borderColor: '#6209e6', color: '#6209e6' }}
+                                style={activeSubtopic === subtopic ? { backgroundColor: '#6209e6', borderColor: '#6209e6' } : { backgroundColor: '#f5f5f5', borderColor: '#6209e6', color: '#6209e6' }}
                             >
                                 {subtopic}
                             </button>
@@ -451,7 +451,7 @@ export default function News() {
                         onClick={() => fetchNews(searchQuery || activeCategory)}
                         disabled={loading}
                         className="gap-2 border hover:opacity-80"
-                        style={{ borderColor: '#6209e6', color: '#6209e6' }}
+                        style={{ backgroundColor: '#f5f5f5', borderColor: '#6209e6', color: '#6209e6' }}
                     >
                         <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
                         Refresh
@@ -493,8 +493,8 @@ export default function News() {
                                         setSearchQuery(topic);
                                         fetchNews(topic);
                                     }}
-                                    className="px-3 py-1.5 bg-white text-sm rounded-full transition-colors border hover:opacity-80"
-                                    style={{ borderColor: '#6209e6', color: '#6209e6' }}
+                                    className="px-3 py-1.5 text-sm rounded-full transition-colors border hover:opacity-80"
+                                    style={{ backgroundColor: '#f5f5f5', borderColor: '#6209e6', color: '#6209e6' }}
                                 >
                                     #{topic}
                                 </button>

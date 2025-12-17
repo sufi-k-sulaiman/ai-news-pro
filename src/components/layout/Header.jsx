@@ -74,7 +74,7 @@ export default function Header({ title, sidebarOpen, setSidebarOpen, children, c
                         <img src={LOGO_URL} alt="1cPublishing" className="h-10 w-10 object-contain" />
                         <div className="hidden sm:block">
                             <span className="text-xl font-bold text-gray-900">Agentic Ai</span>
-                            <p className="text-x font-medium text-purple-800">Demo - 1cPlatform</p>
+                            <p className="text-x font-medium text-purple-800">1cPlatform - Demo</p>
                         </div>
                     </Link>
                     {setSidebarOpen && (

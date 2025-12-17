@@ -170,45 +170,127 @@ export default function StockSectionContent({
                 </div>
             );
 
-        case 'moat':
+        case 'investor-moat':
               return (
-                  <div className="bg-white rounded-2xl border border-gray-200 p-6">
-                      <h3 className="font-semibold text-gray-900 mb-4">MOAT Breakdown</h3>
-                      {data.moatBreakdown ? (
+                  <div className="min-h-[600px] space-y-6">
+                      {data.recommendation && data.moatBreakdown ? (
                           <>
-                              <div className="space-y-3 mb-6">
-                                  <MoatBar label="Brand Power" value={data.moatBreakdown.brandPower} />
-                                  <MoatBar label="Switching Costs" value={data.moatBreakdown.switchingCosts} color="#10B981" />
-                                  <MoatBar label="Network Effects" value={data.moatBreakdown.networkEffects} />
-                                  <MoatBar label="Cost Advantages" value={data.moatBreakdown.costAdvantages} color="#F59E0B" />
-                                  <MoatBar label="Scale Advantage" value={data.moatBreakdown.scaleAdvantage} color="#3B82F6" />
-                                  <MoatBar label="Regulatory Moat" value={data.moatBreakdown.regulatoryMoat} color="#EC4899" />
+                              <div className="bg-white rounded-2xl border border-gray-200 p-6">
+                                  <h3 className="font-semibold text-gray-900 mb-4 flex items-center gap-2">
+                                      <Target className="w-5 h-5 text-purple-600" /> Investment Recommendation
+                                  </h3>
+                                  <div className="flex items-center gap-6 mb-6">
+                                      <div className={`px-6 py-3 rounded-xl text-2xl font-bold ${
+                                          data.recommendation === 'Buy' ? 'bg-green-100 text-green-700' :
+                                          data.recommendation === 'Sell' ? 'bg-red-100 text-red-700' :
+                                          'bg-yellow-100 text-yellow-700'
+                                      }`}>
+                                          {data.recommendation}
+                                      </div>
+                                      {data.confidence && (
+                                          <div>
+                                              <p className="text-sm text-gray-500">AI Confidence</p>
+                                              <p className="text-3xl font-bold text-gray-900">{data.confidence}%</p>
+                                          </div>
+                                      )}
+                                  </div>
+                                  {data.priceTargets && (
+                                      <div className="grid grid-cols-3 gap-4">
+                                          {data.priceTargets.low && (
+                                              <div className="bg-red-50 rounded-xl p-4 text-center">
+                                                  <p className="text-sm text-gray-600">Low Target</p>
+                                                  <p className="text-2xl font-bold text-red-600">${data.priceTargets.low.toFixed(2)}</p>
+                                              </div>
+                                          )}
+                                          {data.priceTargets.mid && (
+                                              <div className="bg-purple-50 rounded-xl p-4 text-center">
+                                                  <p className="text-sm text-gray-600">Mid Target</p>
+                                                  <p className="text-2xl font-bold text-purple-600">${data.priceTargets.mid.toFixed(2)}</p>
+                                              </div>
+                                          )}
+                                          {data.priceTargets.high && (
+                                              <div className="bg-green-50 rounded-xl p-4 text-center">
+                                                  <p className="text-sm text-gray-600">High Target</p>
+                                                  <p className="text-2xl font-bold text-green-600">${data.priceTargets.high.toFixed(2)}</p>
+                                              </div>
+                                          )}
+                                      </div>
+                                  )}
                               </div>
-                              {data.thesis && (
-                                  <div className="p-4 bg-purple-50 rounded-lg">
-                                      <h4 className="font-medium text-gray-900 mb-2">Investment Thesis</h4>
-                                      <p className="text-sm text-gray-700">{data.thesis}</p>
+
+                              {(data.catalysts || data.risks) && (
+                                  <div className="grid grid-cols-2 gap-6">
+                                      {data.catalysts && data.catalysts.length > 0 && (
+                                          <div className="bg-white rounded-2xl border border-gray-200 p-6">
+                                              <h4 className="font-semibold text-gray-900 mb-3 flex items-center gap-2">
+                                                  <Zap className="w-4 h-4 text-green-600" /> Key Catalysts
+                                              </h4>
+                                              <ul className="space-y-2">
+                                                  {data.catalysts.map((c, i) => (
+                                                      <li key={i} className="flex items-start gap-2 text-sm text-gray-700">
+                                                          <span className="w-1.5 h-1.5 rounded-full bg-green-500 mt-2" />
+                                                          {c}
+                                                      </li>
+                                                  ))}
+                                              </ul>
+                                          </div>
+                                      )}
+                                      {data.risks && data.risks.length > 0 && (
+                                          <div className="bg-white rounded-2xl border border-gray-200 p-6">
+                                              <h4 className="font-semibold text-gray-900 mb-3 flex items-center gap-2">
+                                                  <AlertTriangle className="w-4 h-4 text-red-600" /> Risks
+                                              </h4>
+                                              <ul className="space-y-2">
+                                                  {data.risks.map((r, i) => (
+                                                      <li key={i} className="flex items-start gap-2 text-sm text-gray-700">
+                                                          <span className="w-1.5 h-1.5 rounded-full bg-red-500 mt-2" />
+                                                          {r}
+                                                      </li>
+                                                  ))}
+                                              </ul>
+                                          </div>
+                                      )}
                                   </div>
                               )}
-                              {data.advantages && data.advantages.length > 0 && (
-                                  <div className="mt-4">
-                                      <h4 className="font-medium text-gray-900 mb-2">Key Advantages</h4>
-                                      <ul className="space-y-2">
-                                          {data.advantages.map((adv, i) => (
-                                              <li key={i} className="flex items-start gap-2 text-sm text-gray-700">
-                                                  <span className="w-1.5 h-1.5 rounded-full bg-green-500 mt-2" />
-                                                  {adv}
-                                              </li>
-                                          ))}
-                                      </ul>
+
+                              <div className="bg-white rounded-2xl border border-gray-200 p-6">
+                                  <h3 className="font-semibold text-gray-900 mb-4 flex items-center gap-2">
+                                      <Shield className="w-5 h-5 text-purple-600" /> MOAT Breakdown
+                                  </h3>
+                                  <div className="space-y-3 mb-6">
+                                      <MoatBar label="Brand Power" value={data.moatBreakdown.brandPower} />
+                                      <MoatBar label="Switching Costs" value={data.moatBreakdown.switchingCosts} color="#10B981" />
+                                      <MoatBar label="Network Effects" value={data.moatBreakdown.networkEffects} />
+                                      <MoatBar label="Cost Advantages" value={data.moatBreakdown.costAdvantages} color="#F59E0B" />
+                                      <MoatBar label="Scale Advantage" value={data.moatBreakdown.scaleAdvantage} color="#3B82F6" />
+                                      <MoatBar label="Regulatory Moat" value={data.moatBreakdown.regulatoryMoat} color="#EC4899" />
                                   </div>
-                              )}
+                                  {data.thesis && (
+                                      <div className="p-4 bg-purple-50 rounded-lg">
+                                          <h4 className="font-medium text-gray-900 mb-2">Investment Thesis</h4>
+                                          <p className="text-sm text-gray-700">{data.thesis}</p>
+                                      </div>
+                                  )}
+                                  {data.advantages && data.advantages.length > 0 && (
+                                      <div className="mt-4">
+                                          <h4 className="font-medium text-gray-900 mb-2">Key Advantages</h4>
+                                          <ul className="space-y-2">
+                                              {data.advantages.map((adv, i) => (
+                                                  <li key={i} className="flex items-start gap-2 text-sm text-gray-700">
+                                                      <span className="w-1.5 h-1.5 rounded-full bg-green-500 mt-2" />
+                                                      {adv}
+                                                  </li>
+                                              ))}
+                                          </ul>
+                                      </div>
+                                  )}
+                              </div>
                           </>
-                      ) : <p className="text-gray-500 text-center py-12">Loading MOAT data...</p>}
+                      ) : <p className="text-gray-500 text-center py-32">Loading investor MOAT data...</p>}
                   </div>
               );
 
-        case 'valuation':
+          case 'valuation':
               return (
                   <div className="space-y-6">
                       <div className="bg-white rounded-2xl border border-gray-200 p-6">
@@ -938,10 +1020,10 @@ export default function StockSectionContent({
                 </div>
             );
 
-        case 'invest':
+        case 'investor-moat':
               return (
                   <div className="min-h-[600px] space-y-6">
-                      {data.recommendation ? (
+                      {data.recommendation && data.moatBreakdown ? (
                           <>
                               <div className="bg-white rounded-2xl border border-gray-200 p-6">
                                   <h3 className="font-semibold text-gray-900 mb-4 flex items-center gap-2">
@@ -985,6 +1067,7 @@ export default function StockSectionContent({
                                       </div>
                                   )}
                               </div>
+
                               {(data.catalysts || data.risks) && (
                                   <div className="grid grid-cols-2 gap-6">
                                       {data.catalysts && data.catalysts.length > 0 && (
@@ -1019,8 +1102,41 @@ export default function StockSectionContent({
                                       )}
                                   </div>
                               )}
+
+                              <div className="bg-white rounded-2xl border border-gray-200 p-6">
+                                  <h3 className="font-semibold text-gray-900 mb-4 flex items-center gap-2">
+                                      <Shield className="w-5 h-5 text-purple-600" /> Economic MOAT Analysis
+                                  </h3>
+                                  <div className="space-y-3 mb-6">
+                                      <MoatBar label="Brand Power" value={data.moatBreakdown.brandPower} />
+                                      <MoatBar label="Switching Costs" value={data.moatBreakdown.switchingCosts} color="#10B981" />
+                                      <MoatBar label="Network Effects" value={data.moatBreakdown.networkEffects} />
+                                      <MoatBar label="Cost Advantages" value={data.moatBreakdown.costAdvantages} color="#F59E0B" />
+                                      <MoatBar label="Scale Advantage" value={data.moatBreakdown.scaleAdvantage} color="#3B82F6" />
+                                      <MoatBar label="Regulatory Moat" value={data.moatBreakdown.regulatoryMoat} color="#EC4899" />
+                                  </div>
+                                  {data.advantages && data.advantages.length > 0 && (
+                                      <div className="mt-4">
+                                          <h4 className="font-medium text-gray-900 mb-2">Competitive Advantages</h4>
+                                          <ul className="space-y-2">
+                                              {data.advantages.map((adv, i) => (
+                                                  <li key={i} className="flex items-start gap-2 text-sm text-gray-700">
+                                                      <span className="w-1.5 h-1.5 rounded-full bg-green-500 mt-2" />
+                                                      {adv}
+                                                  </li>
+                                              ))}
+                                          </ul>
+                                      </div>
+                                  )}
+                                  {data.thesis && (
+                                      <div className="p-4 bg-purple-50 rounded-lg mt-4">
+                                          <h4 className="font-medium text-gray-900 mb-2">Investment Thesis</h4>
+                                          <p className="text-sm text-gray-700">{data.thesis}</p>
+                                      </div>
+                                  )}
+                              </div>
                           </>
-                      ) : <p className="text-gray-500 text-center py-32">Loading investment recommendation...</p>}
+                      ) : <p className="text-gray-500 text-center py-32">Loading investor MOAT data...</p>}
                   </div>
               );
 

@@ -19,8 +19,7 @@ import StockSectionContent from '@/components/stocks/StockSectionContent';
 
 const NAV_ITEMS = [
     { id: 'overview', label: 'Overview', icon: Eye },
-    { id: 'invest', label: 'Investment Rec', icon: Target },
-    { id: 'moat', label: 'MOAT Analysis', icon: Shield },
+    { id: 'investor-moat', label: 'Investor MOAT', icon: Shield },
     { id: 'valuation', label: 'Valuation', icon: BarChart3 },
     { id: 'simulator', label: 'Simulator', icon: Calculator },
     { id: 'dcf', label: 'DCF Calculator', icon: Activity },
@@ -172,13 +171,17 @@ export default function StockDetail() {
                     };
                     break;
 
-                case 'moat':
-                    prompt = `MOAT analysis for ${stock.ticker}: scores 0-100 for brand power, switching costs, network effects, cost advantages, scale advantage, regulatory moat. Competitive position, 5 advantages, thesis`;
+                case 'investor-moat':
+                    prompt = `Combined investor MOAT analysis for ${stock.ticker}: Investment recommendation (Buy/Hold/Sell), confidence %, price targets (low/mid/high), key catalysts (3-5), risks (3-5), MOAT scores 0-100 for: brand power, switching costs, network effects, cost advantages, scale advantage, regulatory moat, competitive advantages (3-5), investment thesis`;
                     schema = {
                         type: "object",
                         properties: {
+                            recommendation: { type: "string" },
+                            confidence: { type: "number" },
+                            priceTargets: { type: "object", properties: { low: { type: "number" }, mid: { type: "number" }, high: { type: "number" } } },
+                            catalysts: { type: "array", items: { type: "string" } },
+                            risks: { type: "array", items: { type: "string" } },
                             moatBreakdown: { type: "object", properties: { brandPower: { type: "number" }, switchingCosts: { type: "number" }, networkEffects: { type: "number" }, costAdvantages: { type: "number" }, scaleAdvantage: { type: "number" }, regulatoryMoat: { type: "number" } } },
-                            position: { type: "string" },
                             advantages: { type: "array", items: { type: "string" } },
                             thesis: { type: "string" }
                         }
@@ -349,23 +352,6 @@ export default function StockDetail() {
                             investorPresentations: { type: "array", items: { type: "object", properties: { title: { type: "string" }, date: { type: "string" } } } },
                             earningsReleases: { type: "array", items: { type: "object", properties: { title: { type: "string" }, date: { type: "string" }, eps: { type: "string" } } } },
                             fiscalYearData: { type: "array", items: { type: "object", properties: { year: { type: "string" }, revenue: { type: "string" }, earnings: { type: "string" }, assets: { type: "string" } } } }
-                        }
-                    };
-                    break;
-
-                case 'invest':
-                    prompt = `Investment recommendation for ${stock.ticker}: Buy/Hold/Sell with confidence %, price targets (low/mid/high), entry point, position size, time horizon, key catalysts (3-5), risks (3-5)`;
-                    schema = {
-                        type: "object",
-                        properties: {
-                            recommendation: { type: "string" },
-                            confidence: { type: "number" },
-                            priceTargets: { type: "object", properties: { low: { type: "number" }, mid: { type: "number" }, high: { type: "number" } } },
-                            entryPoint: { type: "number" },
-                            positionSize: { type: "string" },
-                            timeHorizon: { type: "string" },
-                            catalysts: { type: "array", items: { type: "string" } },
-                            risks: { type: "array", items: { type: "string" } }
                         }
                     };
                     break;

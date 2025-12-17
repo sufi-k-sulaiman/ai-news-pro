@@ -461,17 +461,8 @@ export default function News() {
 
                 {/* Top Header with Logo */}
                 <div className="sticky top-0 z-50 bg-white shadow-sm">
-                    <div className="max-w-[82rem] mx-auto px-4 py-4 flex items-center justify-between">
-                        {/* Left - Updated Time */}
-                        {lastUpdated && (
-                            <div className="flex items-center gap-2 text-gray-500 text-sm">
-                                <Clock className="w-4 h-4" />
-                                Updated {lastUpdated.toLocaleTimeString()}
-                            </div>
-                        )}
-                        {!lastUpdated && <div />}
-
-                        {/* Center - Logo */}
+                    <div className="max-w-[82rem] mx-auto px-4 py-4 flex items-center gap-4">
+                        {/* Left - Logo */}
                         <div className="flex items-center gap-2.5">
                             <img 
                                 src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/692729a5f5180fbd43f297e9/a182b15e6_1c-logo.png" 
@@ -483,44 +474,52 @@ export default function News() {
                             </div>
                         </div>
 
-                        {/* Right - Refresh Button */}
-                        <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={() => fetchNews(searchQuery || activeCategory)}
-                            disabled={loading}
-                            className="gap-2 hover:opacity-80"
-                            style={{ background: 'linear-gradient(135deg, #e5e7eb 0%, #d1d5db 100%)', color: '#6209e6' }}
-                        >
-                            <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
-                            Refresh
-                        </Button>
+                        {/* Center - Search Bar */}
+                        <form onSubmit={handleSearch} className="flex-1 max-w-2xl">
+                            <div className="relative">
+                                <Input
+                                    type="text"
+                                    value={searchQuery}
+                                    onChange={(e) => setSearchQuery(e.target.value)}
+                                    placeholder="Search for any news topic..."
+                                    className="w-full h-12 pl-5 pr-14 rounded-full bg-white shadow-sm"
+                                    style={{ borderColor: '#6209e6' }}
+                                />
+                                <button
+                                    type="submit"
+                                    className="absolute right-1.5 top-1/2 -translate-y-1/2 w-9 h-9 rounded-full flex items-center justify-center transition-colors"
+                                    style={{ backgroundColor: '#6209e6' }}
+                                    onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#5208c5'}
+                                    onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#6209e6'}
+                                >
+                                    <Search className="w-4 h-4 text-white" />
+                                </button>
+                            </div>
+                        </form>
+
+                        {/* Right - Refresh Button and Time */}
+                        <div className="flex flex-col items-end gap-1">
+                            <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={() => fetchNews(searchQuery || activeCategory)}
+                                disabled={loading}
+                                className="gap-2 hover:opacity-80"
+                                style={{ background: 'linear-gradient(135deg, #e5e7eb 0%, #d1d5db 100%)', color: '#6209e6' }}
+                            >
+                                <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
+                                Refresh
+                            </Button>
+                            {lastUpdated && (
+                                <span className="text-xs text-gray-500">
+                                    {lastUpdated.toLocaleTimeString()}
+                                </span>
+                            )}
+                        </div>
                     </div>
                 </div>
 
                 <div className="max-w-[82rem] mx-auto p-4 md:p-6">
-                {/* Search Bar */}
-                <form onSubmit={handleSearch} className="mb-6">
-                    <div className="relative">
-                        <Input
-                            type="text"
-                            value={searchQuery}
-                            onChange={(e) => setSearchQuery(e.target.value)}
-                            placeholder="Search for any news topic..."
-                            className="w-full h-14 pl-6 pr-16 rounded-full bg-white shadow-sm text-lg"
-                            style={{ borderColor: '#6209e6' }}
-                        />
-                        <button
-                            type="submit"
-                            className="absolute right-2 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full flex items-center justify-center transition-colors"
-                            style={{ backgroundColor: '#6209e6' }}
-                            onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#5208c5'}
-                            onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#6209e6'}
-                        >
-                            <Search className="w-5 h-5 text-white" />
-                        </button>
-                    </div>
-                </form>
 
                 {/* Categories */}
                 <div className="bg-gray-100 rounded-full p-1.5 inline-flex gap-1 mb-2">

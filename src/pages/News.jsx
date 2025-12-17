@@ -2,7 +2,6 @@ import React, { useState, useEffect, useRef } from 'react';
 import PageMeta from '@/components/PageMeta';
 import { Link } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
-import { Moon, Sun } from 'lucide-react';
 
 const pulseAnimation = `
 @keyframes pulse {
@@ -360,30 +359,6 @@ const CATEGORIES = [
 ];
 
 export default function News() {
-    const [isDarkMode, setIsDarkMode] = useState(false);
-
-    useEffect(() => {
-        const saved = localStorage.getItem('newsAppDarkMode') === 'true';
-        setIsDarkMode(saved);
-        if (saved) {
-            document.body.style.backgroundColor = '#080810';
-            document.body.style.color = '#ffffff';
-        }
-    }, []);
-
-    const toggleDarkMode = () => {
-        const newMode = !isDarkMode;
-        setIsDarkMode(newMode);
-        localStorage.setItem('newsAppDarkMode', newMode);
-        if (newMode) {
-            document.body.style.backgroundColor = '#080810';
-            document.body.style.color = '#ffffff';
-        } else {
-            document.body.style.backgroundColor = '#ffffff';
-            document.body.style.color = '#000000';
-        }
-    };
-
     // Update URL for display only (aesthetic, not parsed)
     const updateUrl = (category, query) => {
         const basePath = window.location.pathname.replace(/\/$/, '');
@@ -518,11 +493,11 @@ export default function News() {
             <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
             <meta name="apple-mobile-web-app-capable" content="yes" />
             <meta name="apple-mobile-web-app-status-bar-style" content="default" />
-            <div className={`min-h-screen ${isDarkMode ? 'bg-[#080810]' : 'bg-white'}`}>
+            <div className="min-h-screen bg-white">
                 <style>{pulseAnimation}</style>
 
                 {/* Top Header with Logo */}
-                <div className={`sticky top-0 z-50 shadow-sm ${isDarkMode ? 'bg-[#080810]' : 'bg-white'}`}>
+                <div className="sticky top-0 z-50 bg-white shadow-sm">
                     <div className="max-w-[82rem] mx-auto px-2 sm:px-4 py-2 sm:py-3">
                         {/* Mobile Layout */}
                         <div className="flex flex-col gap-2 sm:hidden">
@@ -534,7 +509,7 @@ export default function News() {
                                         className="object-contain"
                                         style={{ width: '40.32px', height: '40.32px' }} 
                                     />
-                                    <h1 className={`text-sm font-bold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>News Pro</h1>
+                                    <h1 className="text-sm font-bold text-gray-900">News Pro</h1>
                                 </Link>
                                 <Button
                                     variant="ghost"
@@ -555,7 +530,7 @@ export default function News() {
                                         value={searchQuery}
                                         onChange={(e) => setSearchQuery(e.target.value)}
                                         placeholder="Search news..."
-                                        className={`w-full h-10 pl-4 pr-12 rounded-full shadow-sm text-sm ${isDarkMode ? 'bg-[#1a1a2e] text-white' : 'bg-white'}`}
+                                        className="w-full h-10 pl-4 pr-12 rounded-full bg-white shadow-sm text-sm"
                                         style={{ borderColor: '#6209e6' }}
                                         autoComplete="on"
                                     />
@@ -580,7 +555,7 @@ export default function News() {
                                     className="object-contain"
                                     style={{ width: '44.8px', height: '44.8px' }} 
                                 />
-                                <h1 className={`text-base font-bold whitespace-nowrap ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>News Pro</h1>
+                                <h1 className="text-base font-bold text-gray-900 whitespace-nowrap">News Pro</h1>
                             </Link>
 
                             {/* Center - Search Bar */}
@@ -592,7 +567,7 @@ export default function News() {
                                         value={searchQuery}
                                         onChange={(e) => setSearchQuery(e.target.value)}
                                         placeholder="Search for any news topic..."
-                                        className={`w-full h-11 pl-5 pr-14 rounded-full shadow-sm ${isDarkMode ? 'bg-[#1a1a2e] text-white' : 'bg-white'}`}
+                                        className="w-full h-11 pl-5 pr-14 rounded-full bg-white shadow-sm"
                                         style={{ borderColor: '#6209e6' }}
                                         autoComplete="on"
                                     />
@@ -635,7 +610,7 @@ export default function News() {
                 <div className="max-w-[82rem] mx-auto p-2 sm:p-4 md:p-6">
 
                 {/* Categories */}
-                <div className={`rounded-full p-1 sm:p-1.5 mb-2 overflow-x-auto scrollbar-hide ${isDarkMode ? 'bg-[#1a1a2e]' : 'bg-gray-100'}`}>
+                <div className="bg-gray-100 rounded-full p-1 sm:p-1.5 mb-2 overflow-x-auto scrollbar-hide">
                     <div className="flex gap-1 min-w-max">
                         {CATEGORIES.map((cat) => {
                             const IconComponent = cat.icon;
@@ -650,7 +625,7 @@ export default function News() {
                                     className={`px-3 sm:px-5 py-2 sm:py-2.5 rounded-full text-xs sm:text-sm font-medium transition-all flex items-center gap-1.5 sm:gap-2 whitespace-nowrap ${
                                         activeCategory === cat.id
                                             ? 'text-white shadow-sm'
-                                            : isDarkMode ? 'text-gray-300 hover:text-white' : 'text-gray-600 hover:text-gray-900'
+                                            : 'text-gray-600 hover:text-gray-900'
                                     }`}
                                     style={activeCategory === cat.id ? { backgroundColor: '#6209e6' } : { backgroundColor: 'transparent' }}
                                 >
@@ -729,10 +704,10 @@ export default function News() {
 
                 {/* Trending Section */}
                 {!loading && news.length > 0 && (
-                    <div className={`mt-6 sm:mt-8 rounded-2xl border p-4 sm:p-6 ${isDarkMode ? 'bg-[#1a1a2e]' : 'bg-white'}`} style={{ borderColor: '#6209e6' }}>
+                    <div className="mt-6 sm:mt-8 bg-white rounded-2xl border p-4 sm:p-6" style={{ borderColor: '#6209e6' }}>
                         <div className="flex items-center gap-2 mb-3 sm:mb-4">
                             <TrendingUp className="w-4 h-4 sm:w-5 sm:h-5" style={{ color: '#6209e6' }} />
-                            <h2 className={`font-semibold text-sm sm:text-base ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
+                            <h2 className="font-semibold text-sm sm:text-base text-gray-900">
                                 {activeSubtopic ? `Related to ${activeSubtopic}` : `Trending in ${CATEGORIES.find(c => c.id === activeCategory)?.label}`}
                             </h2>
                         </div>
@@ -756,20 +731,6 @@ export default function News() {
                         </div>
                     </div>
                 )}
-
-                {/* Footer with Dark Mode Toggle */}
-                <footer className={`mt-12 border-t py-6 ${isDarkMode ? 'border-gray-800' : 'border-gray-200'}`}>
-                    <div className="flex justify-center items-center gap-3">
-                        <button
-                            onClick={toggleDarkMode}
-                            className="flex items-center gap-2 px-4 py-2 rounded-full transition-all hover:opacity-80"
-                            style={{ backgroundColor: '#6209e6', color: 'white' }}
-                        >
-                            {isDarkMode ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
-                            <span className="text-sm font-medium">{isDarkMode ? 'Light Mode' : 'Dark Mode'}</span>
-                        </button>
-                    </div>
-                </footer>
                 </div>
                 </div>
                 </>

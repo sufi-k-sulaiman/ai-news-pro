@@ -522,7 +522,7 @@ export default function News() {
                 </form>
 
                 {/* Categories */}
-                <div className="flex flex-wrap gap-2 mb-2">
+                <div className="bg-gray-100 rounded-full p-1 inline-flex gap-1 mb-2">
                     {CATEGORIES.map((cat) => {
                         const IconComponent = cat.icon;
                         const isExpanded = expandedCategory === cat.id;
@@ -533,12 +533,12 @@ export default function News() {
                                     handleCategoryClick(cat.id);
                                     setExpandedCategory(isExpanded ? null : cat.id);
                                 }}
-                                className={`px-4 py-2 rounded-full text-sm font-medium transition-all flex items-center gap-2 ${
+                                className={`px-4 py-2 rounded-full text-sm font-medium transition-all flex items-center gap-2 whitespace-nowrap ${
                                     activeCategory === cat.id
-                                        ? 'text-white shadow-md'
-                                        : 'hover:opacity-80'
+                                        ? 'text-white shadow-sm'
+                                        : 'text-gray-600 hover:text-gray-900'
                                 }`}
-                                style={activeCategory === cat.id ? { backgroundColor: '#6209e6' } : { background: 'linear-gradient(135deg, #e5e7eb 0%, #d1d5db 100%)', color: '#6209e6' }}
+                                style={activeCategory === cat.id ? { backgroundColor: '#6209e6' } : { backgroundColor: 'transparent' }}
                             >
                                 <IconComponent className="w-4 h-4" />
                                 {cat.label}

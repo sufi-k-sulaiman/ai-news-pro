@@ -342,15 +342,15 @@ const NewsCardSimple = ({ article, index, imageUrl: preloadedImageUrl, cacheKey 
             };
 
 const CATEGORIES = [
-    { id: 'technology', label: 'Technology', icon: Monitor, subtopics: ['AI', 'Startups', 'Gadgets', 'Cybersecurity', 'Software', 'Cloud Computing', 'Blockchain', 'Robotics', '5G Networks', 'IoT'] },
-    { id: 'business', label: 'Business', icon: BusinessIcon, subtopics: ['Stocks', 'Economy', 'Crypto', 'Real Estate', 'Finance', 'Mergers', 'IPOs', 'Venture Capital', 'Banking', 'Commodities'] },
-    { id: 'science', label: 'Science', icon: FlaskConical, subtopics: ['Space', 'Physics', 'Biology', 'Climate', 'Research', 'Astronomy', 'Genetics', 'Archaeology', 'Chemistry', 'Quantum'] },
-    { id: 'health', label: 'Health', icon: HeartPulse, subtopics: ['Medicine', 'Wellness', 'Mental Health', 'Nutrition', 'Fitness', 'Vaccines', 'Aging', 'Sleep', 'Diseases', 'Healthcare Policy'] },
-    { id: 'politics', label: 'Politics', icon: Landmark, subtopics: ['Elections', 'Policy', 'Congress', 'International', 'Law', 'Supreme Court', 'Diplomacy', 'Defense', 'Immigration', 'Trade'] },
-    { id: 'sports', label: 'Sports', icon: Trophy, subtopics: ['Football', 'Basketball', 'Soccer', 'Tennis', 'Olympics', 'Baseball', 'Golf', 'MMA', 'Formula 1', 'Cricket'] },
-    { id: 'entertainment', label: 'Entertainment', icon: Clapperboard, subtopics: ['Movies', 'Music', 'TV Shows', 'Celebrities', 'Gaming', 'Streaming', 'Broadway', 'Awards', 'Podcasts', 'Anime'] },
-    { id: 'travel', label: 'Travel', icon: Plane, subtopics: ['Destinations', 'Hotels', 'Airlines', 'Cruises', 'Adventure', 'Luxury Travel', 'Budget Travel', 'Road Trips', 'Beach', 'Mountains'] },
-    { id: 'world', label: 'World', icon: Globe2, subtopics: ['Europe', 'Asia', 'Americas', 'Africa', 'Middle East', 'Australia', 'Russia', 'India', 'China', 'Latin America'] },
+    { id: 'technology', label: 'Technology', icon: Monitor, subtopics: ['AI', 'Startups', 'Gadgets', 'Cybersecurity', 'Software', 'Cloud Computing', 'Blockchain', 'Robotics', '5G Networks', 'IoT', 'Data Science', 'Machine Learning', 'AR/VR', 'Quantum Computing'] },
+    { id: 'business', label: 'Business', icon: BusinessIcon, subtopics: ['Stocks', 'Economy', 'Crypto', 'Real Estate', 'Finance', 'Mergers', 'IPOs', 'Venture Capital', 'Banking', 'Commodities', 'E-commerce', 'Retail', 'Supply Chain', 'Energy Markets'] },
+    { id: 'science', label: 'Science', icon: FlaskConical, subtopics: ['Space', 'Physics', 'Biology', 'Climate', 'Research', 'Astronomy', 'Genetics', 'Archaeology', 'Chemistry', 'Quantum', 'Neuroscience', 'Marine Biology', 'Paleontology', 'Nanotechnology'] },
+    { id: 'health', label: 'Health', icon: HeartPulse, subtopics: ['Medicine', 'Wellness', 'Mental Health', 'Nutrition', 'Fitness', 'Vaccines', 'Aging', 'Sleep', 'Diseases', 'Healthcare Policy', 'Hospitals', 'Clinical Trials', 'Medical Tech', 'Public Health'] },
+    { id: 'politics', label: 'Politics', icon: Landmark, subtopics: ['Elections', 'Policy', 'Congress', 'International', 'Law', 'Supreme Court', 'Diplomacy', 'Defense', 'Immigration', 'Trade', 'Senate', 'White House', 'UN', 'Sanctions'] },
+    { id: 'sports', label: 'Sports', icon: Trophy, subtopics: ['Football', 'Basketball', 'Soccer', 'Tennis', 'Olympics', 'Baseball', 'Golf', 'MMA', 'Formula 1', 'Cricket', 'Hockey', 'Boxing', 'Rugby', 'Athletics'] },
+    { id: 'entertainment', label: 'Entertainment', icon: Clapperboard, subtopics: ['Movies', 'Music', 'TV Shows', 'Celebrities', 'Gaming', 'Streaming', 'Broadway', 'Awards', 'Podcasts', 'Anime', 'Netflix', 'Fashion', 'Art', 'Books'] },
+    { id: 'travel', label: 'Travel', icon: Plane, subtopics: ['Destinations', 'Hotels', 'Airlines', 'Cruises', 'Adventure', 'Luxury Travel', 'Budget Travel', 'Road Trips', 'Beach', 'Mountains', 'City Breaks', 'National Parks', 'Food Tourism', 'Safari'] },
+    { id: 'world', label: 'World', icon: Globe2, subtopics: ['Europe', 'Asia', 'Americas', 'Africa', 'Middle East', 'Australia', 'Russia', 'India', 'China', 'Latin America', 'Japan', 'UK', 'Canada', 'Brazil'] },
 ];
 
 export default function News() {

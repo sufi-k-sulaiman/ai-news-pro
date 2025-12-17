@@ -318,11 +318,16 @@ const NewsCardSimple = ({ article, index, imageUrl: preloadedImageUrl, cacheKey 
                     </div>
                 )}
                 <h3 
-                    className="font-semibold text-sm sm:text-base text-gray-900 mb-2 line-clamp-2 cursor-pointer hover:transition-colors" 
+                    className="font-semibold text-sm sm:text-base text-gray-900 mb-2 line-clamp-2 cursor-pointer hover:transition-colors active:opacity-70" 
                     style={{ '--hover-color': '#6209e6' }} 
                     onMouseEnter={(e) => e.currentTarget.style.color = '#6209e6'} 
                     onMouseLeave={(e) => e.currentTarget.style.color = ''}
-                    onClick={() => window.open(article.url, '_blank')}
+                    onClick={(e) => {
+                        e.stopPropagation();
+                        window.open(article.url, '_blank', 'noopener,noreferrer');
+                    }}
+                    role="button"
+                    tabIndex={0}
                 >
                     {cleanTitle}
                 </h3>

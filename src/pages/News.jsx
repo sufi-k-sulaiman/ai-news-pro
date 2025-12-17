@@ -237,6 +237,19 @@ const CATEGORIES = [
 ];
 
 export default function News() {
+    useEffect(() => {
+        // Hide header and footer on mount
+        const header = document.querySelector('header');
+        const footer = document.querySelector('footer');
+        if (header) header.style.display = 'none';
+        if (footer) footer.style.display = 'none';
+        
+        return () => {
+            // Restore on unmount
+            if (header) header.style.display = '';
+            if (footer) footer.style.display = '';
+        };
+    }, []);
     // Update URL for display only (aesthetic, not parsed)
     const updateUrl = (category, query) => {
         const basePath = window.location.pathname;
@@ -334,30 +347,38 @@ export default function News() {
     return (
         <>
             <PageMeta 
-                title="News - Global News Hub"
-                description="Global hub for trusted news articles, delivering accurate reporting and insights worldwide with AI-powered aggregation."
-                keywords="news articles, world news, breaking news, news aggregator, AI news"
+                title="Ai News Pro"
+                description="AI-powered news aggregation platform delivering real-time global news with intelligent categorization."
+                keywords="AI news, news aggregator, breaking news, global news, AI News Pro"
             />
-            <div className="min-h-screen bg-gray-50 p-4 md:p-6">
+            <div className="min-h-screen bg-gray-50">
                 <style>{pulseAnimation}</style>
-                <div className="max-w-[82rem] mx-auto">
-                {/* Header */}
-                <div className="bg-gradient-to-r from-red-600 to-orange-600 rounded-2xl p-6 mb-6 text-white">
-                    <div className="flex items-center justify-between flex-wrap gap-4">
-                        <div className="flex items-center gap-4">
+                
+                {/* Top Header with Logo */}
+                <div className="sticky top-0 z-50 bg-white border-b border-gray-200 shadow-sm">
+                    <div className="max-w-[82rem] mx-auto px-4 py-4 flex items-center justify-center">
+                        <div className="flex items-center gap-3">
+                            <img 
+                                src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/692729a5f5180fbd43f297e9/a182b15e6_1c-logo.png" 
+                                alt="Ai News Pro" 
+                                className="h-12 w-12 object-contain" 
+                            />
                             <div>
-                                <h1 className="text-2xl md:text-3xl font-bold">News</h1>
-                                <p className="text-white/80">Ai-Powered News Aggregator</p>
+                                <h1 className="text-2xl font-bold text-gray-900">Ai News Pro</h1>
+                                <p className="text-sm" style={{ color: '#6209e6' }}>Real-time Global Intelligence</p>
                             </div>
                         </div>
-                        {lastUpdated && (
-                            <div className="flex items-center gap-2 text-white/70 text-sm">
-                                <Clock className="w-4 h-4" />
-                                Updated {lastUpdated.toLocaleTimeString()}
-                            </div>
-                        )}
                     </div>
                 </div>
+
+                <div className="max-w-[82rem] mx-auto p-4 md:p-6">
+                {/* Last Updated */}
+                {lastUpdated && (
+                    <div className="flex items-center justify-end gap-2 text-gray-500 text-sm mb-4">
+                        <Clock className="w-4 h-4" />
+                        Updated {lastUpdated.toLocaleTimeString()}
+                    </div>
+                )}
 
                 {/* Search Bar */}
                 <form onSubmit={handleSearch} className="mb-6">

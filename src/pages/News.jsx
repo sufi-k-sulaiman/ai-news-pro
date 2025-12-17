@@ -1,7 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import PageMeta from '@/components/PageMeta';
-import { useNavigate } from 'react-router-dom';
-import { createPageUrl } from '@/utils';
 
 const pulseAnimation = `
 @keyframes pulse {
@@ -21,7 +19,7 @@ import { Monitor, TrendingUp as BusinessIcon, FlaskConical, HeartPulse, Landmark
 const ARTICLES_PER_PAGE = 8;
 const TOTAL_PAGES = 4;
 
-const NewsGrid = ({ news, currentPage, onPageChange, onArticleClick }) => {
+const NewsGrid = ({ news, currentPage, onPageChange }) => {
     // RSS feeds provide real URLs - no validation needed
     const startIndex = (currentPage - 1) * ARTICLES_PER_PAGE;
     const endIndex = startIndex + ARTICLES_PER_PAGE;
@@ -116,7 +114,7 @@ const NewsGrid = ({ news, currentPage, onPageChange, onArticleClick }) => {
             )}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                 {articles.map((article, index) => (
-                    <NewsCardSimple key={`${newsKey}-${startIndex + index}`} article={article} index={startIndex + index} cacheKey={newsKey} onArticleClick={onArticleClick} />
+                    <NewsCardSimple key={`${newsKey}-${startIndex + index}`} article={article} index={startIndex + index} cacheKey={newsKey} />
                 ))}
             </div>
         </>
@@ -171,7 +169,7 @@ const generateImagesInBackground = async (articles, cacheKey) => {
     }
 };
 
-const NewsCardSimple = ({ article, index, imageUrl: preloadedImageUrl, cacheKey, onArticleClick }) => {
+const NewsCardSimple = ({ article, index, imageUrl: preloadedImageUrl, cacheKey }) => {
     const [imageUrl, setImageUrl] = useState(preloadedImageUrl || imageCache.get(`${cacheKey}-${index}`) || null);
     const [imageLoading, setImageLoading] = useState(index < 8 && !preloadedImageUrl && !imageCache.get(`${cacheKey}-${index}`));
     
@@ -260,10 +258,7 @@ const NewsCardSimple = ({ article, index, imageUrl: preloadedImageUrl, cacheKey,
                     style={{ '--hover-color': '#6209e6' }} 
                     onMouseEnter={(e) => e.currentTarget.style.color = '#6209e6'} 
                     onMouseLeave={(e) => e.currentTarget.style.color = ''}
-                    onClick={() => {
-                        const cleanTitle = cleanHtmlFromText(article.title);
-                        onArticleClick(article.url, cleanTitle);
-                    }}
+                    onClick={() => window.open(article.url, '_blank')}
                 >
                     {cleanTitle}
                 </h3>
@@ -294,7 +289,6 @@ const CATEGORIES = [
 ];
 
 export default function News() {
-    const navigate = useNavigate();
     // Update URL for display only (aesthetic, not parsed)
     const updateUrl = (category, query) => {
         const basePath = window.location.pathname;

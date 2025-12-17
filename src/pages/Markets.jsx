@@ -1183,7 +1183,7 @@ Use real market data. Return ALL ${batch.length} stocks.`,
                         {PRESET_FILTERS.map(preset => (
                             <button 
                                 key={preset.id} 
-                                onClick={() => { setActivePreset(preset.id); updateUrl(null, preset.id); }} 
+                                onClick={() => setActivePreset(preset.id)} 
                                 className={`group flex items-center gap-2 px-4 py-2.5 rounded-xl font-medium text-sm transition-all duration-200 ${
                                     activePreset === preset.id 
                                         ? 'bg-gradient-to-r from-purple-600 to-indigo-600 text-white shadow-lg shadow-purple-500/25 scale-[1.02]' 

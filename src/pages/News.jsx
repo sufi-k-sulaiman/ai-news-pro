@@ -237,19 +237,6 @@ const CATEGORIES = [
 ];
 
 export default function News() {
-    useEffect(() => {
-        // Hide header and footer on mount
-        const header = document.querySelector('header');
-        const footer = document.querySelector('footer');
-        if (header) header.style.display = 'none';
-        if (footer) footer.style.display = 'none';
-        
-        return () => {
-            // Restore on unmount
-            if (header) header.style.display = '';
-            if (footer) footer.style.display = '';
-        };
-    }, []);
     // Update URL for display only (aesthetic, not parsed)
     const updateUrl = (category, query) => {
         const basePath = window.location.pathname;

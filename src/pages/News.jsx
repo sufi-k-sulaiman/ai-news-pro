@@ -34,13 +34,14 @@ const NewsGrid = ({ news, currentPage, onPageChange }) => {
         imageCache.clear();
         currentCacheKey = newsKey;
         setLoadedImages(0);
-        if (articles.length > 0 && currentPage === 1) {
+        if (news.length > 0) {
             setTimeRemaining(8); // Start 8 second timer
             const progressCallback = (loaded, total) => {
                 setLoadedImages(loaded);
             };
             progressCallbacks.add(progressCallback);
-            generateImagesInBackground(articles.slice(0, ARTICLES_PER_PAGE), newsKey);
+            // Generate images for all 4 pages (32 articles)
+            generateImagesInBackground(news.slice(0, ARTICLES_PER_PAGE * TOTAL_PAGES), newsKey);
             
             // Timer countdown
             const interval = setInterval(() => {
@@ -90,11 +91,11 @@ const NewsGrid = ({ news, currentPage, onPageChange }) => {
                 </div>
             )}
             
-            {currentPage === 1 && loadedImages < ARTICLES_PER_PAGE && (
+            {loadedImages < ARTICLES_PER_PAGE * TOTAL_PAGES && (
                 <div className="mb-4 bg-gray-50 rounded-xl p-4">
                     <div className="flex items-center justify-between mb-3">
                         <span className="text-sm text-gray-600">Generating images...</span>
-                        <span className="text-sm font-semibold" style={{ color: '#6209e6' }}>{loadedImages} / {ARTICLES_PER_PAGE} ready</span>
+                        <span className="text-sm font-semibold" style={{ color: '#6209e6' }}>{loadedImages} / {ARTICLES_PER_PAGE * TOTAL_PAGES} ready</span>
                     </div>
                     {timeRemaining > 0 && (
                         <div className="flex items-center gap-3">
@@ -150,7 +151,7 @@ const generateImagesInBackground = async (articles, cacheKey) => {
     try {
         console.log('Generating images in backend...');
         const response = await base44.functions.invoke('generateNewsImages', {
-            articles: articles.slice(0, ARTICLES_PER_PAGE).map(a => ({ title: a.title }))
+            articles: articles.map(a => ({ title: a.title }))
         });
         
         if (response.data?.images && currentCacheKey === cacheKey) {
@@ -159,7 +160,7 @@ const generateImagesInBackground = async (articles, cacheKey) => {
                     imageCache.set(`${cacheKey}-${index}`, url);
                     const callback = updateCallbacks.get(`${cacheKey}-${index}`);
                     if (callback) callback(url);
-                    progressCallbacks.forEach(cb => cb(index + 1, ARTICLES_PER_PAGE));
+                    progressCallbacks.forEach(cb => cb(index + 1, articles.length));
                 }
             });
             console.log(`Generated ${response.data.images.filter(Boolean).length} images`);
@@ -171,7 +172,7 @@ const generateImagesInBackground = async (articles, cacheKey) => {
 
 const NewsCardSimple = ({ article, index, imageUrl: preloadedImageUrl, cacheKey }) => {
     const [imageUrl, setImageUrl] = useState(preloadedImageUrl || imageCache.get(`${cacheKey}-${index}`) || null);
-    const [imageLoading, setImageLoading] = useState(index < 8 && !preloadedImageUrl && !imageCache.get(`${cacheKey}-${index}`));
+    const [imageLoading, setImageLoading] = useState(index < 32 && !preloadedImageUrl && !imageCache.get(`${cacheKey}-${index}`));
     
     const cleanTitle = cleanHtmlFromText(article.title);
     const cleanDescription = cleanHtmlFromText(article.description);
@@ -185,7 +186,7 @@ const NewsCardSimple = ({ article, index, imageUrl: preloadedImageUrl, cacheKey 
             return;
         }
         
-        if (index >= 8) {
+        if (index >= 32) {
             setImageLoading(false);
             return;
         }

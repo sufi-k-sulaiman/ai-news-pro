@@ -8,7 +8,6 @@ const pages = [
     { name: 'Qwirey', page: 'Qwirey', icon: Sparkles, description: 'Your all-in-one Ai assistant, powered by Qwirey', color: 'from-purple-600 to-indigo-600' },
     { name: 'MindMap', page: 'MindMap', icon: Brain, description: 'Ai-powered knowledge visualization and exploration', color: 'from-pink-600 to-rose-600' },
     { name: 'SearchPods', page: 'SearchPods', icon: Radio, description: 'Ai-generated podcasts on any topic with voice playback', color: 'from-blue-600 to-cyan-600' },
-    { name: 'Markets', page: 'Markets', icon: BarChart3, description: 'Ai-powered stock market analysis and screening', color: 'from-orange-600 to-amber-600' },
     { name: 'News', page: 'News', icon: Newspaper, description: 'AI-powered news aggregator across topics', color: 'from-red-600 to-orange-600' },
     { name: 'Learning', page: 'Learning', icon: GraduationCap, description: 'Navigate knowledge islands with progress tracking', color: 'from-emerald-600 to-teal-600' },
     { name: 'Geospatial', page: 'Geospatial', icon: Globe, description: 'Global data intelligence across 18 domains', color: 'from-indigo-600 to-purple-600' },

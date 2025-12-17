@@ -8,7 +8,6 @@ export const menuItems = [
     { label: 'Qwirey', icon: Sparkles, href: createPageUrl('Qwirey') },
     { label: 'MindMap', icon: Brain, href: createPageUrl('MindMap') },
     { label: 'SearchPods', icon: Radio, href: createPageUrl('SearchPods') },
-    { label: 'Markets', icon: BarChart3, href: createPageUrl('Markets') },
     { label: 'News', icon: Newspaper, href: createPageUrl('News') },
     { label: 'Learning', icon: GraduationCap, href: createPageUrl('Learning') },
     { label: 'Geospatial', icon: Globe, href: createPageUrl('Geospatial') },

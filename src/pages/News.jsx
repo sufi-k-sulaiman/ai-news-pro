@@ -143,7 +143,7 @@ const NewsGrid = ({ news, currentPage, onPageChange }) => {
                     )}
                 </div>
             )}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
                 {articles.map((article, index) => (
                     <NewsCardSimple key={`${newsKey}-${startIndex + index}`} article={article} index={startIndex + index} cacheKey={newsKey} />
                 ))}
@@ -280,7 +280,7 @@ const NewsCardSimple = ({ article, index, imageUrl: preloadedImageUrl, cacheKey 
     }, [index, preloadedImageUrl, cacheKey]);
 
     return (
-        <div className="block bg-gray-50 rounded-xl overflow-hidden hover:shadow-lg transition-shadow group border border-gray-200">
+        <div className="block bg-gray-50 rounded-xl overflow-hidden hover:shadow-lg transition-shadow group border border-gray-200 active:scale-[0.98] touch-manipulation">
             <div className="aspect-video bg-white relative overflow-hidden">
                 {imageLoading ? (
                     <div className="absolute inset-0 flex items-center justify-center bg-white">
@@ -308,9 +308,9 @@ const NewsCardSimple = ({ article, index, imageUrl: preloadedImageUrl, cacheKey 
                     </div>
                 )}
             </div>
-            <div className="p-5">
+            <div className="p-3 sm:p-5">
                 {article.time && (
-                    <div className="flex items-center gap-2 mb-3">
+                    <div className="flex items-center gap-2 mb-2 sm:mb-3">
                         <span className="text-xs text-gray-500 flex items-center gap-1">
                             <Clock className="w-3 h-3" />
                             {article.time}
@@ -318,7 +318,7 @@ const NewsCardSimple = ({ article, index, imageUrl: preloadedImageUrl, cacheKey 
                     </div>
                 )}
                 <h3 
-                    className="font-semibold text-gray-900 mb-2 line-clamp-2 cursor-pointer hover:transition-colors" 
+                    className="font-semibold text-sm sm:text-base text-gray-900 mb-2 line-clamp-2 cursor-pointer hover:transition-colors" 
                     style={{ '--hover-color': '#6209e6' }} 
                     onMouseEnter={(e) => e.currentTarget.style.color = '#6209e6'} 
                     onMouseLeave={(e) => e.currentTarget.style.color = ''}
@@ -331,7 +331,7 @@ const NewsCardSimple = ({ article, index, imageUrl: preloadedImageUrl, cacheKey 
                     href={article.url}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="inline-flex items-center gap-1 text-sm font-medium" 
+                    className="inline-flex items-center gap-1 text-xs sm:text-sm font-medium" 
                     style={{ color: '#6209e6' }}
                 >
                     Read more <ExternalLink className="w-3 h-3" />
@@ -508,25 +508,100 @@ export default function News() {
                 description="AI-powered news aggregation platform delivering real-time global news with intelligent categorization."
                 keywords="AI news, news aggregator, breaking news, global news, AI News Pro"
             />
+            <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+            <meta name="apple-mobile-web-app-capable" content="yes" />
+            <meta name="apple-mobile-web-app-status-bar-style" content="default" />
             <div className="min-h-screen bg-white">
                 <style>{pulseAnimation}</style>
 
                 {/* Top Header with Logo */}
                 <div className="sticky top-0 z-50 bg-white shadow-sm">
-                    <div className="max-w-[82rem] mx-auto px-4 py-3 relative">
-                        {/* Left - Logo */}
-                        <Link to={createPageUrl('News')} className="absolute left-4 top-1/2 -translate-y-1/2 flex items-center gap-2.5 hover:opacity-80 transition-opacity">
-                            <img 
-                                src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/692729a5f5180fbd43f297e9/a182b15e6_1c-logo.png" 
-                                alt="Ai News Pro" 
-                                className="h-8 w-8 object-contain" 
-                            />
-                            <h1 className="text-base font-bold text-gray-900 whitespace-nowrap">Ai News Pro</h1>
-                        </Link>
+                    <div className="max-w-[82rem] mx-auto px-2 sm:px-4 py-2 sm:py-3">
+                        {/* Mobile Layout */}
+                        <div className="flex flex-col gap-2 sm:hidden">
+                            <div className="flex items-center justify-between">
+                                <Link to={createPageUrl('News')} className="flex items-center gap-2 hover:opacity-80 transition-opacity">
+                                    <img 
+                                        src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/692729a5f5180fbd43f297e9/a182b15e6_1c-logo.png" 
+                                        alt="Ai News Pro" 
+                                        className="h-7 w-7 object-contain" 
+                                    />
+                                    <h1 className="text-sm font-bold text-gray-900">Ai News Pro</h1>
+                                </Link>
+                                <Button
+                                    variant="outline"
+                                    size="sm"
+                                    onClick={() => fetchNews(searchQuery || activeCategory)}
+                                    disabled={loading}
+                                    className="gap-1 h-8"
+                                    style={{ background: 'linear-gradient(135deg, #e5e7eb 0%, #d1d5db 100%)', color: '#6209e6' }}
+                                >
+                                    <RefreshCw className={`w-3 h-3 ${loading ? 'animate-spin' : ''}`} />
+                                    <span className="text-xs">Refresh</span>
+                                </Button>
+                            </div>
+                            <form onSubmit={handleSearch} className="w-full relative" ref={searchRef}>
+                                <div className="relative">
+                                    <Input
+                                        type="text"
+                                        value={searchQuery}
+                                        onChange={(e) => setSearchQuery(e.target.value)}
+                                        onFocus={() => setShowSuggestions(true)}
+                                        placeholder="Search news..."
+                                        className="w-full h-10 pl-4 pr-12 rounded-full bg-white shadow-sm text-sm"
+                                        style={{ borderColor: '#6209e6' }}
+                                    />
+                                    <button
+                                        type="submit"
+                                        className="absolute right-1 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full flex items-center justify-center transition-colors"
+                                        style={{ backgroundColor: '#6209e6' }}
+                                    >
+                                        <Search className="w-3.5 h-3.5 text-white" />
+                                    </button>
+                                </div>
+                                {showSuggestions && filteredSuggestions.length > 0 && (
+                                    <div className="absolute top-full mt-2 w-full bg-white rounded-2xl shadow-lg border border-gray-200 py-2 z-50 max-h-[300px] overflow-y-auto">
+                                        <div className="px-4 py-2 text-xs font-semibold text-gray-500 flex items-center gap-2">
+                                            <TrendingUp className="w-3 h-3" />
+                                            {searchQuery.trim() ? 'Matching Topics' : `Popular in ${CATEGORIES.find(c => c.id === activeCategory)?.label}`}
+                                        </div>
+                                        {filteredSuggestions.map((topic) => (
+                                            <button
+                                                key={topic}
+                                                type="button"
+                                                onClick={() => {
+                                                    setSearchQuery(topic);
+                                                    setCurrentPage(1);
+                                                    updateUrl(activeCategory, topic);
+                                                    fetchNews(topic);
+                                                    setShowSuggestions(false);
+                                                }}
+                                                className="w-full px-4 py-2 text-left hover:bg-gray-50 transition-colors flex items-center gap-2 text-sm"
+                                            >
+                                                <Search className="w-4 h-4 text-gray-400" />
+                                                <span className="text-gray-900">{topic}</span>
+                                            </button>
+                                        ))}
+                                    </div>
+                                )}
+                            </form>
+                        </div>
 
-                        {/* Center - Search Bar */}
-                        <div className="flex justify-center">
-                            <form onSubmit={handleSearch} className="w-full max-w-xl relative" ref={searchRef}>
+                        {/* Desktop Layout */}
+                        <div className="hidden sm:block relative">
+                            {/* Left - Logo */}
+                            <Link to={createPageUrl('News')} className="absolute left-4 top-1/2 -translate-y-1/2 flex items-center gap-2.5 hover:opacity-80 transition-opacity">
+                                <img 
+                                    src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/692729a5f5180fbd43f297e9/a182b15e6_1c-logo.png" 
+                                    alt="Ai News Pro" 
+                                    className="h-8 w-8 object-contain" 
+                                />
+                                <h1 className="text-base font-bold text-gray-900 whitespace-nowrap">Ai News Pro</h1>
+                            </Link>
+
+                            {/* Center - Search Bar */}
+                            <div className="flex justify-center">
+                                <form onSubmit={handleSearch} className="w-full max-w-xl relative" ref={searchRef}>
                                 <div className="relative">
                                     <Input
                                         type="text"
@@ -574,63 +649,75 @@ export default function News() {
                                         ))}
                                     </div>
                                 )}
-                            </form>
-                        </div>
+                                </form>
+                                </div>
 
-                        {/* Right - Refresh Button and Time */}
-                        <div className="absolute right-4 top-1/2 -translate-y-1/2 flex flex-col items-end gap-0.5">
-                                                {lastUpdated && (
+                                {/* Right - Refresh Button and Time */}
+                                <div className="absolute right-4 top-1/2 -translate-y-1/2 flex flex-col items-end gap-0.5">
+                                {lastUpdated && (
                                 <span className="text-xs text-gray-500">
                                     {lastUpdated.toLocaleTimeString()}
                                 </span>
-                            )}
-                            <Button
+                                )}
+                                <Button
                                 variant="outline"
                                 size="sm"
                                 onClick={() => fetchNews(searchQuery || activeCategory)}
                                 disabled={loading}
                                 className="gap-2 hover:opacity-80 h-9"
                                 style={{ background: 'linear-gradient(135deg, #e5e7eb 0%, #d1d5db 100%)', color: '#6209e6' }}
-                            >
+                                >
                                 <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
                                 Refresh
-                            </Button>
-                        </div>
-                    </div>
-                </div>
+                                </Button>
+                                </div>
+                                </div>
+                                </div>
+                                </div>
 
-                <div className="max-w-[82rem] mx-auto p-4 md:p-6">
+                <div className="max-w-[82rem] mx-auto p-2 sm:p-4 md:p-6">
 
                 {/* Categories */}
-                <div className="bg-gray-100 rounded-full p-1.5 inline-flex gap-1 mb-2">
-                    {CATEGORIES.map((cat) => {
-                        const IconComponent = cat.icon;
-                        const isExpanded = expandedCategory === cat.id;
-                        return (
-                            <button
-                                key={cat.id}
-                                onClick={() => {
-                                    handleCategoryClick(cat.id);
-                                    setExpandedCategory(isExpanded ? null : cat.id);
-                                }}
-                                className={`px-5 py-2.5 rounded-full text-sm font-medium transition-all flex items-center gap-2 whitespace-nowrap ${
-                                    activeCategory === cat.id
-                                        ? 'text-white shadow-sm'
-                                        : 'text-gray-600 hover:text-gray-900'
-                                }`}
-                                style={activeCategory === cat.id ? { backgroundColor: '#6209e6' } : { backgroundColor: 'transparent' }}
-                            >
-                                <IconComponent className="w-4 h-4" />
-                                {cat.label}
-                                {isExpanded ? <ChevronUp className="w-3 h-3" /> : <ChevronDown className="w-3 h-3" />}
-                            </button>
-                        );
-                    })}
+                <div className="bg-gray-100 rounded-full p-1 sm:p-1.5 mb-2 overflow-x-auto scrollbar-hide">
+                    <div className="flex gap-1 min-w-max">
+                        {CATEGORIES.map((cat) => {
+                            const IconComponent = cat.icon;
+                            const isExpanded = expandedCategory === cat.id;
+                            return (
+                                <button
+                                    key={cat.id}
+                                    onClick={() => {
+                                        handleCategoryClick(cat.id);
+                                        setExpandedCategory(isExpanded ? null : cat.id);
+                                    }}
+                                    className={`px-3 sm:px-5 py-2 sm:py-2.5 rounded-full text-xs sm:text-sm font-medium transition-all flex items-center gap-1.5 sm:gap-2 whitespace-nowrap ${
+                                        activeCategory === cat.id
+                                            ? 'text-white shadow-sm'
+                                            : 'text-gray-600 hover:text-gray-900'
+                                    }`}
+                                    style={activeCategory === cat.id ? { backgroundColor: '#6209e6' } : { backgroundColor: 'transparent' }}
+                                >
+                                    <IconComponent className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+                                    {cat.label}
+                                    {isExpanded ? <ChevronUp className="w-3 h-3" /> : <ChevronDown className="w-3 h-3" />}
+                                </button>
+                            );
+                        })}
+                    </div>
                 </div>
+                <style>{`
+                    .scrollbar-hide::-webkit-scrollbar {
+                        display: none;
+                    }
+                    .scrollbar-hide {
+                        -ms-overflow-style: none;
+                        scrollbar-width: none;
+                    }
+                `}</style>
 
                 {/* Subtopics */}
                 {expandedCategory && (
-                    <div className="flex flex-wrap justify-center gap-2 mb-6 animate-in fade-in slide-in-from-top-2 duration-200">
+                    <div className="flex flex-wrap justify-center gap-1.5 sm:gap-2 mb-4 sm:mb-6 animate-in fade-in slide-in-from-top-2 duration-200 px-2">
                         {CATEGORIES.find(c => c.id === expandedCategory)?.subtopics.map((subtopic) => (
                             <button
                                 key={subtopic}
@@ -685,14 +772,14 @@ export default function News() {
 
                 {/* Trending Section */}
                 {!loading && news.length > 0 && (
-                    <div className="mt-8 bg-white rounded-2xl border p-6" style={{ borderColor: '#6209e6' }}>
-                        <div className="flex items-center gap-2 mb-4">
-                            <TrendingUp className="w-5 h-5" style={{ color: '#6209e6' }} />
-                            <h2 className="font-semibold text-gray-900">
+                    <div className="mt-6 sm:mt-8 bg-white rounded-2xl border p-4 sm:p-6" style={{ borderColor: '#6209e6' }}>
+                        <div className="flex items-center gap-2 mb-3 sm:mb-4">
+                            <TrendingUp className="w-4 h-4 sm:w-5 sm:h-5" style={{ color: '#6209e6' }} />
+                            <h2 className="font-semibold text-sm sm:text-base text-gray-900">
                                 {activeSubtopic ? `Related to ${activeSubtopic}` : `Trending in ${CATEGORIES.find(c => c.id === activeCategory)?.label}`}
                             </h2>
                         </div>
-                        <div className="flex flex-wrap gap-2">
+                        <div className="flex flex-wrap gap-1.5 sm:gap-2">
                             {getTrendingTopics().map((topic) => (
                                 <button
                                     key={topic}
@@ -703,7 +790,7 @@ export default function News() {
                                         updateUrl(activeCategory, topic);
                                         fetchNews(topic);
                                     }}
-                                    className="px-3 py-1.5 text-sm rounded-full transition-colors hover:opacity-80"
+                                    className="px-2.5 sm:px-3 py-1 sm:py-1.5 text-xs sm:text-sm rounded-full transition-colors hover:opacity-80 active:scale-95"
                                     style={{ background: 'linear-gradient(135deg, #e5e7eb 0%, #d1d5db 100%)', color: '#6209e6' }}
                                 >
                                     #{topic}

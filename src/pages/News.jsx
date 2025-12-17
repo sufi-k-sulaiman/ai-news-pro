@@ -250,17 +250,14 @@ const NewsCardSimple = ({ article, index, imageUrl: preloadedImageUrl, cacheKey 
                 )}
             </div>
             <div className="p-5">
-                <div className="flex items-center gap-2 mb-3">
-                    <span className="text-xs font-medium px-2 py-1 text-white rounded-full" style={{ backgroundColor: '#6209e6' }}>
-                        {article.source || 'News'}
-                    </span>
-                    {article.time && (
+                {article.time && (
+                    <div className="flex items-center gap-2 mb-3">
                         <span className="text-xs text-gray-500 flex items-center gap-1">
                             <Clock className="w-3 h-3" />
                             {article.time}
                         </span>
-                    )}
-                </div>
+                    </div>
+                )}
                 <h3 className="font-semibold text-gray-900 mb-2 line-clamp-2 group-hover:transition-colors" style={{ '--hover-color': '#6209e6' }} onMouseEnter={(e) => e.currentTarget.style.color = '#6209e6'} onMouseLeave={(e) => e.currentTarget.style.color = ''}>
                     {cleanTitle}
                 </h3>

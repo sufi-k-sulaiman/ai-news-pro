@@ -492,9 +492,11 @@ export default function News() {
     const handleSearch = (e) => {
         e.preventDefault();
         if (searchQuery.trim()) {
+            setActiveSubtopic(searchQuery.trim());
             setCurrentPage(1);
             updateUrl(activeCategory, searchQuery.trim());
             fetchNews(searchQuery.trim());
+            setShowSuggestions(false);
         }
     };
 

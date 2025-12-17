@@ -461,17 +461,15 @@ export default function News() {
 
                 {/* Top Header with Logo */}
                 <div className="sticky top-0 z-50 bg-white shadow-sm">
-                    <div className="max-w-[82rem] mx-auto px-4 py-4 flex items-center gap-4">
+                    <div className="max-w-[82rem] mx-auto px-4 py-3 flex items-center gap-6">
                         {/* Left - Logo */}
-                        <div className="flex items-center gap-2.5">
+                        <div className="flex items-center gap-2.5 flex-shrink-0">
                             <img 
                                 src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/692729a5f5180fbd43f297e9/a182b15e6_1c-logo.png" 
                                 alt="Ai News Pro" 
-                                className="h-9 w-9 object-contain" 
+                                className="h-8 w-8 object-contain" 
                             />
-                            <div>
-                                <h1 className="text-base font-bold text-gray-900">Ai News Pro</h1>
-                            </div>
+                            <h1 className="text-base font-bold text-gray-900 whitespace-nowrap">Ai News Pro</h1>
                         </div>
 
                         {/* Center - Search Bar */}
@@ -482,12 +480,12 @@ export default function News() {
                                     value={searchQuery}
                                     onChange={(e) => setSearchQuery(e.target.value)}
                                     placeholder="Search for any news topic..."
-                                    className="w-full h-12 pl-5 pr-14 rounded-full bg-white shadow-sm"
+                                    className="w-full h-11 pl-5 pr-14 rounded-full bg-white shadow-sm"
                                     style={{ borderColor: '#6209e6' }}
                                 />
                                 <button
                                     type="submit"
-                                    className="absolute right-1.5 top-1/2 -translate-y-1/2 w-9 h-9 rounded-full flex items-center justify-center transition-colors"
+                                    className="absolute right-1.5 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full flex items-center justify-center transition-colors"
                                     style={{ backgroundColor: '#6209e6' }}
                                     onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#5208c5'}
                                     onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#6209e6'}
@@ -498,13 +496,13 @@ export default function News() {
                         </form>
 
                         {/* Right - Refresh Button and Time */}
-                        <div className="flex flex-col items-end gap-1">
+                        <div className="flex flex-col items-end gap-0.5 flex-shrink-0">
                             <Button
                                 variant="outline"
                                 size="sm"
                                 onClick={() => fetchNews(searchQuery || activeCategory)}
                                 disabled={loading}
-                                className="gap-2 hover:opacity-80"
+                                className="gap-2 hover:opacity-80 h-9"
                                 style={{ background: 'linear-gradient(135deg, #e5e7eb 0%, #d1d5db 100%)', color: '#6209e6' }}
                             >
                                 <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />

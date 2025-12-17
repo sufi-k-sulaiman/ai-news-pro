@@ -1232,13 +1232,36 @@ export default function StockSectionContent({
               );
 
         case 'legends': {
+              // Calculate earnings yield for Greenblatt
+              const earningsYield = stock.pe ? (1 / stock.pe) * 100 : 0;
+              
+              // Calculate volatility score from beta
+              const volatilityScore = stock.beta ? Math.max(0, 100 - (Math.abs(stock.beta - 1) * 50)) : 50;
+              
+              // Calculate momentum from change
+              const momentumScore = Math.min(100, Math.max(0, 50 + (stock.change * 2)));
+              
+              // Calculate innovation score based on sector and growth
+              const innovationScore = (stock.sector === 'Technology' ? 40 : stock.sector === 'Healthcare' ? 30 : 10) + 
+                                      Math.min(40, stock.sgr || 0) + 
+                                      Math.min(20, (stock.moat || 0) / 5);
+              
+              // Calculate value score from P/E
+              const valueScore = stock.pe ? Math.min(100, (40 / stock.pe) * 100) : 0;
+              
+              // Calculate financial health
+              const healthScore = (stock.zscore || 0) * 20 + Math.min(30, stock.roe || 0);
+              
               const legendaryFrameworks = [
                   { 
                       name: 'Warren Buffett', 
                       style: 'Value / MOAT', 
                       color: '#8B5CF6', 
-                      metrics: [{ label: 'MOAT', value: stock.moat, max: 100, good: 70 }, { label: 'ROE', value: stock.roe, max: 40, good: 15 }], 
-                      verdict: stock.moat >= 70 && stock.roe >= 15 ? 'Strong Buy' : stock.moat >= 50 ? 'Hold' : 'Avoid',
+                      metrics: [
+                          { label: 'MOAT', value: stock.moat || 0, max: 100, good: 70 }, 
+                          { label: 'ROE', value: stock.roe || 0, max: 40, good: 15 }
+                      ], 
+                      verdict: (stock.moat || 0) >= 70 && (stock.roe || 0) >= 15 ? 'Strong Buy' : (stock.moat || 0) >= 50 ? 'Hold' : 'Avoid',
                       philosophy: 'Focus on companies with strong economic moats and excellent returns on equity',
                       keyMetrics: ['Economic MOAT', 'ROE > 15%', 'Competitive Advantages', 'Pricing Power'],
                       approach: 'Buy wonderful companies at fair prices and hold forever. Focus on businesses with durable competitive advantages.'
@@ -1247,8 +1270,11 @@ export default function StockSectionContent({
                     name: 'Peter Lynch', 
                     style: 'GARP', 
                     color: '#10B981', 
-                    metrics: [{ label: 'PEG', value: stock.peg || 1.2, max: 3, good: 1, inverse: true }, { label: 'Growth', value: stock.sgr || 15, max: 40, good: 15 }], 
-                    verdict: (stock.peg || 1.2) <= 1 ? 'Strong Buy' : (stock.peg || 1.2) <= 1.5 ? 'Buy' : 'Hold',
+                    metrics: [
+                        { label: 'PEG', value: stock.peg || 0, max: 3, good: 1, inverse: true }, 
+                        { label: 'Growth', value: stock.sgr || 0, max: 40, good: 15 }
+                    ], 
+                    verdict: (stock.peg || 999) <= 1 ? 'Strong Buy' : (stock.peg || 999) <= 1.5 ? 'Buy' : 'Hold',
                     philosophy: 'Growth At Reasonable Price - find fast-growing companies trading at fair valuations',
                     keyMetrics: ['PEG < 1.0', 'Earnings Growth', 'Reasonable P/E', 'Scalable Business'],
                     approach: 'Look for companies with earnings growth matching or exceeding their P/E ratio. PEG ratio is the key metric.'
@@ -1257,25 +1283,184 @@ export default function StockSectionContent({
                     name: 'Benjamin Graham', 
                     style: 'Deep Value', 
                     color: '#14B8A6', 
-                    metrics: [{ label: 'P/E', value: stock.pe, max: 40, good: 15, inverse: true }, { label: 'Margin', value: 18, max: 50, good: 25 }], 
-                    verdict: stock.pe < 15 ? 'Graham Value' : 'Not Cheap',
+                    metrics: [
+                        { label: 'P/E', value: stock.pe || 0, max: 40, good: 15, inverse: true }, 
+                        { label: 'Z-Score', value: stock.zscore || 0, max: 5, good: 3 }
+                    ], 
+                    verdict: (stock.pe || 999) < 15 && (stock.zscore || 0) >= 3 ? 'Graham Value' : 'Not Cheap',
                     philosophy: 'Buy stocks trading below intrinsic value with a margin of safety',
                     keyMetrics: ['P/E < 15', 'P/B < 1.5', 'Margin of Safety', 'Strong Balance Sheet'],
                     approach: 'Systematic value investing with strict quantitative criteria. Focus on cheap stocks with strong fundamentals.'
                 },
-                { name: 'Joel Greenblatt', style: 'Magic Formula', color: '#3B82F6', metrics: [{ label: 'ROIC', value: stock.roic || 18, max: 40, good: 15 }, { label: 'Yield', value: 8.5, max: 20, good: 8 }], verdict: (stock.roic || 18) >= 20 ? 'Top Quartile' : 'Above Avg', philosophy: 'Buy good companies at good prices using systematic rules', keyMetrics: ['High ROIC', 'Low EV/EBIT', 'Rank Stocks', 'Annual Rebalancing'], approach: 'Rank companies by ROIC and earnings yield, buy the top-ranked stocks annually.' },
-                { name: 'Ray Dalio', style: 'Risk Parity', color: '#0EA5E9', metrics: [{ label: 'Diversification', value: 72, max: 100, good: 70 }, { label: 'Risk Balance', value: 78, max: 100, good: 70 }], verdict: 'Portfolio Fit', philosophy: 'Balance risk across asset classes, not dollar amounts', keyMetrics: ['Risk Contribution', 'Correlation', 'All-Weather', 'Leverage Control'], approach: 'Allocate capital based on risk contribution, ensuring diversification across economic regimes.' },
-                { name: 'Cathie Wood', style: 'Innovation', color: '#6366F1', metrics: [{ label: 'Innovation', value: stock.sector === 'Technology' ? 85 : 50, max: 100, good: 70 }, { label: 'TAM Growth', value: 85, max: 100, good: 60 }], verdict: stock.sector === 'Technology' ? 'Innovation' : 'Not Focus', philosophy: 'Invest in disruptive innovation with exponential growth potential', keyMetrics: ['TAM Expansion', 'Technology Adoption', 'Winner-Take-All', 'Long-Term Vision'], approach: 'Focus on companies enabling or benefiting from disruptive innovation across multiple sectors.' },
-                { name: 'George Soros', style: 'Reflexivity', color: '#EF4444', metrics: [{ label: 'Psychology', value: 58, max: 100, good: 40 }, { label: 'Momentum', value: 72, max: 100, good: 60 }], verdict: 'Trend Following', philosophy: 'Markets move based on participant perception, creating self-reinforcing trends', keyMetrics: ['Market Psychology', 'Feedback Loops', 'Trend Strength', 'Inflection Points'], approach: 'Identify reflexive trends where market perception influences fundamentals, ride momentum.' },
-                { name: 'David Dreman', style: 'Contrarian', color: '#A855F7', metrics: [{ label: 'Low P/E', value: stock.pe < 15 ? 85 : 35, max: 100, good: 70 }, { label: 'Bias', value: 72, max: 100, good: 65 }], verdict: stock.pe < 15 ? 'Contrarian Buy' : 'Wait', philosophy: 'Exploit behavioral biases by buying unloved, low P/E stocks', keyMetrics: ['Low P/E', 'Market Pessimism', 'Earnings Surprises', 'Behavioral Edge'], approach: 'Buy fundamentally sound stocks trading at low multiples due to temporary negativity.' },
-                { name: 'John Templeton', style: 'Global Contrarian', color: '#F59E0B', metrics: [{ label: 'Pessimism', value: 65, max: 100, good: 70 }, { label: 'Global Value', value: 72, max: 100, good: 60 }], verdict: 'Contrarian Buy', philosophy: 'Buy at the point of maximum pessimism globally', keyMetrics: ['Global Opportunities', 'Crisis Investing', 'Long-Term Value', 'Maximum Pessimism'], approach: 'Search globally for bargains in markets experiencing temporary crisis or pessimism.' },
-                { name: 'Aswath Damodaran', style: 'Academic DCF', color: '#EC4899', metrics: [{ label: 'DCF Gap', value: 15, max: 50, good: 10 }, { label: 'WACC', value: 9.5, max: 15, good: 10, inverse: true }], verdict: 'Fairly Valued', philosophy: 'Rigorous DCF valuation with data-driven assumptions', keyMetrics: ['DCF Models', 'WACC', 'Growth Assumptions', 'Terminal Value'], approach: 'Build detailed DCF models with transparent assumptions and sensitivity analysis.' },
-                { name: 'Stanley Druckenmiller', style: 'Macro Opportunism', color: '#84CC16', metrics: [{ label: 'Liquidity', value: 75, max: 100, good: 60 }, { label: 'Fed Policy', value: 62, max: 100, good: 50 }], verdict: 'Macro Favorable', philosophy: 'Identify macro inflection points and bet big when conviction is high', keyMetrics: ['Fed Policy', 'Liquidity Cycles', 'Economic Inflection', 'Position Sizing'], approach: 'Analyze macro conditions, make concentrated bets when opportunity and conviction align.' },
-                { name: 'Carl Icahn', style: 'Activist', color: '#DC2626', metrics: [{ label: 'Governance', value: 68, max: 100, good: 60 }, { label: 'Unlock Value', value: 55, max: 100, good: 50 }], verdict: 'No Activism', philosophy: 'Unlock shareholder value through board representation and operational changes', keyMetrics: ['Poor Governance', 'Asset Value', 'Operational Improvement', 'Catalyst Creation'], approach: 'Target underperforming companies, gain board seats, push for strategic changes.' },
-                { name: 'Seth Klarman', style: 'Deep Value', color: '#059669', metrics: [{ label: 'Cash Option', value: 65, max: 100, good: 60 }, { label: 'Patience', value: 80, max: 100, good: 75 }], verdict: 'Margin OK', philosophy: 'Patient value investing with large margin of safety and cash optionality', keyMetrics: ['Margin of Safety', 'Cash Holdings', 'Patience', 'Risk Avoidance'], approach: 'Wait for exceptional opportunities, maintain cash, demand large margin of safety.' },
-                { name: 'David Tepper', style: 'Distressed', color: '#EA580C', metrics: [{ label: 'Credit Cycle', value: 72, max: 100, good: 60 }, { label: 'Bold Risk', value: 65, max: 100, good: 55 }], verdict: 'Hold', philosophy: 'Buy distressed debt and equities during credit crises', keyMetrics: ['Credit Spreads', 'Recovery Value', 'Crisis Timing', 'Risk/Reward'], approach: 'Analyze credit cycles, buy distressed securities when recovery potential exceeds risk.' },
-                { name: 'Jim Simons', style: 'Quantitative', color: '#7C3AED', metrics: [{ label: 'Stat Arb', value: 78, max: 100, good: 70 }, { label: 'Alpha', value: 71, max: 100, good: 65 }], verdict: 'Quant Neutral', philosophy: 'Mathematical models and statistical arbitrage at scale', keyMetrics: ['Statistical Edge', 'Execution Speed', 'Model Diversification', 'Data Quality'], approach: 'Develop mathematical models to exploit market inefficiencies through systematic trading.' },
-                { name: 'John Bogle', style: 'Index/Passive', color: '#64748B', metrics: [{ label: 'Cost Efficiency', value: 88, max: 100, good: 80 }, { label: 'Compound', value: 82, max: 100, good: 70 }], verdict: 'Index Component', philosophy: 'Low-cost passive investing beats most active managers long-term', keyMetrics: ['Low Costs', 'Market Returns', 'Long-Term Compounding', 'Diversification'], approach: 'Buy and hold low-cost index funds, minimize trading, let compounding work.' },
+                { 
+                    name: 'Joel Greenblatt', 
+                    style: 'Magic Formula', 
+                    color: '#3B82F6', 
+                    metrics: [
+                        { label: 'ROIC', value: stock.roic || 0, max: 40, good: 15 }, 
+                        { label: 'EY', value: earningsYield, max: 15, good: 8 }
+                    ], 
+                    verdict: (stock.roic || 0) >= 20 && earningsYield >= 8 ? 'Top Quartile' : 'Above Avg',
+                    philosophy: 'Buy good companies at good prices using systematic rules', 
+                    keyMetrics: ['High ROIC', 'Low EV/EBIT', 'Rank Stocks', 'Annual Rebalancing'], 
+                    approach: 'Rank companies by ROIC and earnings yield, buy the top-ranked stocks annually.' 
+                },
+                { 
+                    name: 'Ray Dalio', 
+                    style: 'Risk Parity', 
+                    color: '#0EA5E9', 
+                    metrics: [
+                        { label: 'Volatility', value: volatilityScore, max: 100, good: 70 }, 
+                        { label: 'Beta', value: stock.beta ? Math.min(100, (2 / stock.beta) * 50) : 50, max: 100, good: 70 }
+                    ], 
+                    verdict: volatilityScore >= 70 ? 'Portfolio Fit' : 'Too Volatile',
+                    philosophy: 'Balance risk across asset classes, not dollar amounts', 
+                    keyMetrics: ['Risk Contribution', 'Correlation', 'All-Weather', 'Leverage Control'], 
+                    approach: 'Allocate capital based on risk contribution, ensuring diversification across economic regimes.' 
+                },
+                { 
+                    name: 'Cathie Wood', 
+                    style: 'Innovation', 
+                    color: '#6366F1', 
+                    metrics: [
+                        { label: 'Innovation', value: innovationScore, max: 100, good: 70 }, 
+                        { label: 'Growth', value: stock.sgr || 0, max: 50, good: 20 }
+                    ], 
+                    verdict: innovationScore >= 70 && (stock.sgr || 0) >= 20 ? 'Innovation Play' : 'Not Focus',
+                    philosophy: 'Invest in disruptive innovation with exponential growth potential', 
+                    keyMetrics: ['TAM Expansion', 'Technology Adoption', 'Winner-Take-All', 'Long-Term Vision'], 
+                    approach: 'Focus on companies enabling or benefiting from disruptive innovation across multiple sectors.' 
+                },
+                { 
+                    name: 'George Soros', 
+                    style: 'Reflexivity', 
+                    color: '#EF4444', 
+                    metrics: [
+                        { label: 'Momentum', value: momentumScore, max: 100, good: 60 }, 
+                        { label: 'Volatility', value: stock.beta ? stock.beta * 50 : 50, max: 150, good: 75 }
+                    ], 
+                    verdict: momentumScore >= 60 ? 'Trend Following' : 'Wait',
+                    philosophy: 'Markets move based on participant perception, creating self-reinforcing trends', 
+                    keyMetrics: ['Market Psychology', 'Feedback Loops', 'Trend Strength', 'Inflection Points'], 
+                    approach: 'Identify reflexive trends where market perception influences fundamentals, ride momentum.' 
+                },
+                { 
+                    name: 'David Dreman', 
+                    style: 'Contrarian', 
+                    color: '#A855F7', 
+                    metrics: [
+                        { label: 'Value', value: valueScore, max: 100, good: 70 }, 
+                        { label: 'Sentiment', value: stock.change < 0 ? 75 : 40, max: 100, good: 65 }
+                    ], 
+                    verdict: valueScore >= 70 && stock.change < 0 ? 'Contrarian Buy' : 'Wait',
+                    philosophy: 'Exploit behavioral biases by buying unloved, low P/E stocks', 
+                    keyMetrics: ['Low P/E', 'Market Pessimism', 'Earnings Surprises', 'Behavioral Edge'], 
+                    approach: 'Buy fundamentally sound stocks trading at low multiples due to temporary negativity.' 
+                },
+                { 
+                    name: 'John Templeton', 
+                    style: 'Global Contrarian', 
+                    color: '#F59E0B', 
+                    metrics: [
+                        { label: 'Value', value: valueScore, max: 100, good: 70 }, 
+                        { label: 'Crisis Signal', value: stock.change < -5 ? 85 : 30, max: 100, good: 70 }
+                    ], 
+                    verdict: valueScore >= 70 && stock.change < -5 ? 'Max Pessimism' : 'Wait',
+                    philosophy: 'Buy at the point of maximum pessimism globally', 
+                    keyMetrics: ['Global Opportunities', 'Crisis Investing', 'Long-Term Value', 'Maximum Pessimism'], 
+                    approach: 'Search globally for bargains in markets experiencing temporary crisis or pessimism.' 
+                },
+                { 
+                    name: 'Aswath Damodaran', 
+                    style: 'Academic DCF', 
+                    color: '#EC4899', 
+                    metrics: [
+                        { label: 'FCF Yield', value: (stock.fcf || 0) / 10, max: 15, good: 8 }, 
+                        { label: 'Growth', value: stock.sgr || 0, max: 30, good: 10 }
+                    ], 
+                    verdict: (stock.fcf || 0) >= 80 && (stock.sgr || 0) >= 10 ? 'Undervalued' : 'Fair',
+                    philosophy: 'Rigorous DCF valuation with data-driven assumptions', 
+                    keyMetrics: ['DCF Models', 'WACC', 'Growth Assumptions', 'Terminal Value'], 
+                    approach: 'Build detailed DCF models with transparent assumptions and sensitivity analysis.' 
+                },
+                { 
+                    name: 'Stanley Druckenmiller', 
+                    style: 'Macro Opportunism', 
+                    color: '#84CC16', 
+                    metrics: [
+                        { label: 'Momentum', value: momentumScore, max: 100, good: 60 }, 
+                        { label: 'Quality', value: (stock.roe || 0) + (stock.moat || 0) / 2, max: 100, good: 50 }
+                    ], 
+                    verdict: momentumScore >= 60 && (stock.roe || 0) >= 15 ? 'Macro Buy' : 'Wait',
+                    philosophy: 'Identify macro inflection points and bet big when conviction is high', 
+                    keyMetrics: ['Fed Policy', 'Liquidity Cycles', 'Economic Inflection', 'Position Sizing'], 
+                    approach: 'Analyze macro conditions, make concentrated bets when opportunity and conviction align.' 
+                },
+                { 
+                    name: 'Carl Icahn', 
+                    style: 'Activist', 
+                    color: '#DC2626', 
+                    metrics: [
+                        { label: 'Underperform', value: (stock.roe || 0) < 12 ? 75 : 30, max: 100, good: 60 }, 
+                        { label: 'Asset Value', value: stock.pe ? Math.min(100, (30 / stock.pe) * 100) : 0, max: 100, good: 70 }
+                    ], 
+                    verdict: (stock.roe || 0) < 12 && stock.pe < 20 ? 'Activist Target' : 'No Opportunity',
+                    philosophy: 'Unlock shareholder value through board representation and operational changes', 
+                    keyMetrics: ['Poor Governance', 'Asset Value', 'Operational Improvement', 'Catalyst Creation'], 
+                    approach: 'Target underperforming companies, gain board seats, push for strategic changes.' 
+                },
+                { 
+                    name: 'Seth Klarman', 
+                    style: 'Deep Value', 
+                    color: '#059669', 
+                    metrics: [
+                        { label: 'MOS', value: stock.pe ? Math.min(100, (25 / stock.pe) * 100) : 0, max: 100, good: 80 }, 
+                        { label: 'Safety', value: healthScore, max: 100, good: 75 }
+                    ], 
+                    verdict: stock.pe < 12 && healthScore >= 75 ? 'Deep Value' : 'Wait',
+                    philosophy: 'Patient value investing with large margin of safety and cash optionality', 
+                    keyMetrics: ['Margin of Safety', 'Cash Holdings', 'Patience', 'Risk Avoidance'], 
+                    approach: 'Wait for exceptional opportunities, maintain cash, demand large margin of safety.' 
+                },
+                { 
+                    name: 'David Tepper', 
+                    style: 'Distressed', 
+                    color: '#EA580C', 
+                    metrics: [
+                        { label: 'Distress', value: stock.zscore < 2 ? 85 : 20, max: 100, good: 70 }, 
+                        { label: 'Recovery', value: stock.pe < 10 ? 80 : 30, max: 100, good: 65 }
+                    ], 
+                    verdict: stock.zscore < 2 && stock.pe < 10 ? 'Distressed Buy' : 'No Signal',
+                    philosophy: 'Buy distressed debt and equities during credit crises', 
+                    keyMetrics: ['Credit Spreads', 'Recovery Value', 'Crisis Timing', 'Risk/Reward'], 
+                    approach: 'Analyze credit cycles, buy distressed securities when recovery potential exceeds risk.' 
+                },
+                { 
+                    name: 'Jim Simons', 
+                    style: 'Quantitative', 
+                    color: '#7C3AED', 
+                    metrics: [
+                        { label: 'Efficiency', value: (stock.roe || 0) + (stock.roa || 0), max: 80, good: 40 }, 
+                        { label: 'Predictability', value: volatilityScore, max: 100, good: 70 }
+                    ], 
+                    verdict: volatilityScore >= 70 ? 'Model Signal' : 'No Edge',
+                    philosophy: 'Mathematical models and statistical arbitrage at scale', 
+                    keyMetrics: ['Statistical Edge', 'Execution Speed', 'Model Diversification', 'Data Quality'], 
+                    approach: 'Develop mathematical models to exploit market inefficiencies through systematic trading.' 
+                },
+                { 
+                    name: 'John Bogle', 
+                    style: 'Index/Passive', 
+                    color: '#64748B', 
+                    metrics: [
+                        { label: 'Quality', value: ((stock.roe || 0) + (stock.moat || 0)) / 2, max: 100, good: 50 }, 
+                        { label: 'Stability', value: stock.beta ? Math.min(100, (1.5 / stock.beta) * 100) : 50, max: 100, good: 70 }
+                    ], 
+                    verdict: 'Index Hold',
+                    philosophy: 'Low-cost passive investing beats most active managers long-term', 
+                    keyMetrics: ['Low Costs', 'Market Returns', 'Long-Term Compounding', 'Diversification'], 
+                    approach: 'Buy and hold low-cost index funds, minimize trading, let compounding work.' 
+                },
             ];
 
             const legendRadarData = [

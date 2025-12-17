@@ -253,7 +253,7 @@ export default function Learning() {
             {/* Top Row - Header Left, Subject Selector Right */}
             <div className="mx-4 md:mx-8 mt-4 flex flex-col lg:flex-row gap-4">
                 {/* Hero Banner - Left */}
-                <div className="bg-gradient-to-r from-purple-600 to-indigo-600 rounded-2xl p-8 shadow-lg lg:w-1/2 flex flex-col justify-between min-h-[320px]">
+                <div className="bg-gradient-to-r from-purple-700 to-indigo-600 rounded-2xl p-8 shadow-lg lg:w-1/2 flex flex-col justify-between min-h-[320px]">
                     <div>
                         <h1 className="text-2xl md:text-3xl font-bold text-white">Learning Archipelago</h1>
                         <p className="text-purple-200 text-sm">Ai-Powered Learning Journey</p>
@@ -363,7 +363,7 @@ export default function Learning() {
                                             {subject.name}
                                         </span>
                                         {isSelected && (
-                                            <Check className="w-4 h-4 text-purple-600" />
+                                            <Check className="w-4 h-4 text-purple-700" />
                                         )}
                                     </button>
                                 );
@@ -389,7 +389,7 @@ export default function Learning() {
                             }
                         `}</style>
                         <div className="relative mb-4 flex items-center justify-center">
-                            <div className="absolute w-16 h-16 rounded-full border-4 border-purple-200 border-t-purple-600 animate-spin" />
+                            <div className="absolute w-16 h-16 rounded-full border-4 border-purple-200 border-t-purple-700 animate-spin" />
                             <img 
                                 src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/692729a5f5180fbd43f297e9/622024f26_image-loading-logo.png" 
                                 alt="Loading" 

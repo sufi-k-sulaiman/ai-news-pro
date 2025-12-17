@@ -135,16 +135,29 @@ export function LoadingState({ message = 'Loading...', size = 'default' }) {
         <div className={`flex flex-col items-center justify-center ${size === 'large' ? 'min-h-[400px]' : 'py-12'}`}>
             <style>{`
                 @keyframes logoPulse {
-                    0%, 100% { opacity: 0.4; transform: scale(1); }
-                    50% { opacity: 0.7; transform: scale(1.03); }
+                    0%, 100% { opacity: 1; transform: scale(1); }
+                    50% { opacity: 0.85; transform: scale(1.05); }
+                }
+                @keyframes vibeRing {
+                    0%, 100% { transform: scale(1) rotate(0deg); opacity: 0.6; }
+                    25% { transform: scale(1.05) rotate(90deg); opacity: 0.8; }
+                    50% { transform: scale(1.1) rotate(180deg); opacity: 1; }
+                    75% { transform: scale(1.05) rotate(270deg); opacity: 0.8; }
                 }
             `}</style>
             <div className="relative mb-4 flex items-center justify-center">
-                <div className={`absolute ${spinnerSize} rounded-full border-4 border-purple-200 border-t-purple-600 animate-spin`} />
+                <div 
+                    className={`absolute ${spinnerSize} rounded-full border-4 border-transparent`}
+                    style={{ 
+                        borderTopColor: '#6209e6',
+                        borderRightColor: '#8b5cf6',
+                        animation: 'vibeRing 1.2s cubic-bezier(0.4, 0, 0.2, 1) infinite'
+                    }}
+                />
                 <img 
-                    src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/692729a5f5180fbd43f297e9/622024f26_image-loading-logo.png" 
+                    src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/694319442a278f16b6d6cf50/46592a6af_newsai.png" 
                     alt="Loading" 
-                    className={`${logoSize} object-contain grayscale opacity-50`}
+                    className={`${logoSize} object-contain`}
                     style={{ animation: 'logoPulse 1.5s ease-in-out infinite' }}
                 />
             </div>

@@ -318,51 +318,48 @@ export default function StockDetail() {
                     break;
 
                 case 'legends':
-                    prompt = `Analyze ${stock.ticker} through 8 legendary frameworks. Data: MOAT=${stock.moat}, ROE=${stock.roe}%, PE=${stock.pe}, Z-Score=${stock.zscore}, Growth=${stock.sgr}%. 
-
-For Warren Buffett, Peter Lynch, Benjamin Graham, Joel Greenblatt, Ray Dalio, Cathie Wood, George Soros, John Templeton create:
-- name (string)
-- style (string, max 20 chars)
-- color (hex string)
-- verdict (string, max 15 chars)
-- philosophy (string, max 80 chars)
-- approach (string, max 100 chars)
-- keyMetrics (array of exactly 3 strings)
-- metrics (array of exactly 2 objects with: label, value, max, good, inverse)`;
-                    schema = {
-                        type: "object",
-                        properties: {
-                            frameworks: {
-                                type: "array",
-                                items: {
-                                    type: "object",
-                                    properties: {
-                                        name: { type: "string" },
-                                        style: { type: "string" },
-                                        color: { type: "string" },
-                                        verdict: { type: "string" },
-                                        philosophy: { type: "string" },
-                                        approach: { type: "string" },
-                                        keyMetrics: { type: "array", items: { type: "string" } },
-                                        metrics: {
-                                            type: "array",
-                                            items: {
-                                                type: "object",
-                                                properties: {
-                                                    label: { type: "string" },
-                                                    value: { type: "number" },
-                                                    max: { type: "number" },
-                                                    good: { type: "number" },
-                                                    inverse: { type: "boolean" }
-                                                }
-                                            }
+                    // Split into 4 batches of 4 frameworks each for reliability
+                    const batches = [
+                        ['Warren Buffett', 'Peter Lynch', 'Benjamin Graham', 'Joel Greenblatt'],
+                        ['Ray Dalio', 'Cathie Wood', 'George Soros', 'David Dreman'],
+                        ['John Templeton', 'Aswath Damodaran', 'Stanley Druckenmiller', 'Carl Icahn'],
+                        ['Seth Klarman', 'David Tepper', 'Jim Simons', 'John Bogle']
+                    ];
+                    
+                    const allFrameworks = [];
+                    for (const batch of batches) {
+                        const batchPrompt = `Analyze ${stock.ticker} for ${batch.join(', ')}. Stock: MOAT=${stock.moat}, ROE=${stock.roe}%, PE=${stock.pe}, PEG=${stock.peg}, Z=${stock.zscore}, Beta=${stock.beta}, Growth=${stock.sgr}%. Return JSON with frameworks array containing name, style, color(hex), verdict, philosophy, approach, keyMetrics(3 strings), metrics(2 objects with label/value/max/good/inverse).`;
+                        const batchSchema = {
+                            type: "object",
+                            properties: {
+                                frameworks: {
+                                    type: "array",
+                                    items: {
+                                        type: "object",
+                                        properties: {
+                                            name: { type: "string" },
+                                            style: { type: "string" },
+                                            color: { type: "string" },
+                                            verdict: { type: "string" },
+                                            philosophy: { type: "string" },
+                                            approach: { type: "string" },
+                                            keyMetrics: { type: "array", items: { type: "string" } },
+                                            metrics: { type: "array", items: { type: "object", properties: { label: { type: "string" }, value: { type: "number" }, max: { type: "number" }, good: { type: "number" }, inverse: { type: "boolean" } } } }
                                         }
                                     }
                                 }
                             }
-                        }
-                    };
-                    break;
+                        };
+                        const batchResponse = await base44.integrations.Core.InvokeLLM({
+                            prompt: batchPrompt,
+                            add_context_from_internet: true,
+                            response_json_schema: batchSchema
+                        });
+                        allFrameworks.push(...(batchResponse.frameworks || []));
+                    }
+                    setSectionData(prev => ({ ...prev, legends: { frameworks: allFrameworks } }));
+                    setLoadingSection(null);
+                    return;
 
                 default:
                     return;

@@ -527,7 +527,7 @@ export default function News() {
                         {/* Mobile Layout */}
                         <div className="flex flex-col gap-2 sm:hidden">
                             <div className="flex items-center justify-between">
-                                <Link to={createPageUrl('News')} className="flex items-center gap-2 hover:opacity-80 transition-opacity">
+                                <Link to={createPageUrl('News')} className="flex items-center gap-1 hover:opacity-80 transition-opacity">
                                     <img 
                                         src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/694319442a278f16b6d6cf50/46592a6af_newsai.png" 
                                         alt="Ai News Pro" 
@@ -600,7 +600,7 @@ export default function News() {
                         {/* Desktop Layout */}
                         <div className="hidden sm:block relative">
                             {/* Left - Logo */}
-                            <Link to={createPageUrl('News')} className="absolute left-4 top-1/2 -translate-y-1/2 flex items-center gap-2.5 hover:opacity-80 transition-opacity">
+                            <Link to={createPageUrl('News')} className="absolute left-4 top-1/2 -translate-y-1/2 flex items-center gap-1 hover:opacity-80 transition-opacity">
                                 <img 
                                     src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/694319442a278f16b6d6cf50/46592a6af_newsai.png" 
                                     alt="Ai News Pro" 

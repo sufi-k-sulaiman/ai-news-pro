@@ -508,7 +508,7 @@ export default function News() {
                                         alt="Ai News Pro" 
                                         className="h-9 w-9 object-contain" 
                                     />
-                                    <h1 className="text-sm font-bold text-gray-900">Ai News Pro</h1>
+                                    <h1 className="text-sm font-bold text-gray-900">News Pro</h1>
                                 </Link>
                                 <Button
                                     variant="ghost"

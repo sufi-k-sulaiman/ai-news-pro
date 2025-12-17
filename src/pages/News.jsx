@@ -80,9 +80,9 @@ const NewsGrid = ({ news, currentPage, onPageChange }) => {
                             key={page}
                             onClick={() => onPageChange(page)}
                             className={`px-4 py-2 rounded-full text-sm font-medium transition-all ${
-                                currentPage === page ? 'text-white shadow-md' : 'hover:opacity-80 border'
+                                currentPage === page ? 'text-white shadow-md' : 'hover:opacity-80'
                             }`}
-                            style={currentPage === page ? { backgroundColor: '#6209e6' } : { backgroundColor: '#f5f5f5', borderColor: '#6209e6', color: '#6209e6' }}
+                            style={currentPage === page ? { backgroundColor: '#6209e6' } : { background: 'linear-gradient(135deg, #e5e7eb 0%, #d1d5db 100%)', color: '#6209e6' }}
                         >
                             {page}
                         </button>

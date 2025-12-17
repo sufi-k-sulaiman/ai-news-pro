@@ -486,7 +486,7 @@ export default function News() {
     return (
         <>
             <PageMeta 
-                title="Ai News Pro"
+                title="News Pro"
                 description="AI-powered news aggregation platform delivering real-time global news with intelligent categorization."
                 keywords="AI news, news aggregator, breaking news, global news, AI News Pro"
             />

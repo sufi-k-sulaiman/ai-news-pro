@@ -342,15 +342,15 @@ const NewsCardSimple = ({ article, index, imageUrl: preloadedImageUrl, cacheKey 
             };
 
 const CATEGORIES = [
-    { id: 'technology', label: 'Technology', icon: Monitor, subtopics: ['AI', 'Startups', 'Gadgets', 'Cybersecurity', 'Software', 'Cloud Computing', 'Blockchain', 'Robotics', '5G Networks', 'IoT', 'Data Science', 'Machine Learning', 'AR/VR'] },
-    { id: 'business', label: 'Business', icon: BusinessIcon, subtopics: ['Stocks', 'Economy', 'Crypto', 'Real Estate', 'Finance', 'Mergers', 'IPOs', 'Venture Capital', 'Banking', 'Commodities', 'E-commerce', 'Retail', 'Supply Chain'] },
-    { id: 'science', label: 'Science', icon: FlaskConical, subtopics: ['Space', 'Physics', 'Biology', 'Climate', 'Research', 'Astronomy', 'Genetics', 'Archaeology', 'Chemistry', 'Quantum', 'Neuroscience', 'Marine Biology', 'Paleontology'] },
-    { id: 'health', label: 'Health', icon: HeartPulse, subtopics: ['Medicine', 'Wellness', 'Mental Health', 'Nutrition', 'Fitness', 'Vaccines', 'Aging', 'Sleep', 'Diseases', 'Healthcare Policy', 'Hospitals', 'Clinical Trials', 'Medical Tech'] },
-    { id: 'politics', label: 'Politics', icon: Landmark, subtopics: ['Elections', 'Policy', 'Congress', 'International', 'Law', 'Supreme Court', 'Diplomacy', 'Defense', 'Immigration', 'Trade', 'Senate', 'White House', 'UN'] },
-    { id: 'sports', label: 'Sports', icon: Trophy, subtopics: ['Football', 'Basketball', 'Soccer', 'Tennis', 'Olympics', 'Baseball', 'Golf', 'MMA', 'Formula 1', 'Cricket', 'Hockey', 'Boxing', 'Rugby'] },
-    { id: 'entertainment', label: 'Entertainment', icon: Clapperboard, subtopics: ['Movies', 'Music', 'TV Shows', 'Celebrities', 'Gaming', 'Streaming', 'Broadway', 'Awards', 'Podcasts', 'Anime', 'Netflix', 'Fashion', 'Art'] },
-    { id: 'travel', label: 'Travel', icon: Plane, subtopics: ['Destinations', 'Hotels', 'Airlines', 'Cruises', 'Adventure', 'Luxury Travel', 'Budget Travel', 'Road Trips', 'Beach', 'Mountains', 'City Breaks', 'National Parks', 'Food Tourism'] },
-    { id: 'world', label: 'World', icon: Globe2, subtopics: ['Europe', 'Asia', 'Americas', 'Africa', 'Middle East', 'Australia', 'Russia', 'India', 'China', 'Latin America', 'Japan', 'UK', 'Canada'] },
+    { id: 'technology', label: 'Technology', icon: Monitor, subtopics: ['AI', 'Startups', 'Gadgets', 'Cybersecurity', 'Software', 'Cloud Computing', 'Blockchain', 'Robotics', '5G Networks', 'IoT', 'Data Science', 'Machine Learning'] },
+    { id: 'business', label: 'Business', icon: BusinessIcon, subtopics: ['Stocks', 'Economy', 'Crypto', 'Real Estate', 'Finance', 'Mergers', 'IPOs', 'Venture Capital', 'Banking', 'Commodities', 'E-commerce', 'Retail'] },
+    { id: 'science', label: 'Science', icon: FlaskConical, subtopics: ['Space', 'Physics', 'Biology', 'Climate', 'Research', 'Astronomy', 'Genetics', 'Archaeology', 'Chemistry', 'Quantum', 'Neuroscience', 'Marine Biology'] },
+    { id: 'health', label: 'Health', icon: HeartPulse, subtopics: ['Medicine', 'Wellness', 'Mental Health', 'Nutrition', 'Fitness', 'Vaccines', 'Aging', 'Sleep', 'Diseases', 'Healthcare Policy', 'Hospitals', 'Clinical Trials'] },
+    { id: 'politics', label: 'Politics', icon: Landmark, subtopics: ['Elections', 'Policy', 'Congress', 'International', 'Law', 'Supreme Court', 'Diplomacy', 'Defense', 'Immigration', 'Trade', 'Senate', 'White House'] },
+    { id: 'sports', label: 'Sports', icon: Trophy, subtopics: ['Football', 'Basketball', 'Soccer', 'Tennis', 'Olympics', 'Baseball', 'Golf', 'MMA', 'Formula 1', 'Cricket', 'Hockey', 'Boxing'] },
+    { id: 'entertainment', label: 'Entertainment', icon: Clapperboard, subtopics: ['Movies', 'Music', 'TV Shows', 'Celebrities', 'Gaming', 'Streaming', 'Broadway', 'Awards', 'Podcasts', 'Anime', 'Netflix', 'Fashion'] },
+    { id: 'travel', label: 'Travel', icon: Plane, subtopics: ['Destinations', 'Hotels', 'Airlines', 'Cruises', 'Adventure', 'Luxury Travel', 'Budget Travel', 'Road Trips', 'Beach', 'Mountains', 'City Breaks', 'National Parks'] },
+    { id: 'world', label: 'World', icon: Globe2, subtopics: ['Europe', 'Asia', 'Americas', 'Africa', 'Middle East', 'Australia', 'Russia', 'India', 'China', 'Latin America', 'Japan', 'UK'] },
 ];
 
 export default function News() {
@@ -626,7 +626,7 @@ export default function News() {
                                         ? 'text-white'
                                         : 'hover:opacity-80'
                                 }`}
-                                style={activeSubtopic === subtopic ? { backgroundColor: '#6209e6', fontSize: '0.823rem', padding: '0.411rem 0.823rem' } : { background: 'linear-gradient(135deg, #f9fafb 0%, #f3f4f6 100%)', color: '#6209e6', fontSize: '0.823rem', padding: '0.411rem 0.823rem' }}
+                                style={activeSubtopic === subtopic ? { backgroundColor: '#6209e6', fontSize: '0.856rem', padding: '0.428rem 0.856rem' } : { background: 'linear-gradient(135deg, #f9fafb 0%, #f3f4f6 100%)', color: '#6209e6', fontSize: '0.856rem', padding: '0.428rem 0.856rem' }}
                             >
                                 {subtopic}
                             </button>

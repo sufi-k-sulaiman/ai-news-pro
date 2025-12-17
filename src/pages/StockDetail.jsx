@@ -157,7 +157,7 @@ export default function StockDetail() {
                     };
                     const periodDesc = periodDescriptions[priceChartPeriod] || periodDescriptions['36M'];
                     
-                    prompt = `Provide data for ${stock.ticker}: company description, competitive advantages (3), revenue streams (3), latest developments (3), real historical price data for "${priceChartPeriod}": ${periodDesc}, MOAT analysis (brand power, switching costs, network effects, cost advantages, intangibles 0-100 each), investment thesis`;
+                    prompt = `Provide REAL data for ${stock.ticker}: company description, 3-5 competitive advantages, 3-5 revenue streams, 2-3 latest developments, real historical price data for "${priceChartPeriod}": ${periodDesc}, MOAT analysis with scores 0-100 for: brand power, switching costs, network effects, cost advantages, scale advantage, regulatory moat, investment thesis`;
                     schema = {
                         type: "object",
                         properties: {
@@ -166,7 +166,7 @@ export default function StockDetail() {
                             revenueStreams: { type: "array", items: { type: "string" } },
                             developments: { type: "array", items: { type: "string" } },
                             priceHistory: { type: "array", items: { type: "object", properties: { time: { type: "string" }, price: { type: "number" } } } },
-                            moatBreakdown: { type: "object", properties: { brandPower: { type: "number" }, switchingCosts: { type: "number" }, networkEffects: { type: "number" }, costAdvantages: { type: "number" }, intangibles: { type: "number" } } },
+                            moatBreakdown: { type: "object", properties: { brandPower: { type: "number" }, switchingCosts: { type: "number" }, networkEffects: { type: "number" }, costAdvantages: { type: "number" }, scaleAdvantage: { type: "number" }, regulatoryMoat: { type: "number" } } },
                             thesis: { type: "string" }
                         }
                     };

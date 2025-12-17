@@ -111,6 +111,17 @@ const NewsGrid = ({ news, currentPage, onPageChange }) => {
                             <span className="text-xs font-medium text-gray-500 min-w-[40px]">{timeRemaining}s</span>
                         )}
                     </div>
+                    {timeRemaining > 0 && (
+                        <div className="h-1.5 bg-gray-200 rounded-full overflow-hidden">
+                            <div 
+                                className="h-full transition-all duration-1000 ease-linear"
+                                style={{ 
+                                    width: `${(timeRemaining / 8) * 100}%`,
+                                    backgroundColor: '#6209e6'
+                                }}
+                            />
+                        </div>
+                    )}
                 </div>
             )}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">

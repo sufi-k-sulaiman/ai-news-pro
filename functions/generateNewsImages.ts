@@ -9,8 +9,8 @@ Deno.serve(async (req) => {
             return Response.json({ error: 'Invalid articles array' }, { status: 400 });
         }
         
-        // Generate images for all pages in parallel
-        const maxImages = Math.min(articles.length, 32);
+        // Generate images for current + next page (16 max)
+        const maxImages = Math.min(articles.length, 16);
         
         const imagePromises = articles.slice(0, maxImages).map(async (article) => {
             const cleanTitle = article.title

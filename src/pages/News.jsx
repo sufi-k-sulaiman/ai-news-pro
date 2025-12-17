@@ -92,26 +92,25 @@ const NewsGrid = ({ news, currentPage, onPageChange }) => {
             
             {currentPage === 1 && loadedImages < ARTICLES_PER_PAGE && (
                 <div className="mb-4 bg-gray-50 rounded-xl p-4">
-                    <div className="flex items-center justify-between mb-2">
+                    <div className="flex items-center justify-between mb-3">
                         <span className="text-sm text-gray-600">Generating images...</span>
                         <span className="text-sm font-semibold" style={{ color: '#6209e6' }}>{loadedImages} / {ARTICLES_PER_PAGE} ready</span>
                     </div>
-                    <div className="flex items-center gap-3 mb-2">
-                        <div className="flex-1 h-2 bg-gray-200 rounded-full overflow-hidden">
-                            <div 
-                                className="h-full transition-all duration-500"
-                                style={{ 
-                                    width: `${(loadedImages / ARTICLES_PER_PAGE) * 100}%`, 
-                                    background: 'linear-gradient(90deg, #7c3aed 0%, #6209e6 100%)',
-                                    boxShadow: '0 0 10px rgba(98, 9, 230, 0.5)'
-                                }}
-                            />
-                        </div>
-                        {timeRemaining > 0 && (
+                    {timeRemaining > 0 && (
+                        <div className="flex items-center gap-3">
+                            <div className="flex-1 h-2 bg-gray-200 rounded-full overflow-hidden">
+                                <div 
+                                    className="h-full transition-all duration-1000 ease-linear"
+                                    style={{ 
+                                        width: `${(timeRemaining / 8) * 100}%`,
+                                        backgroundColor: '#6209e6'
+                                    }}
+                                />
+                            </div>
                             <span className="text-xs font-medium text-gray-500 min-w-[40px]">{timeRemaining}s</span>
-                        )}
                         </div>
-                        </div>
+                    )}
+                </div>
             )}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                 {articles.map((article, index) => (

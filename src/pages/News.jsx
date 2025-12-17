@@ -531,7 +531,7 @@ export default function News() {
                                     <img 
                                         src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/694319442a278f16b6d6cf50/46592a6af_newsai.png" 
                                         alt="Ai News Pro" 
-                                        className="h-8 w-8 object-contain" 
+                                        className="h-9 w-9 object-contain" 
                                     />
                                     <h1 className="text-sm font-bold text-gray-900">Ai News Pro</h1>
                                 </Link>
@@ -576,13 +576,15 @@ export default function News() {
                                             <button
                                                 key={topic}
                                                 type="button"
-                                                onClick={() => {
+                                                onClick={(e) => {
+                                                    e.preventDefault();
+                                                    e.stopPropagation();
+                                                    setShowSuggestions(false);
                                                     setSearchQuery(topic);
                                                     setActiveSubtopic(topic);
                                                     setCurrentPage(1);
                                                     updateUrl(activeCategory, topic);
                                                     fetchNews(topic);
-                                                    setShowSuggestions(false);
                                                 }}
                                                 className="w-full px-4 py-2 text-left hover:bg-gray-50 transition-colors flex items-center gap-2 text-sm"
                                             >
@@ -602,7 +604,7 @@ export default function News() {
                                 <img 
                                     src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/694319442a278f16b6d6cf50/46592a6af_newsai.png" 
                                     alt="Ai News Pro" 
-                                    className="h-9 w-9 object-contain" 
+                                    className="h-10 w-10 object-contain" 
                                 />
                                 <h1 className="text-base font-bold text-gray-900 whitespace-nowrap">Ai News Pro</h1>
                             </Link>
@@ -642,13 +644,15 @@ export default function News() {
                                             <button
                                                 key={topic}
                                                 type="button"
-                                                onClick={() => {
+                                                onClick={(e) => {
+                                                    e.preventDefault();
+                                                    e.stopPropagation();
+                                                    setShowSuggestions(false);
                                                     setSearchQuery(topic);
                                                     setActiveSubtopic(topic);
                                                     setCurrentPage(1);
                                                     updateUrl(activeCategory, topic);
                                                     fetchNews(topic);
-                                                    setShowSuggestions(false);
                                                 }}
                                                 className="w-full px-4 py-2.5 text-left hover:bg-gray-50 transition-colors flex items-center gap-2 text-sm"
                                             >

@@ -4,7 +4,7 @@ import ErrorBoundary from '@/components/ErrorBoundary';
 
 export default function Layout({ children, currentPageName }) {
   useEffect(() => {
-    const LOGO_URL = 'https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/692729a5f5180fbd43f297e9/a182b15e6_1c-logo.png';
+    const LOGO_URL = 'https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/694319442a278f16b6d6cf50/46592a6af_newsai.png';
     let link = document.querySelector("link[rel~='icon']");
     if (!link) {
       link = document.createElement('link');

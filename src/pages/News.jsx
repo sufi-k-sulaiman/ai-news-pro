@@ -529,7 +529,7 @@ export default function News() {
                             <div className="flex items-center justify-between">
                                 <Link to={createPageUrl('News')} className="flex items-center gap-2 hover:opacity-80 transition-opacity">
                                     <img 
-                                        src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/692729a5f5180fbd43f297e9/a182b15e6_1c-logo.png" 
+                                        src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/694319442a278f16b6d6cf50/46592a6af_newsai.png" 
                                         alt="Ai News Pro" 
                                         className="h-7 w-7 object-contain" 
                                     />
@@ -600,7 +600,7 @@ export default function News() {
                             {/* Left - Logo */}
                             <Link to={createPageUrl('News')} className="absolute left-4 top-1/2 -translate-y-1/2 flex items-center gap-2.5 hover:opacity-80 transition-opacity">
                                 <img 
-                                    src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/692729a5f5180fbd43f297e9/a182b15e6_1c-logo.png" 
+                                    src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/694319442a278f16b6d6cf50/46592a6af_newsai.png" 
                                     alt="Ai News Pro" 
                                     className="h-8 w-8 object-contain" 
                                 />

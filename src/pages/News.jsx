@@ -506,7 +506,8 @@ export default function News() {
                                     <img 
                                         src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/694319442a278f16b6d6cf50/46592a6af_newsai.png" 
                                         alt="Ai News Pro" 
-                                        className="h-9 w-9 object-contain" 
+                                        className="object-contain"
+                                        style={{ width: '40.32px', height: '40.32px' }} 
                                     />
                                     <h1 className="text-sm font-bold text-gray-900">News Pro</h1>
                                 </Link>
@@ -551,7 +552,8 @@ export default function News() {
                                 <img 
                                     src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/694319442a278f16b6d6cf50/46592a6af_newsai.png" 
                                     alt="Ai News Pro" 
-                                    className="h-10 w-10 object-contain" 
+                                    className="object-contain"
+                                    style={{ width: '44.8px', height: '44.8px' }} 
                                 />
                                 <h1 className="text-base font-bold text-gray-900 whitespace-nowrap">News Pro</h1>
                             </Link>

@@ -318,7 +318,13 @@ export default function StockDetail() {
                     break;
 
                 case 'legends':
-                    prompt = `Generate complete legendary investor framework analysis for ${stock.ticker} with current metrics: MOAT=${stock.moat}, ROE=${stock.roe}, PE=${stock.pe}, PEG=${stock.peg}, Z-Score=${stock.zscore}, Beta=${stock.beta}, FCF=${stock.fcf}, Growth=${stock.sgr}%, Change=${stock.change}%, ROIC=${stock.roic}, ROA=${stock.roa}, Sector=${stock.sector}. For each of 16 legendary investors (Warren Buffett, Peter Lynch, Benjamin Graham, Joel Greenblatt, Ray Dalio, Cathie Wood, George Soros, David Dreman, John Templeton, Aswath Damodaran, Stanley Druckenmiller, Carl Icahn, Seth Klarman, David Tepper, Jim Simons, John Bogle), provide: name, investment style, color (hex), 2-3 metrics with label/value/max/good/inverse(bool), verdict (1-3 words), philosophy (1 sentence), keyMetrics (4 items), approach (2 sentences). Calculate ALL metric values dynamically based on actual stock data provided.`;
+                    prompt = `Analyze ${stock.ticker} using 16 legendary investor frameworks. Stock metrics: MOAT=${stock.moat}, ROE=${stock.roe}%, PE=${stock.pe}, PEG=${stock.peg}, Z-Score=${stock.zscore}, Beta=${stock.beta}, Growth=${stock.sgr}%, ROIC=${stock.roic}%, ROA=${stock.roa}%. 
+
+For Warren Buffett, Peter Lynch, Benjamin Graham, Joel Greenblatt, Ray Dalio, Cathie Wood, George Soros, David Dreman, John Templeton, Aswath Damodaran, Stanley Druckenmiller, Carl Icahn, Seth Klarman, David Tepper, Jim Simons, John Bogle:
+
+Return array with: name, style, color(hex), verdict(2-3 words), philosophy(short), approach(short), keyMetrics(array of 4 strings), metrics array with 2-3 items each having: label, value(number), max(number), good(number), inverse(boolean).
+
+Use ACTUAL stock values for calculations.`;
                     schema = {
                         type: "object",
                         properties: {
@@ -330,6 +336,10 @@ export default function StockDetail() {
                                         name: { type: "string" },
                                         style: { type: "string" },
                                         color: { type: "string" },
+                                        verdict: { type: "string" },
+                                        philosophy: { type: "string" },
+                                        approach: { type: "string" },
+                                        keyMetrics: { type: "array", items: { type: "string" } },
                                         metrics: {
                                             type: "array",
                                             items: {
@@ -340,17 +350,16 @@ export default function StockDetail() {
                                                     max: { type: "number" },
                                                     good: { type: "number" },
                                                     inverse: { type: "boolean" }
-                                                }
+                                                },
+                                                required: ["label", "value", "max", "good", "inverse"]
                                             }
-                                        },
-                                        verdict: { type: "string" },
-                                        philosophy: { type: "string" },
-                                        keyMetrics: { type: "array", items: { type: "string" } },
-                                        approach: { type: "string" }
-                                    }
+                                        }
+                                    },
+                                    required: ["name", "style", "color", "verdict", "philosophy", "approach", "keyMetrics", "metrics"]
                                 }
                             }
-                        }
+                        },
+                        required: ["frameworks"]
                     };
                     break;
 

@@ -16,8 +16,8 @@ import ErrorDisplay, { LoadingState, getErrorCode } from '@/components/ErrorDisp
 
 import { Monitor, TrendingUp as BusinessIcon, FlaskConical, HeartPulse, Landmark, Trophy, Clapperboard, Globe2, ChevronDown, ChevronUp } from 'lucide-react';
 
-const ARTICLES_PER_PAGE = 6;
-const TOTAL_PAGES = 3;
+const ARTICLES_PER_PAGE = 4;
+const TOTAL_PAGES = 4;
 
 const NewsGrid = ({ news, currentPage, onPageChange }) => {
     // RSS feeds provide real URLs - no validation needed
@@ -26,6 +26,7 @@ const NewsGrid = ({ news, currentPage, onPageChange }) => {
     const articles = news.slice(startIndex, endIndex);
     const totalPages = Math.min(Math.ceil(news.length / ARTICLES_PER_PAGE), TOTAL_PAGES);
     const [loadedImages, setLoadedImages] = useState(0);
+    const [timeRemaining, setTimeRemaining] = useState(0);
 
     // Generate images in background when articles load
     const newsKey = JSON.stringify(news.map(a => a.title).slice(0, 3));
@@ -33,13 +34,29 @@ const NewsGrid = ({ news, currentPage, onPageChange }) => {
         imageCache.clear();
         currentCacheKey = newsKey;
         setLoadedImages(0);
-        if (articles.length > 0) {
+        if (articles.length > 0 && currentPage === 1) {
+            setTimeRemaining(12); // Start 12 second timer
             const progressCallback = (loaded, total) => {
                 setLoadedImages(loaded);
             };
             progressCallbacks.add(progressCallback);
             generateImagesInBackground(articles.slice(0, ARTICLES_PER_PAGE), newsKey);
-            return () => progressCallbacks.delete(progressCallback);
+            
+            // Timer countdown
+            const interval = setInterval(() => {
+                setTimeRemaining(prev => {
+                    if (prev <= 1) {
+                        clearInterval(interval);
+                        return 0;
+                    }
+                    return prev - 1;
+                });
+            }, 1000);
+            
+            return () => {
+                progressCallbacks.delete(progressCallback);
+                clearInterval(interval);
+            };
         }
     }, [newsKey]);
 
@@ -73,17 +90,22 @@ const NewsGrid = ({ news, currentPage, onPageChange }) => {
                 </div>
             )}
             
-            {loadedImages > 0 && loadedImages < ARTICLES_PER_PAGE && (
+            {currentPage === 1 && loadedImages < ARTICLES_PER_PAGE && (
                 <div className="mb-4 bg-white rounded-xl border p-4" style={{ borderColor: '#6209e6' }}>
-                    <div className="flex items-center justify-between">
+                    <div className="flex items-center justify-between mb-2">
                         <span className="text-sm text-gray-600">Generating images...</span>
                         <span className="text-sm font-semibold" style={{ color: '#6209e6' }}>{loadedImages} / {ARTICLES_PER_PAGE} ready</span>
                     </div>
-                    <div className="mt-2 h-2 bg-white rounded-full overflow-hidden border" style={{ borderColor: '#6209e6' }}>
-                        <div 
-                            className="h-full transition-all duration-500"
-                            style={{ width: `${(loadedImages / ARTICLES_PER_PAGE) * 100}%`, backgroundColor: '#6209e6' }}
-                        />
+                    <div className="flex items-center gap-3 mb-2">
+                        <div className="flex-1 h-2 bg-white rounded-full overflow-hidden border" style={{ borderColor: '#6209e6' }}>
+                            <div 
+                                className="h-full transition-all duration-500"
+                                style={{ width: `${(loadedImages / ARTICLES_PER_PAGE) * 100}%`, backgroundColor: '#6209e6' }}
+                            />
+                        </div>
+                        {timeRemaining > 0 && (
+                            <span className="text-xs font-medium text-gray-500 min-w-[40px]">{timeRemaining}s</span>
+                        )}
                     </div>
                 </div>
             )}
@@ -145,7 +167,7 @@ const generateImagesInBackground = async (articles, cacheKey) => {
 
 const NewsCardSimple = ({ article, index, imageUrl: preloadedImageUrl, cacheKey }) => {
     const [imageUrl, setImageUrl] = useState(preloadedImageUrl || imageCache.get(`${cacheKey}-${index}`) || null);
-    const [imageLoading, setImageLoading] = useState(index < ARTICLES_PER_PAGE && !preloadedImageUrl && !imageCache.get(`${cacheKey}-${index}`));
+    const [imageLoading, setImageLoading] = useState(index < 4 && !preloadedImageUrl && !imageCache.get(`${cacheKey}-${index}`));
     
     const cleanTitle = cleanHtmlFromText(article.title);
     const cleanDescription = cleanHtmlFromText(article.description);
@@ -159,7 +181,7 @@ const NewsCardSimple = ({ article, index, imageUrl: preloadedImageUrl, cacheKey 
             return;
         }
         
-        if (index >= ARTICLES_PER_PAGE) {
+        if (index >= 4) {
             setImageLoading(false);
             return;
         }

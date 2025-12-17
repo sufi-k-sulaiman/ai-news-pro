@@ -1554,11 +1554,41 @@ export default function StockSectionContent({
             ];
 
             const legendRadarData = [
-                { subject: 'Value', Buffett: 85, Lynch: 70, Greenblatt: 80, Graham: 90 },
-                { subject: 'Growth', Buffett: 60, Lynch: 85, Greenblatt: 70, Graham: 40 },
-                { subject: 'Quality', Buffett: 90, Lynch: 75, Greenblatt: 85, Graham: 70 },
-                { subject: 'Momentum', Buffett: 30, Lynch: 65, Greenblatt: 50, Graham: 20 },
-                { subject: 'Safety', Buffett: 85, Lynch: 60, Greenblatt: 75, Graham: 95 }
+                { 
+                    subject: 'Value', 
+                    Buffett: Math.min(100, ((stock.moat || 0) + (stock.roe || 0) * 2) / 2), 
+                    Lynch: Math.min(100, (stock.peg ? 100 / stock.peg : 50)), 
+                    Greenblatt: Math.min(100, (stock.roic || 0) * 2.5), 
+                    Graham: Math.min(100, stock.pe ? (40 / stock.pe) * 100 : 0) 
+                },
+                { 
+                    subject: 'Growth', 
+                    Buffett: Math.min(100, (stock.sgr || 0) * 3), 
+                    Lynch: Math.min(100, (stock.sgr || 0) * 4), 
+                    Greenblatt: Math.min(100, (stock.sgr || 0) * 3.5), 
+                    Graham: Math.min(100, (stock.sgr || 0) * 2) 
+                },
+                { 
+                    subject: 'Quality', 
+                    Buffett: Math.min(100, ((stock.moat || 0) + (stock.roe || 0) * 2.5) / 2), 
+                    Lynch: Math.min(100, ((stock.roe || 0) * 2 + (stock.moat || 0)) / 2), 
+                    Greenblatt: Math.min(100, (stock.roic || 0) * 3), 
+                    Graham: Math.min(100, (stock.zscore || 0) * 20 + (stock.roe || 0)) 
+                },
+                { 
+                    subject: 'Momentum', 
+                    Buffett: Math.min(100, Math.max(0, 50 + stock.change)), 
+                    Lynch: Math.min(100, Math.max(0, 50 + stock.change * 1.5)), 
+                    Greenblatt: Math.min(100, Math.max(0, 50 + stock.change * 1.2)), 
+                    Graham: Math.min(100, Math.max(0, 40 + stock.change * 0.5)) 
+                },
+                { 
+                    subject: 'Safety', 
+                    Buffett: Math.min(100, (stock.zscore || 0) * 20 + (stock.moat || 0) / 2), 
+                    Lynch: Math.min(100, (stock.zscore || 0) * 15), 
+                    Greenblatt: Math.min(100, (stock.zscore || 0) * 18), 
+                    Graham: Math.min(100, (stock.zscore || 0) * 25) 
+                }
             ];
 
             const overallScores = legendaryFrameworks.map(l => ({

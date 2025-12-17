@@ -139,7 +139,10 @@ export default function Header({ title, sidebarOpen, setSidebarOpen, children, c
                         href="https://1cplatform.com/Onboarding" 
                         target="_blank" 
                         rel="noopener noreferrer"
-                        className="hidden sm:inline-flex items-center gap-2 px-8 py-3.5 bg-purple-600 hover:bg-purple-700 text-white font-semibold rounded-full transition-all shadow-lg hover:shadow-xl"
+                        className="hidden sm:inline-flex items-center gap-2 px-8 py-3.5 text-white font-semibold rounded-full transition-all shadow-lg hover:shadow-xl"
+                        style={{ backgroundColor: '#6B21F8' }}
+                        onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#5B15E0'}
+                        onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#6B21F8'}
                     >
                         Get started
                         <ArrowRight className="w-5 h-5" />

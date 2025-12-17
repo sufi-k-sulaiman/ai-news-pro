@@ -216,8 +216,7 @@ const NewsCardSimple = ({ article, index, imageUrl: preloadedImageUrl, cacheKey 
             href={article.url}
             target="_blank"
             rel="noopener noreferrer"
-            className="block bg-white rounded-xl border overflow-hidden hover:shadow-lg transition-shadow group"
-            style={{ borderColor: '#6209e6' }}
+            className="block bg-gray-50 rounded-xl overflow-hidden hover:shadow-lg transition-shadow group"
         >
             <div className="aspect-video bg-white relative overflow-hidden">
                 {imageLoading ? (

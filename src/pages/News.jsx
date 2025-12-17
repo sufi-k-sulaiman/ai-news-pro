@@ -134,6 +134,7 @@ const cleanHtmlFromText = (text) => {
         .replace(/&nbsp;/g, ' ')
         .replace(/https?:\/\/[^\s]+/g, '')
         .replace(/\s+/g, ' ')
+        .replace(/\s*[-|–—]\s*(Google News|Yahoo News|Reuters|AP News|CNN|BBC|Fox News|NBC News|CBS News|ABC News).*$/gi, '')
         .trim();
 };
 

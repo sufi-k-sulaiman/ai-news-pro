@@ -16,7 +16,7 @@ import ErrorDisplay, { LoadingState, getErrorCode } from '@/components/ErrorDisp
 
 import { Monitor, TrendingUp as BusinessIcon, FlaskConical, HeartPulse, Landmark, Trophy, Clapperboard, Globe2, ChevronDown, ChevronUp } from 'lucide-react';
 
-const ARTICLES_PER_PAGE = 4;
+const ARTICLES_PER_PAGE = 6;
 const TOTAL_PAGES = 4;
 
 const NewsGrid = ({ news, currentPage, onPageChange }) => {
@@ -35,7 +35,7 @@ const NewsGrid = ({ news, currentPage, onPageChange }) => {
         currentCacheKey = newsKey;
         setLoadedImages(0);
         if (articles.length > 0 && currentPage === 1) {
-            setTimeRemaining(12); // Start 12 second timer
+            setTimeRemaining(8); // Start 8 second timer
             const progressCallback = (loaded, total) => {
                 setLoadedImages(loaded);
             };
@@ -167,7 +167,7 @@ const generateImagesInBackground = async (articles, cacheKey) => {
 
 const NewsCardSimple = ({ article, index, imageUrl: preloadedImageUrl, cacheKey }) => {
     const [imageUrl, setImageUrl] = useState(preloadedImageUrl || imageCache.get(`${cacheKey}-${index}`) || null);
-    const [imageLoading, setImageLoading] = useState(index < 4 && !preloadedImageUrl && !imageCache.get(`${cacheKey}-${index}`));
+    const [imageLoading, setImageLoading] = useState(index < 6 && !preloadedImageUrl && !imageCache.get(`${cacheKey}-${index}`));
     
     const cleanTitle = cleanHtmlFromText(article.title);
     const cleanDescription = cleanHtmlFromText(article.description);
@@ -181,7 +181,7 @@ const NewsCardSimple = ({ article, index, imageUrl: preloadedImageUrl, cacheKey 
             return;
         }
         
-        if (index >= 4) {
+        if (index >= 6) {
             setImageLoading(false);
             return;
         }

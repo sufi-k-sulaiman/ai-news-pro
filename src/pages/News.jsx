@@ -16,11 +16,15 @@ import ErrorDisplay, { LoadingState, getErrorCode } from '@/components/ErrorDisp
 
 import { Monitor, TrendingUp as BusinessIcon, FlaskConical, HeartPulse, Landmark, Trophy, Clapperboard, Globe2, ChevronDown, ChevronUp } from 'lucide-react';
 
-const ARTICLES_PER_CATEGORY = 12;
+const ARTICLES_PER_PAGE = 6;
+const TOTAL_PAGES = 3;
 
-const NewsGrid = ({ news }) => {
+const NewsGrid = ({ news, currentPage, onPageChange }) => {
     // RSS feeds provide real URLs - no validation needed
-    const articles = news.slice(0, ARTICLES_PER_CATEGORY);
+    const startIndex = (currentPage - 1) * ARTICLES_PER_PAGE;
+    const endIndex = startIndex + ARTICLES_PER_PAGE;
+    const articles = news.slice(startIndex, endIndex);
+    const totalPages = Math.min(Math.ceil(news.length / ARTICLES_PER_PAGE), TOTAL_PAGES);
     const [loadedImages, setLoadedImages] = useState(0);
 
     // Generate images in background when articles load
@@ -34,7 +38,7 @@ const NewsGrid = ({ news }) => {
                 setLoadedImages(loaded);
             };
             progressCallbacks.add(progressCallback);
-            generateImagesInBackground(articles, newsKey);
+            generateImagesInBackground(articles.slice(0, ARTICLES_PER_PAGE), newsKey);
             return () => progressCallbacks.delete(progressCallback);
         }
     }, [newsKey]);
@@ -51,25 +55,43 @@ const NewsGrid = ({ news }) => {
 
     return (
         <>
-            {loadedImages > 0 && loadedImages < 12 && (
+            {loadedImages > 0 && loadedImages < ARTICLES_PER_PAGE && (
                 <div className="mb-4 bg-white rounded-xl border p-4" style={{ borderColor: '#6209e6' }}>
                     <div className="flex items-center justify-between">
                         <span className="text-sm text-gray-600">Generating images...</span>
-                        <span className="text-sm font-semibold" style={{ color: '#6209e6' }}>{loadedImages} / 12 ready</span>
+                        <span className="text-sm font-semibold" style={{ color: '#6209e6' }}>{loadedImages} / {ARTICLES_PER_PAGE} ready</span>
                     </div>
                     <div className="mt-2 h-2 bg-white rounded-full overflow-hidden border" style={{ borderColor: '#6209e6' }}>
                         <div 
                             className="h-full transition-all duration-500"
-                            style={{ width: `${(loadedImages / 12) * 100}%`, backgroundColor: '#6209e6' }}
+                            style={{ width: `${(loadedImages / ARTICLES_PER_PAGE) * 100}%`, backgroundColor: '#6209e6' }}
                         />
                     </div>
                 </div>
             )}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                 {articles.map((article, index) => (
-                    <NewsCardSimple key={`${newsKey}-${index}`} article={article} index={index} cacheKey={newsKey} />
+                    <NewsCardSimple key={`${newsKey}-${startIndex + index}`} article={article} index={startIndex + index} cacheKey={newsKey} />
                 ))}
             </div>
+            
+            {/* Pagination */}
+            {totalPages > 1 && (
+                <div className="flex justify-center gap-2 mt-8">
+                    {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
+                        <button
+                            key={page}
+                            onClick={() => onPageChange(page)}
+                            className={`px-4 py-2 rounded-full text-sm font-medium transition-all ${
+                                currentPage === page ? 'text-white shadow-md' : 'hover:opacity-80 border'
+                            }`}
+                            style={currentPage === page ? { backgroundColor: '#6209e6' } : { backgroundColor: '#f5f5f5', borderColor: '#6209e6', color: '#6209e6' }}
+                        >
+                            {page}
+                        </button>
+                    ))}
+                </div>
+            )}
         </>
     );
 };
@@ -102,7 +124,7 @@ const generateImagesInBackground = async (articles, cacheKey) => {
     try {
         console.log('Generating images in backend...');
         const response = await base44.functions.invoke('generateNewsImages', {
-            articles: articles.slice(0, 12).map(a => ({ title: a.title }))
+            articles: articles.slice(0, ARTICLES_PER_PAGE).map(a => ({ title: a.title }))
         });
         
         if (response.data?.images && currentCacheKey === cacheKey) {
@@ -111,7 +133,7 @@ const generateImagesInBackground = async (articles, cacheKey) => {
                     imageCache.set(`${cacheKey}-${index}`, url);
                     const callback = updateCallbacks.get(`${cacheKey}-${index}`);
                     if (callback) callback(url);
-                    progressCallbacks.forEach(cb => cb(index + 1, 12));
+                    progressCallbacks.forEach(cb => cb(index + 1, ARTICLES_PER_PAGE));
                 }
             });
             console.log(`Generated ${response.data.images.filter(Boolean).length} images`);
@@ -123,7 +145,7 @@ const generateImagesInBackground = async (articles, cacheKey) => {
 
 const NewsCardSimple = ({ article, index, imageUrl: preloadedImageUrl, cacheKey }) => {
     const [imageUrl, setImageUrl] = useState(preloadedImageUrl || imageCache.get(`${cacheKey}-${index}`) || null);
-    const [imageLoading, setImageLoading] = useState(index < 12 && !preloadedImageUrl && !imageCache.get(`${cacheKey}-${index}`));
+    const [imageLoading, setImageLoading] = useState(index < ARTICLES_PER_PAGE && !preloadedImageUrl && !imageCache.get(`${cacheKey}-${index}`));
     
     const cleanTitle = cleanHtmlFromText(article.title);
     const cleanDescription = cleanHtmlFromText(article.description);
@@ -137,7 +159,7 @@ const NewsCardSimple = ({ article, index, imageUrl: preloadedImageUrl, cacheKey 
             return;
         }
         
-        if (index >= 12) {
+        if (index >= ARTICLES_PER_PAGE) {
             setImageLoading(false);
             return;
         }
@@ -272,6 +294,7 @@ export default function News() {
     const [error, setError] = useState(null);
     const [lastUpdated, setLastUpdated] = useState(null);
     const [activeSubtopic, setActiveSubtopic] = useState(null);
+    const [currentPage, setCurrentPage] = useState(1);
 
     const fetchNews = async (keyword) => {
         setLoading(true);
@@ -320,6 +343,7 @@ export default function News() {
     const handleSearch = (e) => {
         e.preventDefault();
         if (searchQuery.trim()) {
+            setCurrentPage(1);
             updateUrl(activeCategory, searchQuery.trim());
             fetchNews(searchQuery.trim());
         }
@@ -329,6 +353,7 @@ export default function News() {
         setActiveCategory(categoryId);
         setSearchQuery('');
         setActiveSubtopic(null);
+        setCurrentPage(1);
         updateUrl(categoryId, '');
     };
 
@@ -425,6 +450,7 @@ export default function News() {
                                 onClick={() => {
                                     setSearchQuery(subtopic);
                                     setActiveSubtopic(subtopic);
+                                    setCurrentPage(1);
                                     updateUrl(activeCategory, subtopic);
                                     fetchNews(subtopic);
                                 }}
@@ -475,7 +501,7 @@ export default function News() {
                         <p className="text-gray-500">Try searching for a different topic</p>
                     </div>
                 ) : (
-                    <NewsGrid news={news} />
+                    <NewsGrid news={news} currentPage={currentPage} onPageChange={setCurrentPage} />
                 )}
 
                 {/* Trending Section */}
@@ -491,6 +517,7 @@ export default function News() {
                                     key={topic}
                                     onClick={() => {
                                         setSearchQuery(topic);
+                                        setCurrentPage(1);
                                         fetchNews(topic);
                                     }}
                                     className="px-3 py-1.5 text-sm rounded-full transition-colors border hover:opacity-80"

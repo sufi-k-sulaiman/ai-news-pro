@@ -398,26 +398,9 @@ export default function News() {
     const [lastUpdated, setLastUpdated] = useState(null);
     const [activeSubtopic, setActiveSubtopic] = useState(null);
     const [currentPage, setCurrentPage] = useState(1);
-    const [showSuggestions, setShowSuggestions] = useState(false);
-    const searchRef = useRef(null);
 
-    // Dynamic trending topics based on current category and all subtopics
-    const getDynamicSuggestions = () => {
-        const currentCategory = CATEGORIES.find(c => c.id === activeCategory);
-        const currentSubtopics = currentCategory?.subtopics || [];
-        
-        // Get all subtopics from all categories
-        const allSubtopics = CATEGORIES.flatMap(cat => cat.subtopics);
-        
-        // Prioritize current category subtopics, then others
-        const suggestions = [...new Set([...currentSubtopics, ...allSubtopics])];
-        
-        return suggestions;
-    };
-    
-    const filteredSuggestions = searchQuery.trim() 
-        ? getDynamicSuggestions().filter(topic => topic.toLowerCase().includes(searchQuery.toLowerCase())).slice(0, 8)
-        : getDynamicSuggestions().slice(0, 10);
+
+
 
     // Dynamic trending topics based on active category/subtopic
     const getTrendingTopics = () => {
@@ -435,15 +418,7 @@ export default function News() {
         }
     };
 
-    useEffect(() => {
-        const handleClickOutside = (event) => {
-            if (searchRef.current && !searchRef.current.contains(event.target)) {
-                setShowSuggestions(false);
-            }
-        };
-        document.addEventListener('mousedown', handleClickOutside);
-        return () => document.removeEventListener('mousedown', handleClickOutside);
-    }, []);
+
 
     const fetchNews = async (keyword) => {
         setLoading(true);
@@ -547,16 +522,16 @@ export default function News() {
                                     <span className="text-xs">Refresh</span>
                                 </Button>
                             </div>
-                            <form onSubmit={handleSearch} className="w-full relative" ref={searchRef}>
+                            <form onSubmit={handleSearch} className="w-full relative">
                                 <div className="relative">
                                     <Input
                                         type="text"
                                         value={searchQuery}
                                         onChange={(e) => setSearchQuery(e.target.value)}
-                                        onFocus={() => setShowSuggestions(true)}
                                         placeholder="Search news..."
                                         className="w-full h-10 pl-4 pr-12 rounded-full bg-white shadow-sm text-sm"
                                         style={{ borderColor: '#6209e6' }}
+                                        autoComplete="on"
                                     />
                                     <button
                                         type="submit"
@@ -566,34 +541,6 @@ export default function News() {
                                         <Search className="w-3.5 h-3.5 text-white" />
                                     </button>
                                 </div>
-                                {showSuggestions && filteredSuggestions.length > 0 && (
-                                    <div className="absolute top-full mt-2 w-full bg-white rounded-2xl shadow-lg border border-gray-200 py-2 z-50 max-h-[300px] overflow-y-auto">
-                                        <div className="px-4 py-2 text-xs font-semibold text-gray-500 flex items-center gap-2">
-                                            <TrendingUp className="w-3 h-3" />
-                                            {searchQuery.trim() ? 'Matching Topics' : `Popular in ${CATEGORIES.find(c => c.id === activeCategory)?.label}`}
-                                        </div>
-                                        {filteredSuggestions.map((topic) => (
-                                            <button
-                                                key={topic}
-                                                type="button"
-                                                onClick={(e) => {
-                                                    e.preventDefault();
-                                                    e.stopPropagation();
-                                                    setShowSuggestions(false);
-                                                    setSearchQuery(topic);
-                                                    setActiveSubtopic(topic);
-                                                    setCurrentPage(1);
-                                                    updateUrl(activeCategory, topic);
-                                                    fetchNews(topic);
-                                                }}
-                                                className="w-full px-4 py-2 text-left hover:bg-gray-50 transition-colors flex items-center gap-2 text-sm"
-                                            >
-                                                <Search className="w-4 h-4 text-gray-400" />
-                                                <span className="text-gray-900">{topic}</span>
-                                            </button>
-                                        ))}
-                                    </div>
-                                )}
                             </form>
                         </div>
 
@@ -611,16 +558,16 @@ export default function News() {
 
                             {/* Center - Search Bar */}
                             <div className="flex justify-center">
-                                <form onSubmit={handleSearch} className="w-full max-w-xl relative" ref={searchRef}>
+                                <form onSubmit={handleSearch} className="w-full max-w-xl relative">
                                 <div className="relative">
                                     <Input
                                         type="text"
                                         value={searchQuery}
                                         onChange={(e) => setSearchQuery(e.target.value)}
-                                        onFocus={() => setShowSuggestions(true)}
                                         placeholder="Search for any news topic..."
                                         className="w-full h-11 pl-5 pr-14 rounded-full bg-white shadow-sm"
                                         style={{ borderColor: '#6209e6' }}
+                                        autoComplete="on"
                                     />
                                     <button
                                         type="submit"
@@ -632,36 +579,6 @@ export default function News() {
                                         <Search className="w-4 h-4 text-white" />
                                     </button>
                                 </div>
-
-                                {/* Suggestions Dropdown */}
-                                {showSuggestions && filteredSuggestions.length > 0 && (
-                                    <div className="absolute top-full mt-2 w-full bg-white rounded-2xl shadow-lg border border-gray-200 py-2 z-50 max-h-[400px] overflow-y-auto">
-                                        <div className="px-4 py-2 text-xs font-semibold text-gray-500 flex items-center gap-2">
-                                            <TrendingUp className="w-3 h-3" />
-                                            {searchQuery.trim() ? 'Matching Topics' : `Popular in ${CATEGORIES.find(c => c.id === activeCategory)?.label}`}
-                                        </div>
-                                        {filteredSuggestions.map((topic) => (
-                                            <button
-                                                key={topic}
-                                                type="button"
-                                                onClick={(e) => {
-                                                    e.preventDefault();
-                                                    e.stopPropagation();
-                                                    setShowSuggestions(false);
-                                                    setSearchQuery(topic);
-                                                    setActiveSubtopic(topic);
-                                                    setCurrentPage(1);
-                                                    updateUrl(activeCategory, topic);
-                                                    fetchNews(topic);
-                                                }}
-                                                className="w-full px-4 py-2.5 text-left hover:bg-gray-50 transition-colors flex items-center gap-2 text-sm"
-                                            >
-                                                <Search className="w-4 h-4 text-gray-400" />
-                                                <span className="text-gray-900">{topic}</span>
-                                            </button>
-                                        ))}
-                                    </div>
-                                )}
                                 </form>
                                 </div>
 

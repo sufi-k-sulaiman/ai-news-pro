@@ -1,5 +1,7 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import PageMeta from '@/components/PageMeta';
+import { Link } from 'react-router-dom';
+import { createPageUrl } from '@/utils';
 
 const pulseAnimation = `
 @keyframes pulse {
@@ -387,6 +389,24 @@ export default function News() {
     const [lastUpdated, setLastUpdated] = useState(null);
     const [activeSubtopic, setActiveSubtopic] = useState(null);
     const [currentPage, setCurrentPage] = useState(1);
+    const [showSuggestions, setShowSuggestions] = useState(false);
+    const searchRef = useRef(null);
+
+    const TRENDING_TOPICS = ['AI', 'Climate Change', 'Stock Market', 'Elections 2024', 'Space Exploration', 'Cryptocurrency', 'Tech Layoffs', 'Healthcare', 'EV Cars', 'Renewable Energy'];
+    
+    const filteredSuggestions = searchQuery.trim() 
+        ? TRENDING_TOPICS.filter(topic => topic.toLowerCase().includes(searchQuery.toLowerCase()))
+        : TRENDING_TOPICS;
+
+    useEffect(() => {
+        const handleClickOutside = (event) => {
+            if (searchRef.current && !searchRef.current.contains(event.target)) {
+                setShowSuggestions(false);
+            }
+        };
+        document.addEventListener('mousedown', handleClickOutside);
+        return () => document.removeEventListener('mousedown', handleClickOutside);
+    }, []);
 
     const fetchNews = async (keyword) => {
         setLoading(true);
@@ -463,23 +483,24 @@ export default function News() {
                 <div className="sticky top-0 z-50 bg-white shadow-sm">
                     <div className="max-w-[82rem] mx-auto px-4 py-3 relative">
                         {/* Left - Logo */}
-                        <div className="absolute left-4 top-1/2 -translate-y-1/2 flex items-center gap-2.5">
+                        <Link to={createPageUrl('News')} className="absolute left-4 top-1/2 -translate-y-1/2 flex items-center gap-2.5 hover:opacity-80 transition-opacity">
                             <img 
                                 src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/692729a5f5180fbd43f297e9/a182b15e6_1c-logo.png" 
                                 alt="Ai News Pro" 
                                 className="h-8 w-8 object-contain" 
                             />
                             <h1 className="text-base font-bold text-gray-900 whitespace-nowrap">Ai News Pro</h1>
-                        </div>
+                        </Link>
 
                         {/* Center - Search Bar */}
                         <div className="flex justify-center">
-                            <form onSubmit={handleSearch} className="w-full max-w-xl">
+                            <form onSubmit={handleSearch} className="w-full max-w-xl relative" ref={searchRef}>
                                 <div className="relative">
                                     <Input
                                         type="text"
                                         value={searchQuery}
                                         onChange={(e) => setSearchQuery(e.target.value)}
+                                        onFocus={() => setShowSuggestions(true)}
                                         placeholder="Search for any news topic..."
                                         className="w-full h-11 pl-5 pr-14 rounded-full bg-white shadow-sm"
                                         style={{ borderColor: '#6209e6' }}
@@ -494,6 +515,33 @@ export default function News() {
                                         <Search className="w-4 h-4 text-white" />
                                     </button>
                                 </div>
+
+                                {/* Suggestions Dropdown */}
+                                {showSuggestions && filteredSuggestions.length > 0 && (
+                                    <div className="absolute top-full mt-2 w-full bg-white rounded-2xl shadow-lg border border-gray-200 py-2 z-50">
+                                        <div className="px-4 py-2 text-xs font-semibold text-gray-500 flex items-center gap-2">
+                                            <TrendingUp className="w-3 h-3" />
+                                            Trending Topics
+                                        </div>
+                                        {filteredSuggestions.map((topic) => (
+                                            <button
+                                                key={topic}
+                                                type="button"
+                                                onClick={() => {
+                                                    setSearchQuery(topic);
+                                                    setCurrentPage(1);
+                                                    updateUrl(activeCategory, topic);
+                                                    fetchNews(topic);
+                                                    setShowSuggestions(false);
+                                                }}
+                                                className="w-full px-4 py-2.5 text-left hover:bg-gray-50 transition-colors flex items-center gap-2 text-sm"
+                                            >
+                                                <Search className="w-4 h-4 text-gray-400" />
+                                                <span className="text-gray-900">{topic}</span>
+                                            </button>
+                                        ))}
+                                    </div>
+                                )}
                             </form>
                         </div>
 

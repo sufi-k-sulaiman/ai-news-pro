@@ -351,9 +351,7 @@ export default function News() {
                                 className="h-9 w-9 object-contain" 
                             />
                             <div>
-                                <h1 className="text-base font-bold text-gray-900">Ai News Pro</h1>
-                                <p className="text-sm" style={{ color: '#6209e6' }}>Real-time Global Intelligence</p>
-                            </div>
+                                <h1 className="text-base font-bold text-gray-900">Ai News Pro</h1>                            </div>
                         </div>
                     </div>
                 </div>

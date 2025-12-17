@@ -1,11 +1,10 @@
 import React, { useEffect } from 'react';
 import { HelmetProvider } from 'react-helmet-async';
-import PageLayout from '@/components/PageLayout';
 import ErrorBoundary from '@/components/ErrorBoundary';
-import { LOGO_URL } from '@/components/NavigationConfig';
 
 export default function Layout({ children, currentPageName }) {
   useEffect(() => {
+    const LOGO_URL = 'https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/692729a5f5180fbd43f297e9/a182b15e6_1c-logo.png';
     let link = document.querySelector("link[rel~='icon']");
     if (!link) {
       link = document.createElement('link');
@@ -81,9 +80,8 @@ export default function Layout({ children, currentPageName }) {
 
   return (
       <HelmetProvider>
-          <PageLayout activePage={currentPageName}>
-              <ErrorBoundary fallbackMessage="There was an error loading this page.">
-              <style>{`
+          <ErrorBoundary fallbackMessage="There was an error loading this page.">
+          <style>{`
         /* Hide Leaflet attribution */
         .leaflet-control-attribution {
           display: none !important;
@@ -127,9 +125,8 @@ export default function Layout({ children, currentPageName }) {
           display: none !important;
         }
         `}</style>
-      {children}
-      </ErrorBoundary>
-      </PageLayout>
-      </HelmetProvider>
-      );
-      }
+        {children}
+        </ErrorBoundary>
+        </HelmetProvider>
+        );
+        }

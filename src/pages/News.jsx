@@ -91,16 +91,20 @@ const NewsGrid = ({ news, currentPage, onPageChange }) => {
             )}
             
             {currentPage === 1 && loadedImages < ARTICLES_PER_PAGE && (
-                <div className="mb-4 bg-white rounded-xl border p-4" style={{ borderColor: '#6209e6' }}>
+                <div className="mb-4 bg-gray-50 rounded-xl p-4">
                     <div className="flex items-center justify-between mb-2">
                         <span className="text-sm text-gray-600">Generating images...</span>
                         <span className="text-sm font-semibold" style={{ color: '#6209e6' }}>{loadedImages} / {ARTICLES_PER_PAGE} ready</span>
                     </div>
                     <div className="flex items-center gap-3 mb-2">
-                        <div className="flex-1 h-2 bg-white rounded-full overflow-hidden border" style={{ borderColor: '#6209e6' }}>
+                        <div className="flex-1 h-2 bg-gray-200 rounded-full overflow-hidden">
                             <div 
                                 className="h-full transition-all duration-500"
-                                style={{ width: `${(loadedImages / ARTICLES_PER_PAGE) * 100}%`, backgroundColor: '#6209e6' }}
+                                style={{ 
+                                    width: `${(loadedImages / ARTICLES_PER_PAGE) * 100}%`, 
+                                    background: 'linear-gradient(90deg, #7c3aed 0%, #6209e6 100%)',
+                                    boxShadow: '0 0 10px rgba(98, 9, 230, 0.5)'
+                                }}
                             />
                         </div>
                         {timeRemaining > 0 && (

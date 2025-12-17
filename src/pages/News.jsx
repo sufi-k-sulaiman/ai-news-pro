@@ -461,9 +461,9 @@ export default function News() {
 
                 {/* Top Header with Logo */}
                 <div className="sticky top-0 z-50 bg-white shadow-sm">
-                    <div className="max-w-[82rem] mx-auto px-4 py-3 flex items-center gap-6">
+                    <div className="max-w-[82rem] mx-auto px-4 py-3 relative">
                         {/* Left - Logo */}
-                        <div className="flex items-center gap-2.5 flex-shrink-0">
+                        <div className="absolute left-4 top-1/2 -translate-y-1/2 flex items-center gap-2.5">
                             <img 
                                 src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/692729a5f5180fbd43f297e9/a182b15e6_1c-logo.png" 
                                 alt="Ai News Pro" 
@@ -473,30 +473,32 @@ export default function News() {
                         </div>
 
                         {/* Center - Search Bar */}
-                        <form onSubmit={handleSearch} className="flex-1 max-w-2xl">
-                            <div className="relative">
-                                <Input
-                                    type="text"
-                                    value={searchQuery}
-                                    onChange={(e) => setSearchQuery(e.target.value)}
-                                    placeholder="Search for any news topic..."
-                                    className="w-full h-11 pl-5 pr-14 rounded-full bg-white shadow-sm"
-                                    style={{ borderColor: '#6209e6' }}
-                                />
-                                <button
-                                    type="submit"
-                                    className="absolute right-1.5 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full flex items-center justify-center transition-colors"
-                                    style={{ backgroundColor: '#6209e6' }}
-                                    onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#5208c5'}
-                                    onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#6209e6'}
-                                >
-                                    <Search className="w-4 h-4 text-white" />
-                                </button>
-                            </div>
-                        </form>
+                        <div className="flex justify-center">
+                            <form onSubmit={handleSearch} className="w-full max-w-xl">
+                                <div className="relative">
+                                    <Input
+                                        type="text"
+                                        value={searchQuery}
+                                        onChange={(e) => setSearchQuery(e.target.value)}
+                                        placeholder="Search for any news topic..."
+                                        className="w-full h-11 pl-5 pr-14 rounded-full bg-white shadow-sm"
+                                        style={{ borderColor: '#6209e6' }}
+                                    />
+                                    <button
+                                        type="submit"
+                                        className="absolute right-1.5 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full flex items-center justify-center transition-colors"
+                                        style={{ backgroundColor: '#6209e6' }}
+                                        onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#5208c5'}
+                                        onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#6209e6'}
+                                    >
+                                        <Search className="w-4 h-4 text-white" />
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
 
                         {/* Right - Refresh Button and Time */}
-                        <div className="flex flex-col items-end gap-0.5 flex-shrink-0">
+                        <div className="absolute right-4 top-1/2 -translate-y-1/2 flex flex-col items-end gap-0.5">
                             <Button
                                 variant="outline"
                                 size="sm"

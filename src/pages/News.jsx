@@ -522,7 +522,7 @@ export default function News() {
                 </form>
 
                 {/* Categories */}
-                <div className="bg-gray-100 rounded-full p-1 inline-flex gap-1 mb-2">
+                <div className="bg-gray-100 rounded-full p-1.5 inline-flex gap-1 mb-2">
                     {CATEGORIES.map((cat) => {
                         const IconComponent = cat.icon;
                         const isExpanded = expandedCategory === cat.id;
@@ -533,7 +533,7 @@ export default function News() {
                                     handleCategoryClick(cat.id);
                                     setExpandedCategory(isExpanded ? null : cat.id);
                                 }}
-                                className={`px-4 py-2 rounded-full text-sm font-medium transition-all flex items-center gap-2 whitespace-nowrap ${
+                                className={`px-5 py-2.5 rounded-full text-sm font-medium transition-all flex items-center gap-2 whitespace-nowrap ${
                                     activeCategory === cat.id
                                         ? 'text-white shadow-sm'
                                         : 'text-gray-600 hover:text-gray-900'

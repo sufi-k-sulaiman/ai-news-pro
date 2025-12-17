@@ -391,7 +391,17 @@ export default function News() {
 
                 {/* Top Header with Logo */}
                 <div className="sticky top-0 z-50 bg-white shadow-sm">
-                    <div className="max-w-[82rem] mx-auto px-4 py-4 flex items-center justify-center">
+                    <div className="max-w-[82rem] mx-auto px-4 py-4 flex items-center justify-between">
+                        {/* Left - Updated Time */}
+                        {lastUpdated && (
+                            <div className="flex items-center gap-2 text-gray-500 text-sm">
+                                <Clock className="w-4 h-4" />
+                                Updated {lastUpdated.toLocaleTimeString()}
+                            </div>
+                        )}
+                        {!lastUpdated && <div />}
+
+                        {/* Center - Logo */}
                         <div className="flex items-center gap-2.5">
                             <img 
                                 src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/692729a5f5180fbd43f297e9/a182b15e6_1c-logo.png" 
@@ -399,20 +409,26 @@ export default function News() {
                                 className="h-9 w-9 object-contain" 
                             />
                             <div>
-                                <h1 className="text-base font-bold text-gray-900">Ai News Pro</h1>                            </div>
+                                <h1 className="text-base font-bold text-gray-900">Ai News Pro</h1>
+                            </div>
                         </div>
+
+                        {/* Right - Refresh Button */}
+                        <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => fetchNews(searchQuery || activeCategory)}
+                            disabled={loading}
+                            className="gap-2 hover:opacity-80"
+                            style={{ background: 'linear-gradient(135deg, #e5e7eb 0%, #d1d5db 100%)', color: '#6209e6' }}
+                        >
+                            <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
+                            Refresh
+                        </Button>
                     </div>
                 </div>
 
                 <div className="max-w-[82rem] mx-auto p-4 md:p-6">
-                {/* Last Updated */}
-                {lastUpdated && (
-                    <div className="flex items-center justify-end gap-2 text-gray-500 text-sm mb-4">
-                        <Clock className="w-4 h-4" />
-                        Updated {lastUpdated.toLocaleTimeString()}
-                    </div>
-                )}
-
                 {/* Search Bar */}
                 <form onSubmit={handleSearch} className="mb-6">
                     <div className="relative">
@@ -488,23 +504,8 @@ export default function News() {
                         ))}
                     </div>
                 )}
-                
-                {!expandedCategory && <div className="mb-4" />}
 
-                {/* Refresh Button */}
-                <div className="flex justify-end mb-4">
-                    <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => fetchNews(searchQuery || activeCategory)}
-                        disabled={loading}
-                        className="gap-2 hover:opacity-80"
-                        style={{ background: 'linear-gradient(135deg, #e5e7eb 0%, #d1d5db 100%)', color: '#6209e6' }}
-                    >
-                        <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
-                        Refresh
-                    </Button>
-                </div>
+                {!expandedCategory && <div className="mb-4" />}
 
                 {/* News Grid */}
                 {loading ? (

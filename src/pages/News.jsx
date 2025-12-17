@@ -571,6 +571,7 @@ export default function News() {
                                                 type="button"
                                                 onClick={() => {
                                                     setSearchQuery(topic);
+                                                    setActiveSubtopic(topic);
                                                     setCurrentPage(1);
                                                     updateUrl(activeCategory, topic);
                                                     fetchNews(topic);
@@ -636,6 +637,7 @@ export default function News() {
                                                 type="button"
                                                 onClick={() => {
                                                     setSearchQuery(topic);
+                                                    setActiveSubtopic(topic);
                                                     setCurrentPage(1);
                                                     updateUrl(activeCategory, topic);
                                                     fetchNews(topic);

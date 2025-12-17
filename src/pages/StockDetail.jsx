@@ -21,8 +21,6 @@ const NAV_ITEMS = [
     { id: 'overview', label: 'Overview', icon: Eye },
     { id: 'investor-moat', label: 'Investor MOAT', icon: Shield },
     { id: 'simulator', label: 'Simulator', icon: Calculator },
-    { id: 'bullbear', label: 'Bull/Bear Case', icon: TrendingUp },
-    { id: 'fundamentals', label: 'Fundamentals', icon: LineChart },
     { id: 'financials', label: 'Financials', icon: DollarSign },
     { id: 'technicals', label: 'Technicals', icon: BarChart3 },
     { id: 'sentiment', label: 'Sentiment', icon: Brain },
@@ -186,19 +184,6 @@ export default function StockDetail() {
                     };
                     break;
 
-                case 'fundamentals':
-                    prompt = `Fundamentals for ${stock.ticker}: 5-year revenue growth with yearly data, earnings growth, profit margins (gross, operating, net %), debt-to-equity, interest coverage`;
-                    schema = {
-                        type: "object",
-                        properties: {
-                            revenueGrowth: { type: "array", items: { type: "object", properties: { year: { type: "string" }, growth: { type: "number" }, revenue: { type: "number" } } } },
-                            margins: { type: "object", properties: { gross: { type: "number" }, operating: { type: "number" }, net: { type: "number" } } },
-                            debtToEquity: { type: "number" },
-                            interestCoverage: { type: "number" }
-                        }
-                    };
-                    break;
-
                 case 'technicals':
                     prompt = `Technical analysis for ${stock.ticker}: trend, support/resistance levels, moving averages (50,100,200), RSI, MACD signal, volume trend`;
                     schema = {
@@ -274,31 +259,19 @@ export default function StockDetail() {
                     };
                     break;
 
-                case 'bullbear':
-                    prompt = `Bull/bear for ${stock.ticker}: 5 bull points, 5 bear points, bull target price, bear target price, bull/bear probabilities %`;
+                case 'financials':
+                    prompt = `Complete financial analysis for ${stock.ticker}: 5-year revenue growth (yearly data with growth % and revenue $B), profit margins (gross/operating/net %), debt-to-equity, interest coverage, financial ratios (P/E, PEG, ROE, ROIC, ROA, FCF %), 5 bull case points, 5 bear case points, bull target price, bear target price`;
                     schema = {
                         type: "object",
                         properties: {
+                            revenueGrowth: { type: "array", items: { type: "object", properties: { year: { type: "string" }, growth: { type: "number" }, revenue: { type: "number" } } } },
+                            margins: { type: "object", properties: { gross: { type: "number" }, operating: { type: "number" }, net: { type: "number" } } },
+                            debtToEquity: { type: "number" },
+                            interestCoverage: { type: "number" },
                             bullCase: { type: "array", items: { type: "string" } },
                             bearCase: { type: "array", items: { type: "string" } },
                             bullTarget: { type: "number" },
-                            bearTarget: { type: "number" },
-                            bullProbability: { type: "number" },
-                            bearProbability: { type: "number" }
-                        }
-                    };
-                    break;
-
-                case 'financials':
-                    prompt = `Financial ratios for ${stock.ticker}: current P/E, PEG, ROE, ROIC, ROA, profit margins, liquidity ratios`;
-                    schema = {
-                        type: "object",
-                        properties: {
-                            pe: { type: "number" },
-                            peg: { type: "number" },
-                            roe: { type: "number" },
-                            roic: { type: "number" },
-                            roa: { type: "number" }
+                            bearTarget: { type: "number" }
                         }
                     };
                     break;

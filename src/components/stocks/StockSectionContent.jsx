@@ -292,104 +292,159 @@ export default function StockSectionContent({
 
 
 
-        case 'fundamentals':
-            return (
-                <div className="min-h-[600px] space-y-6">
-                    <div className="bg-white rounded-2xl border border-gray-200 p-6">
-                        <h3 className="font-semibold text-gray-900 mb-4">Revenue & Growth</h3>
-                        {data.revenueGrowth?.length > 0 ? (
-                            <div className="h-64">
-                                <ResponsiveContainer width="100%" height="100%">
-                                    <BarChart data={data.revenueGrowth}>
-                                        <XAxis dataKey="year" tick={{ fontSize: 11 }} />
-                                        <YAxis yAxisId="left" tick={{ fontSize: 10 }} tickFormatter={(v) => `${v}%`} />
-                                        <YAxis yAxisId="right" orientation="right" tick={{ fontSize: 10 }} tickFormatter={(v) => `$${v}B`} />
-                                        <Tooltip />
-                                        <Bar yAxisId="right" dataKey="revenue" fill="#8B5CF6" radius={[4, 4, 0, 0]} name="Revenue" />
-                                        <Bar yAxisId="left" dataKey="growth" fill="#10B981" radius={[4, 4, 0, 0]} name="Growth %" />
-                                    </BarChart>
-                                </ResponsiveContainer>
-                            </div>
-                        ) : <p className="text-gray-500 text-center py-12">Loading revenue data...</p>}
-                    </div>
-                    {data.debtToEquity && data.interestCoverage && data.margins && (
-                        <div className="grid grid-cols-3 gap-4">
-                            <div className="bg-white rounded-xl border border-gray-200 p-4 text-center">
-                                <p className="text-sm text-gray-500">Debt/Equity</p>
-                                <p className="text-2xl font-bold text-gray-900">{data.debtToEquity.toFixed(2)}</p>
-                            </div>
-                            <div className="bg-white rounded-xl border border-gray-200 p-4 text-center">
-                                <p className="text-sm text-gray-500">Interest Coverage</p>
-                                <p className="text-2xl font-bold text-gray-900">{data.interestCoverage.toFixed(1)}x</p>
-                            </div>
-                            <div className="bg-white rounded-xl border border-gray-200 p-4 text-center">
-                                <p className="text-sm text-gray-500">Gross Margin</p>
-                                <p className="text-2xl font-bold text-green-600">{data.margins.gross}%</p>
-                            </div>
-                        </div>
-                    )}
-                    {data.margins && data.margins.gross && data.margins.operating && data.margins.net && (
-                        <div className="bg-white rounded-xl border border-gray-200 p-6">
-                            <h3 className="font-semibold text-gray-900 mb-4">Profit Margins</h3>
-                            <div className="grid grid-cols-3 gap-4">
-                                <div className="text-center">
-                                    <p className="text-sm text-gray-500">Gross</p>
-                                    <p className="text-3xl font-bold text-green-600">{data.margins.gross}%</p>
-                                </div>
-                                <div className="text-center">
-                                    <p className="text-sm text-gray-500">Operating</p>
-                                    <p className="text-3xl font-bold text-blue-600">{data.margins.operating}%</p>
-                                </div>
-                                <div className="text-center">
-                                    <p className="text-sm text-gray-500">Net</p>
-                                    <p className="text-3xl font-bold text-purple-600">{data.margins.net}%</p>
-                                </div>
-                            </div>
-                        </div>
-                    )}
-                </div>
-            );
+
 
         case 'financials':
               return (
-                  <div className="min-h-[600px] bg-white rounded-2xl border border-gray-200 p-6">
-                      <h3 className="font-semibold text-gray-900 mb-6">Financial Ratios</h3>
-                      {stock.pe && stock.roe ? (
-                          <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-                              <div className="bg-gray-50 rounded-xl p-4 text-center">
-                                  <p className="text-sm text-gray-500">P/E Ratio</p>
-                                  <p className="text-2xl font-bold text-gray-900">{stock.pe.toFixed(1)}</p>
+                  <div className="min-h-[600px] space-y-6">
+                      {/* Revenue & Growth */}
+                      {data.revenueGrowth?.length > 0 && (
+                          <div className="bg-white rounded-2xl border border-gray-200 p-6">
+                              <h3 className="font-semibold text-gray-900 mb-4">Revenue & Growth</h3>
+                              <div className="h-64">
+                                  <ResponsiveContainer width="100%" height="100%">
+                                      <BarChart data={data.revenueGrowth}>
+                                          <XAxis dataKey="year" tick={{ fontSize: 11 }} />
+                                          <YAxis yAxisId="left" tick={{ fontSize: 10 }} tickFormatter={(v) => `${v}%`} />
+                                          <YAxis yAxisId="right" orientation="right" tick={{ fontSize: 10 }} tickFormatter={(v) => `$${v}B`} />
+                                          <Tooltip />
+                                          <Bar yAxisId="right" dataKey="revenue" fill="#8B5CF6" radius={[4, 4, 0, 0]} name="Revenue" />
+                                          <Bar yAxisId="left" dataKey="growth" fill="#10B981" radius={[4, 4, 0, 0]} name="Growth %" />
+                                      </BarChart>
+                                  </ResponsiveContainer>
                               </div>
-                              {stock.peg && (
-                                  <div className="bg-gray-50 rounded-xl p-4 text-center">
-                                      <p className="text-sm text-gray-500">PEG Ratio</p>
-                                      <p className="text-2xl font-bold text-gray-900">{stock.peg.toFixed(2)}</p>
-                                  </div>
-                              )}
-                              <div className="bg-gray-50 rounded-xl p-4 text-center">
-                                  <p className="text-sm text-gray-500">ROE</p>
-                                  <p className="text-2xl font-bold text-green-600">{stock.roe}%</p>
-                              </div>
-                              {stock.roic && (
-                                  <div className="bg-gray-50 rounded-xl p-4 text-center">
-                                      <p className="text-sm text-gray-500">ROIC</p>
-                                      <p className="text-2xl font-bold text-gray-900">{stock.roic}%</p>
-                                  </div>
-                              )}
-                              {stock.roa && (
-                                  <div className="bg-gray-50 rounded-xl p-4 text-center">
-                                      <p className="text-sm text-gray-500">ROA</p>
-                                      <p className="text-2xl font-bold text-gray-900">{stock.roa}%</p>
-                                  </div>
-                              )}
-                              {stock.fcf && (
-                                  <div className="bg-gray-50 rounded-xl p-4 text-center">
-                                      <p className="text-sm text-gray-500">FCF</p>
-                                      <p className="text-2xl font-bold text-gray-900">{stock.fcf}%</p>
-                                  </div>
-                              )}
                           </div>
-                      ) : <p className="text-gray-500 text-center py-12">Loading financial ratios...</p>}
+                      )}
+
+                      {/* Financial Metrics */}
+                      {data.margins && (
+                          <>
+                              <div className="grid grid-cols-3 gap-4">
+                                  {data.debtToEquity && (
+                                      <div className="bg-white rounded-xl border border-gray-200 p-4 text-center">
+                                          <p className="text-sm text-gray-500">Debt/Equity</p>
+                                          <p className="text-2xl font-bold text-gray-900">{data.debtToEquity.toFixed(2)}</p>
+                                      </div>
+                                  )}
+                                  {data.interestCoverage && (
+                                      <div className="bg-white rounded-xl border border-gray-200 p-4 text-center">
+                                          <p className="text-sm text-gray-500">Interest Coverage</p>
+                                          <p className="text-2xl font-bold text-gray-900">{data.interestCoverage.toFixed(1)}x</p>
+                                      </div>
+                                  )}
+                                  <div className="bg-white rounded-xl border border-gray-200 p-4 text-center">
+                                      <p className="text-sm text-gray-500">Gross Margin</p>
+                                      <p className="text-2xl font-bold text-green-600">{data.margins.gross}%</p>
+                                  </div>
+                              </div>
+                              <div className="bg-white rounded-xl border border-gray-200 p-6">
+                                  <h3 className="font-semibold text-gray-900 mb-4">Profit Margins</h3>
+                                  <div className="grid grid-cols-3 gap-4">
+                                      <div className="text-center">
+                                          <p className="text-sm text-gray-500">Gross</p>
+                                          <p className="text-3xl font-bold text-green-600">{data.margins.gross}%</p>
+                                      </div>
+                                      <div className="text-center">
+                                          <p className="text-sm text-gray-500">Operating</p>
+                                          <p className="text-3xl font-bold text-blue-600">{data.margins.operating}%</p>
+                                      </div>
+                                      <div className="text-center">
+                                          <p className="text-sm text-gray-500">Net</p>
+                                          <p className="text-3xl font-bold text-purple-600">{data.margins.net}%</p>
+                                      </div>
+                                  </div>
+                              </div>
+                          </>
+                      )}
+
+                      {/* Financial Ratios */}
+                      {stock.pe && stock.roe && (
+                          <div className="bg-white rounded-2xl border border-gray-200 p-6">
+                              <h3 className="font-semibold text-gray-900 mb-4">Financial Ratios</h3>
+                              <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                                  <div className="bg-gray-50 rounded-xl p-4 text-center">
+                                      <p className="text-sm text-gray-500">P/E Ratio</p>
+                                      <p className="text-2xl font-bold text-gray-900">{stock.pe.toFixed(1)}</p>
+                                  </div>
+                                  {stock.peg && (
+                                      <div className="bg-gray-50 rounded-xl p-4 text-center">
+                                          <p className="text-sm text-gray-500">PEG Ratio</p>
+                                          <p className="text-2xl font-bold text-gray-900">{stock.peg.toFixed(2)}</p>
+                                      </div>
+                                  )}
+                                  <div className="bg-gray-50 rounded-xl p-4 text-center">
+                                      <p className="text-sm text-gray-500">ROE</p>
+                                      <p className="text-2xl font-bold text-green-600">{stock.roe}%</p>
+                                  </div>
+                                  {stock.roic && (
+                                      <div className="bg-gray-50 rounded-xl p-4 text-center">
+                                          <p className="text-sm text-gray-500">ROIC</p>
+                                          <p className="text-2xl font-bold text-gray-900">{stock.roic}%</p>
+                                      </div>
+                                  )}
+                                  {stock.roa && (
+                                      <div className="bg-gray-50 rounded-xl p-4 text-center">
+                                          <p className="text-sm text-gray-500">ROA</p>
+                                          <p className="text-2xl font-bold text-gray-900">{stock.roa}%</p>
+                                      </div>
+                                  )}
+                                  {stock.fcf && (
+                                      <div className="bg-gray-50 rounded-xl p-4 text-center">
+                                          <p className="text-sm text-gray-500">FCF</p>
+                                          <p className="text-2xl font-bold text-gray-900">{stock.fcf}%</p>
+                                      </div>
+                                  )}
+                              </div>
+                          </div>
+                      )}
+
+                      {/* Bull/Bear Case */}
+                      {data.bullCase && data.bearCase && (
+                          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                              <div className="bg-gradient-to-br from-green-50 to-emerald-50 rounded-2xl border border-green-200 p-6">
+                                  <div className="flex items-center justify-between mb-4">
+                                      <h3 className="font-semibold text-green-900 flex items-center gap-2">
+                                          <ThumbsUp className="w-5 h-5" /> Bull Case
+                                      </h3>
+                                      {data.bullTarget && (
+                                          <span className="px-3 py-1 bg-green-100 text-green-700 text-sm font-medium rounded-full">
+                                              ${data.bullTarget.toFixed(2)}
+                                          </span>
+                                      )}
+                                  </div>
+                                  <ul className="space-y-3">
+                                      {data.bullCase.map((point, i) => (
+                                          <li key={i} className="flex items-start gap-2 text-sm text-gray-700">
+                                              <ArrowUpRight className="w-4 h-4 text-green-600 mt-0.5" />
+                                              {point}
+                                          </li>
+                                      ))}
+                                  </ul>
+                              </div>
+                              <div className="bg-gradient-to-br from-red-50 to-orange-50 rounded-2xl border border-red-200 p-6">
+                                  <div className="flex items-center justify-between mb-4">
+                                      <h3 className="font-semibold text-red-900 flex items-center gap-2">
+                                          <ThumbsDown className="w-5 h-5" /> Bear Case
+                                      </h3>
+                                      {data.bearTarget && (
+                                          <span className="px-3 py-1 bg-red-100 text-red-700 text-sm font-medium rounded-full">
+                                              ${data.bearTarget.toFixed(2)}
+                                          </span>
+                                      )}
+                                  </div>
+                                  <ul className="space-y-3">
+                                      {data.bearCase.map((point, i) => (
+                                          <li key={i} className="flex items-start gap-2 text-sm text-gray-700">
+                                              <ArrowDownRight className="w-4 h-4 text-red-600 mt-0.5" />
+                                              {point}
+                                          </li>
+                                      ))}
+                                  </ul>
+                              </div>
+                          </div>
+                      )}
+
+                      {!data.revenueGrowth && <p className="text-gray-500 text-center py-32">Loading financial data...</p>}
                   </div>
               );
 
@@ -605,55 +660,7 @@ export default function StockSectionContent({
                 </div>
             );
 
-        case 'bullbear':
-              return (
-                  <div className="min-h-[600px]">
-                      {data.bullCase && data.bearCase ? (
-                          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                              <div className="bg-gradient-to-br from-green-50 to-emerald-50 rounded-2xl border border-green-200 p-6">
-                                  <div className="flex items-center justify-between mb-4">
-                                      <h3 className="font-semibold text-green-900 flex items-center gap-2">
-                                          <ThumbsUp className="w-5 h-5" /> Bull Case
-                                      </h3>
-                                      {data.bullTarget && (
-                                          <span className="px-3 py-1 bg-green-100 text-green-700 text-sm font-medium rounded-full">
-                                              ${data.bullTarget.toFixed(2)}
-                                          </span>
-                                      )}
-                                  </div>
-                                  <ul className="space-y-3">
-                                      {data.bullCase.map((point, i) => (
-                                          <li key={i} className="flex items-start gap-2 text-sm text-gray-700">
-                                              <ArrowUpRight className="w-4 h-4 text-green-600 mt-0.5" />
-                                              {point}
-                                          </li>
-                                      ))}
-                                  </ul>
-                              </div>
-                              <div className="bg-gradient-to-br from-red-50 to-orange-50 rounded-2xl border border-red-200 p-6">
-                                  <div className="flex items-center justify-between mb-4">
-                                      <h3 className="font-semibold text-red-900 flex items-center gap-2">
-                                          <ThumbsDown className="w-5 h-5" /> Bear Case
-                                      </h3>
-                                      {data.bearTarget && (
-                                          <span className="px-3 py-1 bg-red-100 text-red-700 text-sm font-medium rounded-full">
-                                              ${data.bearTarget.toFixed(2)}
-                                          </span>
-                                      )}
-                                  </div>
-                                  <ul className="space-y-3">
-                                      {data.bearCase.map((point, i) => (
-                                          <li key={i} className="flex items-start gap-2 text-sm text-gray-700">
-                                              <ArrowDownRight className="w-4 h-4 text-red-600 mt-0.5" />
-                                              {point}
-                                          </li>
-                                      ))}
-                                  </ul>
-                              </div>
-                          </div>
-                      ) : <p className="text-gray-500 text-center py-32">Loading bull/bear analysis...</p>}
-                  </div>
-              );
+
 
 
 

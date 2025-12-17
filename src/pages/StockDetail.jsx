@@ -318,10 +318,41 @@ export default function StockDetail() {
                     break;
 
                 case 'legends':
-                    // Legends uses stock data directly, no AI needed
-                    setSectionData(prev => ({ ...prev, [section]: { loaded: true } }));
-                    setLoadingSection(null);
-                    return;
+                    prompt = `Generate complete legendary investor framework analysis for ${stock.ticker} with current metrics: MOAT=${stock.moat}, ROE=${stock.roe}, PE=${stock.pe}, PEG=${stock.peg}, Z-Score=${stock.zscore}, Beta=${stock.beta}, FCF=${stock.fcf}, Growth=${stock.sgr}%, Change=${stock.change}%, ROIC=${stock.roic}, ROA=${stock.roa}, Sector=${stock.sector}. For each of 16 legendary investors (Warren Buffett, Peter Lynch, Benjamin Graham, Joel Greenblatt, Ray Dalio, Cathie Wood, George Soros, David Dreman, John Templeton, Aswath Damodaran, Stanley Druckenmiller, Carl Icahn, Seth Klarman, David Tepper, Jim Simons, John Bogle), provide: name, investment style, color (hex), 2-3 metrics with label/value/max/good/inverse(bool), verdict (1-3 words), philosophy (1 sentence), keyMetrics (4 items), approach (2 sentences). Calculate ALL metric values dynamically based on actual stock data provided.`;
+                    schema = {
+                        type: "object",
+                        properties: {
+                            frameworks: {
+                                type: "array",
+                                items: {
+                                    type: "object",
+                                    properties: {
+                                        name: { type: "string" },
+                                        style: { type: "string" },
+                                        color: { type: "string" },
+                                        metrics: {
+                                            type: "array",
+                                            items: {
+                                                type: "object",
+                                                properties: {
+                                                    label: { type: "string" },
+                                                    value: { type: "number" },
+                                                    max: { type: "number" },
+                                                    good: { type: "number" },
+                                                    inverse: { type: "boolean" }
+                                                }
+                                            }
+                                        },
+                                        verdict: { type: "string" },
+                                        philosophy: { type: "string" },
+                                        keyMetrics: { type: "array", items: { type: "string" } },
+                                        approach: { type: "string" }
+                                    }
+                                }
+                            }
+                        }
+                    };
+                    break;
 
                 default:
                     return;

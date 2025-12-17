@@ -392,11 +392,23 @@ export default function News() {
     const [showSuggestions, setShowSuggestions] = useState(false);
     const searchRef = useRef(null);
 
-    const TRENDING_TOPICS = ['AI', 'Climate Change', 'Stock Market', 'Elections 2024', 'Space Exploration', 'Cryptocurrency', 'Tech Layoffs', 'Healthcare', 'EV Cars', 'Renewable Energy'];
+    // Dynamic trending topics based on current category and all subtopics
+    const getDynamicSuggestions = () => {
+        const currentCategory = CATEGORIES.find(c => c.id === activeCategory);
+        const currentSubtopics = currentCategory?.subtopics || [];
+        
+        // Get all subtopics from all categories
+        const allSubtopics = CATEGORIES.flatMap(cat => cat.subtopics);
+        
+        // Prioritize current category subtopics, then others
+        const suggestions = [...new Set([...currentSubtopics, ...allSubtopics])];
+        
+        return suggestions;
+    };
     
     const filteredSuggestions = searchQuery.trim() 
-        ? TRENDING_TOPICS.filter(topic => topic.toLowerCase().includes(searchQuery.toLowerCase()))
-        : TRENDING_TOPICS;
+        ? getDynamicSuggestions().filter(topic => topic.toLowerCase().includes(searchQuery.toLowerCase())).slice(0, 8)
+        : getDynamicSuggestions().slice(0, 10);
 
     useEffect(() => {
         const handleClickOutside = (event) => {
@@ -518,10 +530,10 @@ export default function News() {
 
                                 {/* Suggestions Dropdown */}
                                 {showSuggestions && filteredSuggestions.length > 0 && (
-                                    <div className="absolute top-full mt-2 w-full bg-white rounded-2xl shadow-lg border border-gray-200 py-2 z-50">
+                                    <div className="absolute top-full mt-2 w-full bg-white rounded-2xl shadow-lg border border-gray-200 py-2 z-50 max-h-[400px] overflow-y-auto">
                                         <div className="px-4 py-2 text-xs font-semibold text-gray-500 flex items-center gap-2">
                                             <TrendingUp className="w-3 h-3" />
-                                            Trending Topics
+                                            {searchQuery.trim() ? 'Matching Topics' : `Popular in ${CATEGORIES.find(c => c.id === activeCategory)?.label}`}
                                         </div>
                                         {filteredSuggestions.map((topic) => (
                                             <button

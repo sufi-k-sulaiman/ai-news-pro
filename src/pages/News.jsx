@@ -626,7 +626,7 @@ export default function News() {
                                         ? 'text-white'
                                         : 'hover:opacity-80'
                                 }`}
-                                style={activeSubtopic === subtopic ? { backgroundColor: '#6209e6', fontSize: '0.856rem', padding: '0.428rem 0.856rem' } : { background: 'linear-gradient(135deg, #f9fafb 0%, #f3f4f6 100%)', color: '#6209e6', fontSize: '0.856rem', padding: '0.428rem 0.856rem' }}
+                                style={activeSubtopic === subtopic ? { backgroundColor: '#6209e6', fontSize: '0.882rem', padding: '0.441rem 0.882rem' } : { background: 'linear-gradient(135deg, #f9fafb 0%, #f3f4f6 100%)', color: '#6209e6', fontSize: '0.882rem', padding: '0.441rem 0.882rem' }}
                             >
                                 {subtopic}
                             </button>

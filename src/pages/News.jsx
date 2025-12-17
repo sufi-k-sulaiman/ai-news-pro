@@ -600,7 +600,7 @@ export default function News() {
                                 style={{ color: '#6209e6' }}
                                 >
                                 <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
-                                Refresh
+                                <span className="hidden lg:inline">Refresh</span>
                                 </Button>
                                 </div>
                                 </div>

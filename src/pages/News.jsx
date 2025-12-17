@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import PageMeta from '@/components/PageMeta';
-import { Dialog, DialogContent } from "@/components/ui/dialog";
-import { X } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+import { createPageUrl } from '@/utils';
 
 const pulseAnimation = `
 @keyframes pulse {
@@ -260,7 +260,10 @@ const NewsCardSimple = ({ article, index, imageUrl: preloadedImageUrl, cacheKey,
                     style={{ '--hover-color': '#6209e6' }} 
                     onMouseEnter={(e) => e.currentTarget.style.color = '#6209e6'} 
                     onMouseLeave={(e) => e.currentTarget.style.color = ''}
-                    onClick={() => onArticleClick(article)}
+                    onClick={() => {
+                        const cleanTitle = cleanHtmlFromText(article.title);
+                        onArticleClick(article.url, cleanTitle);
+                    }}
                 >
                     {cleanTitle}
                 </h3>
@@ -291,6 +294,7 @@ const CATEGORIES = [
 ];
 
 export default function News() {
+    const navigate = useNavigate();
     // Update URL for display only (aesthetic, not parsed)
     const updateUrl = (category, query) => {
         const basePath = window.location.pathname;
@@ -326,7 +330,6 @@ export default function News() {
     const [lastUpdated, setLastUpdated] = useState(null);
     const [activeSubtopic, setActiveSubtopic] = useState(null);
     const [currentPage, setCurrentPage] = useState(1);
-    const [selectedArticle, setSelectedArticle] = useState(null);
 
     const fetchNews = async (keyword) => {
         setLoading(true);
@@ -534,32 +537,15 @@ export default function News() {
                         <p className="text-gray-500">Try searching for a different topic</p>
                     </div>
                 ) : (
-                    <NewsGrid news={news} currentPage={currentPage} onPageChange={setCurrentPage} onArticleClick={setSelectedArticle} />
+                    <NewsGrid 
+                        news={news} 
+                        currentPage={currentPage} 
+                        onPageChange={setCurrentPage} 
+                        onArticleClick={(url, title) => {
+                            navigate(`${createPageUrl('ArticleView')}?url=${encodeURIComponent(url)}&title=${encodeURIComponent(title)}`);
+                        }} 
+                    />
                 )}
-
-                {/* Article Modal */}
-                <Dialog open={!!selectedArticle} onOpenChange={() => setSelectedArticle(null)}>
-                    <DialogContent className="max-w-7xl h-[90vh] p-0">
-                        <div className="flex flex-col h-full">
-                            <div className="flex items-center justify-between p-4 border-b">
-                                <h2 className="font-semibold text-gray-900 flex-1 pr-4">
-                                    {selectedArticle && cleanHtmlFromText(selectedArticle.title)}
-                                </h2>
-                                <button 
-                                    onClick={() => setSelectedArticle(null)}
-                                    className="w-8 h-8 rounded-full flex items-center justify-center hover:bg-gray-100"
-                                >
-                                    <X className="w-5 h-5" />
-                                </button>
-                            </div>
-                            <iframe 
-                                src={selectedArticle?.url}
-                                className="flex-1 w-full border-0"
-                                title="Article"
-                            />
-                        </div>
-                    </DialogContent>
-                </Dialog>
 
                 {/* Trending Section */}
                 {!loading && news.length > 0 && (

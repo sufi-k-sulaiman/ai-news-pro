@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import PageMeta from '@/components/PageMeta';
+import { Dialog, DialogContent } from "@/components/ui/dialog";
+import { X } from 'lucide-react';
 
 const pulseAnimation = `
 @keyframes pulse {
@@ -19,7 +21,7 @@ import { Monitor, TrendingUp as BusinessIcon, FlaskConical, HeartPulse, Landmark
 const ARTICLES_PER_PAGE = 8;
 const TOTAL_PAGES = 4;
 
-const NewsGrid = ({ news, currentPage, onPageChange }) => {
+const NewsGrid = ({ news, currentPage, onPageChange, onArticleClick }) => {
     // RSS feeds provide real URLs - no validation needed
     const startIndex = (currentPage - 1) * ARTICLES_PER_PAGE;
     const endIndex = startIndex + ARTICLES_PER_PAGE;
@@ -114,7 +116,7 @@ const NewsGrid = ({ news, currentPage, onPageChange }) => {
             )}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                 {articles.map((article, index) => (
-                    <NewsCardSimple key={`${newsKey}-${startIndex + index}`} article={article} index={startIndex + index} cacheKey={newsKey} />
+                    <NewsCardSimple key={`${newsKey}-${startIndex + index}`} article={article} index={startIndex + index} cacheKey={newsKey} onArticleClick={onArticleClick} />
                 ))}
             </div>
         </>
@@ -169,7 +171,7 @@ const generateImagesInBackground = async (articles, cacheKey) => {
     }
 };
 
-const NewsCardSimple = ({ article, index, imageUrl: preloadedImageUrl, cacheKey }) => {
+const NewsCardSimple = ({ article, index, imageUrl: preloadedImageUrl, cacheKey, onArticleClick }) => {
     const [imageUrl, setImageUrl] = useState(preloadedImageUrl || imageCache.get(`${cacheKey}-${index}`) || null);
     const [imageLoading, setImageLoading] = useState(index < 8 && !preloadedImageUrl && !imageCache.get(`${cacheKey}-${index}`));
     
@@ -216,12 +218,7 @@ const NewsCardSimple = ({ article, index, imageUrl: preloadedImageUrl, cacheKey 
     }, [index, preloadedImageUrl, cacheKey]);
 
     return (
-        <a 
-            href={article.url}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="block bg-gray-50 rounded-xl overflow-hidden hover:shadow-lg transition-shadow group border border-gray-200"
-        >
+        <div className="block bg-gray-50 rounded-xl overflow-hidden hover:shadow-lg transition-shadow group border border-gray-200">
             <div className="aspect-video bg-white relative overflow-hidden">
                 {imageLoading ? (
                     <div className="absolute inset-0 flex items-center justify-center bg-white">
@@ -258,17 +255,29 @@ const NewsCardSimple = ({ article, index, imageUrl: preloadedImageUrl, cacheKey 
                         </span>
                     </div>
                 )}
-                <h3 className="font-semibold text-gray-900 mb-2 line-clamp-2 group-hover:transition-colors" style={{ '--hover-color': '#6209e6' }} onMouseEnter={(e) => e.currentTarget.style.color = '#6209e6'} onMouseLeave={(e) => e.currentTarget.style.color = ''}>
+                <h3 
+                    className="font-semibold text-gray-900 mb-2 line-clamp-2 cursor-pointer hover:transition-colors" 
+                    style={{ '--hover-color': '#6209e6' }} 
+                    onMouseEnter={(e) => e.currentTarget.style.color = '#6209e6'} 
+                    onMouseLeave={(e) => e.currentTarget.style.color = ''}
+                    onClick={() => onArticleClick(article)}
+                >
                     {cleanTitle}
                 </h3>
 
-                <span className="inline-flex items-center gap-1 text-sm font-medium" style={{ color: '#6209e6' }}>
+                <a 
+                    href={article.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-1 text-sm font-medium" 
+                    style={{ color: '#6209e6' }}
+                >
                     Read more <ExternalLink className="w-3 h-3" />
-                </span>
+                </a>
             </div>
-        </a>
-    );
-};
+            </div>
+            );
+            };
 
 const CATEGORIES = [
     { id: 'technology', label: 'Technology', icon: Monitor, subtopics: ['AI', 'Startups', 'Gadgets', 'Cybersecurity', 'Software', 'Cloud Computing', 'Blockchain', 'Robotics', '5G Networks', 'IoT'] },
@@ -317,6 +326,7 @@ export default function News() {
     const [lastUpdated, setLastUpdated] = useState(null);
     const [activeSubtopic, setActiveSubtopic] = useState(null);
     const [currentPage, setCurrentPage] = useState(1);
+    const [selectedArticle, setSelectedArticle] = useState(null);
 
     const fetchNews = async (keyword) => {
         setLoading(true);
@@ -524,8 +534,32 @@ export default function News() {
                         <p className="text-gray-500">Try searching for a different topic</p>
                     </div>
                 ) : (
-                    <NewsGrid news={news} currentPage={currentPage} onPageChange={setCurrentPage} />
+                    <NewsGrid news={news} currentPage={currentPage} onPageChange={setCurrentPage} onArticleClick={setSelectedArticle} />
                 )}
+
+                {/* Article Modal */}
+                <Dialog open={!!selectedArticle} onOpenChange={() => setSelectedArticle(null)}>
+                    <DialogContent className="max-w-7xl h-[90vh] p-0">
+                        <div className="flex flex-col h-full">
+                            <div className="flex items-center justify-between p-4 border-b">
+                                <h2 className="font-semibold text-gray-900 flex-1 pr-4">
+                                    {selectedArticle && cleanHtmlFromText(selectedArticle.title)}
+                                </h2>
+                                <button 
+                                    onClick={() => setSelectedArticle(null)}
+                                    className="w-8 h-8 rounded-full flex items-center justify-center hover:bg-gray-100"
+                                >
+                                    <X className="w-5 h-5" />
+                                </button>
+                            </div>
+                            <iframe 
+                                src={selectedArticle?.url}
+                                className="flex-1 w-full border-0"
+                                title="Article"
+                            />
+                        </div>
+                    </DialogContent>
+                </Dialog>
 
                 {/* Trending Section */}
                 {!loading && news.length > 0 && (

@@ -2,9 +2,10 @@ import React, { useState, useEffect, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
 import PageMeta from '@/components/PageMeta';
-import { Search, RefreshCw, TrendingUp, TrendingDown, Shield, Zap, DollarSign, BarChart3, Activity, AlertTriangle } from 'lucide-react';
+import { Search, RefreshCw, TrendingUp, TrendingDown, Shield, Zap, DollarSign, BarChart3, Activity, AlertTriangle, ChevronDown } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import StockCard from '@/components/markets/StockCard';
 import StockTicker from '@/components/markets/StockTicker';
 import FilterChips from '@/components/markets/FilterChips';
@@ -1178,23 +1179,27 @@ Use real market data. Return ALL ${batch.length} stocks.`,
                         </div>
                     </div>
                     
-                    {/* Preset Filters */}
-                    <div className="flex flex-wrap items-center gap-2">
-                        {PRESET_FILTERS.map(preset => (
-                            <button 
-                                key={preset.id} 
-                                onClick={() => setActivePreset(preset.id)} 
-                                className={`group flex items-center gap-2 px-4 py-2.5 rounded-xl font-medium text-sm transition-all duration-200 ${
-                                    activePreset === preset.id 
-                                        ? 'bg-gradient-to-r from-purple-600 to-indigo-600 text-white shadow-lg shadow-purple-500/25 scale-[1.02]' 
-                                        : 'bg-white/70 text-gray-600 hover:bg-white hover:shadow-md hover:text-purple-600 border border-gray-200/50'
-                                }`}
-                            >
-                                <preset.icon className={`w-4 h-4 ${activePreset === preset.id ? 'text-white' : 'text-purple-500 group-hover:scale-110 transition-transform'}`} />
-                                <span className="hidden sm:inline">{preset.label}</span>
-                            </button>
-                        ))}
-                    </div>
+                    {/* Preset Filters Dropdown */}
+                    <Select value={activePreset} onValueChange={setActivePreset}>
+                        <SelectTrigger className="w-48 h-11 bg-gradient-to-r from-purple-600 to-indigo-600 text-white border-0 shadow-lg shadow-purple-500/25 hover:shadow-xl transition-all">
+                            <div className="flex items-center gap-2">
+                                {PRESET_FILTERS.find(p => p.id === activePreset)?.icon && 
+                                    React.createElement(PRESET_FILTERS.find(p => p.id === activePreset).icon, { className: "w-4 h-4" })
+                                }
+                                <SelectValue />
+                            </div>
+                        </SelectTrigger>
+                        <SelectContent>
+                            {PRESET_FILTERS.map(preset => (
+                                <SelectItem key={preset.id} value={preset.id}>
+                                    <div className="flex items-center gap-2">
+                                        <preset.icon className="w-4 h-4 text-purple-600" />
+                                        {preset.label}
+                                    </div>
+                                </SelectItem>
+                            ))}
+                        </SelectContent>
+                    </Select>
                 </div>
 
                 {/* Dropdown Filters Row */}

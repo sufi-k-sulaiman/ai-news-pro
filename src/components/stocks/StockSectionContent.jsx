@@ -41,7 +41,7 @@ export default function StockSectionContent({
         const shares = investmentAmount / stock.price;
         const futurePrice = stock.price * Math.pow(1 + expectedReturn / 100, yearsToHold);
         const futureValue = shares * futurePrice;
-        const annualDividend = (stock.dividend || 2) * shares;
+        const annualDividend = (stock.dividend || 0) * shares;
         const totalDividends = annualDividend * yearsToHold;
         return { 
             shares: shares.toFixed(2), 
@@ -61,7 +61,7 @@ export default function StockSectionContent({
                 price: point.price
             })) || [];
             
-            const startPrice = filteredPriceData[0]?.price || stock.price * 0.8;
+            const startPrice = filteredPriceData[0]?.price || stock.price;
             const highPrice = Math.max(...(filteredPriceData.map(p => p.price).concat([stock.price])));
             const lowPrice = Math.min(...(filteredPriceData.map(p => p.price).concat([stock.price])));
             
@@ -69,7 +69,7 @@ export default function StockSectionContent({
                 <div className="space-y-6">
                     <div className="bg-white rounded-2xl border border-gray-200 p-6">
                         <h3 className="font-semibold text-gray-900 mb-3">Company Overview</h3>
-                        <p className="text-gray-600 mb-4">{data.description || `${stock.name} is a leading company in the ${stock.sector} sector.`}</p>
+                        {data.description && <p className="text-gray-600 mb-4">{data.description}</p>}
                         {data.advantages && (
                             <div>
                                 <h4 className="font-medium text-gray-900 mb-2">Competitive Advantages</h4>
@@ -708,7 +708,7 @@ export default function StockSectionContent({
               const projectionData = Array.from({ length: yearsToHold + 1 }, (_, i) => ({
                   year: `Y${i}`,
                   value: investmentAmount * Math.pow(1 + expectedReturn / 100, i),
-                  withDividends: investmentAmount * Math.pow(1 + expectedReturn / 100, i) + ((stock.dividend || 2) * (investmentAmount / stock.price) * i)
+                  withDividends: investmentAmount * Math.pow(1 + expectedReturn / 100, i) + ((stock.dividend || 0) * (investmentAmount / stock.price) * i)
               }));
 
               return (
@@ -890,8 +890,8 @@ export default function StockSectionContent({
                             </div>
                             <div className="text-right">
                                 <p className="text-xs text-gray-500">Fiscal Year End</p>
-                                <p className="text-sm font-semibold text-gray-900">{data.fiscalYearEnd || 'December 31'}</p>
-                                <p className="text-xs text-gray-400">Next: {data.nextEarnings || 'Jan 2025'}</p>
+                                {data.fiscalYearEnd && <p className="text-sm font-semibold text-gray-900">{data.fiscalYearEnd}</p>}
+                                {data.nextEarnings && <p className="text-xs text-gray-400">Next: {data.nextEarnings}</p>}
                             </div>
                         </div>
                     </div>
@@ -952,8 +952,8 @@ export default function StockSectionContent({
                             </div>
                             <div className="text-right">
                                 <p className="text-xs text-gray-500">Fiscal Year End</p>
-                                <p className="text-sm font-semibold text-gray-900">{data.fiscalYearEnd || 'Dec 31'}</p>
-                                <p className="text-xs text-gray-400">Next: {data.nextEarnings || 'Jan 2025'}</p>
+                                {data.fiscalYearEnd && <p className="text-sm font-semibold text-gray-900">{data.fiscalYearEnd}</p>}
+                                {data.nextEarnings && <p className="text-xs text-gray-400">Next: {data.nextEarnings}</p>}
                             </div>
                         </div>
                     </div>

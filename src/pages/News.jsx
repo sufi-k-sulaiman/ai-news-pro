@@ -179,8 +179,8 @@ const loadImagesFromLocalStorage = (cacheKey) => {
         const cached = localStorage.getItem(`news-images-${cacheKey}`);
         if (cached) {
             const data = JSON.parse(cached);
-            // Check if cache is less than 24 hours old
-            if (Date.now() - data.timestamp < 24 * 60 * 60 * 1000) {
+            // Check if cache is less than 72 hours old
+            if (Date.now() - data.timestamp < 72 * 60 * 60 * 1000) {
                 return data.images;
             }
         }

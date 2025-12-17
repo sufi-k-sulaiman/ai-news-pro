@@ -41,8 +41,8 @@ const NewsGrid = ({ news }) => {
 
     if (articles.length === 0) {
         return (
-            <div className="text-center py-20 bg-white rounded-2xl border border-gray-200">
-                <Globe className="w-16 h-16 text-gray-300 mx-auto mb-4" />
+            <div className="text-center py-20 bg-white rounded-2xl border" style={{ borderColor: '#6209e6' }}>
+                <Globe className="w-16 h-16 mx-auto mb-4" style={{ color: '#6209e6', opacity: 0.3 }} />
                 <h2 className="text-xl font-semibold text-gray-800 mb-2">No Articles Found</h2>
                 <p className="text-gray-500">Try a different topic</p>
             </div>
@@ -52,15 +52,15 @@ const NewsGrid = ({ news }) => {
     return (
         <>
             {loadedImages > 0 && loadedImages < 12 && (
-                <div className="mb-4 bg-white rounded-xl border border-gray-200 p-4">
+                <div className="mb-4 bg-white rounded-xl border p-4" style={{ borderColor: '#6209e6' }}>
                     <div className="flex items-center justify-between">
                         <span className="text-sm text-gray-600">Generating images...</span>
-                        <span className="text-sm font-semibold text-purple-600">{loadedImages} / 12 ready</span>
+                        <span className="text-sm font-semibold" style={{ color: '#6209e6' }}>{loadedImages} / 12 ready</span>
                     </div>
-                    <div className="mt-2 h-2 bg-gray-100 rounded-full overflow-hidden">
+                    <div className="mt-2 h-2 bg-white rounded-full overflow-hidden border" style={{ borderColor: '#6209e6' }}>
                         <div 
-                            className="h-full bg-gradient-to-r from-purple-600 to-pink-600 transition-all duration-500"
-                            style={{ width: `${(loadedImages / 12) * 100}%` }}
+                            className="h-full transition-all duration-500"
+                            style={{ width: `${(loadedImages / 12) * 100}%`, backgroundColor: '#6209e6' }}
                         />
                     </div>
                 </div>
@@ -203,7 +203,7 @@ const NewsCardSimple = ({ article, index, imageUrl: preloadedImageUrl, cacheKey 
             </div>
             <div className="p-5">
                 <div className="flex items-center gap-2 mb-3">
-                    <span className="text-xs font-medium px-2 py-1 bg-red-100 text-red-700 rounded-full">
+                    <span className="text-xs font-medium px-2 py-1 text-white rounded-full" style={{ backgroundColor: '#6209e6' }}>
                         {article.source || 'News'}
                     </span>
                     {article.time && (
@@ -213,11 +213,11 @@ const NewsCardSimple = ({ article, index, imageUrl: preloadedImageUrl, cacheKey 
                         </span>
                     )}
                 </div>
-                <h3 className="font-semibold text-gray-900 mb-2 line-clamp-2 group-hover:text-red-600 transition-colors">
+                <h3 className="font-semibold text-gray-900 mb-2 line-clamp-2 group-hover:transition-colors" style={{ '--hover-color': '#6209e6' }} onMouseEnter={(e) => e.currentTarget.style.color = '#6209e6'} onMouseLeave={(e) => e.currentTarget.style.color = ''}>
                     {cleanTitle}
                 </h3>
 
-                <span className="inline-flex items-center gap-1 text-red-600 hover:text-red-700 text-sm font-medium">
+                <span className="inline-flex items-center gap-1 text-sm font-medium" style={{ color: '#6209e6' }}>
                     Read more <ExternalLink className="w-3 h-3" />
                 </span>
             </div>
@@ -338,11 +338,11 @@ export default function News() {
                 description="AI-powered news aggregation platform delivering real-time global news with intelligent categorization."
                 keywords="AI news, news aggregator, breaking news, global news, AI News Pro"
             />
-            <div className="min-h-screen bg-gray-50">
+            <div className="min-h-screen bg-white">
                 <style>{pulseAnimation}</style>
-                
+
                 {/* Top Header with Logo */}
-                <div className="sticky top-0 z-50 bg-white border-b border-gray-200 shadow-sm">
+                <div className="sticky top-0 z-50 bg-white border-b shadow-sm" style={{ borderColor: '#6209e6' }}>
                     <div className="max-w-[82rem] mx-auto px-4 py-4 flex items-center justify-center">
                         <div className="flex items-center gap-2.5">
                             <img 
@@ -398,9 +398,10 @@ export default function News() {
                                 }}
                                 className={`px-4 py-2 rounded-full text-sm font-medium transition-all flex items-center gap-2 ${
                                     activeCategory === cat.id
-                                        ? 'bg-red-600 text-white shadow-md'
-                                        : 'bg-white text-gray-700 hover:bg-gray-100 border border-gray-200'
+                                        ? 'text-white shadow-md'
+                                        : 'bg-white hover:opacity-80 border'
                                 }`}
+                                style={activeCategory === cat.id ? { backgroundColor: '#6209e6' } : { borderColor: '#6209e6', color: '#6209e6' }}
                             >
                                 <IconComponent className="w-4 h-4" />
                                 {cat.label}
@@ -424,9 +425,10 @@ export default function News() {
                                 }}
                                 className={`px-3 py-1.5 text-xs font-medium rounded-full border transition-colors ${
                                     activeSubtopic === subtopic
-                                        ? 'bg-red-600 text-white border-red-600'
-                                        : 'bg-red-50 hover:bg-red-100 text-red-700 border-red-200'
+                                        ? 'text-white'
+                                        : 'bg-white hover:opacity-80'
                                 }`}
+                                style={activeSubtopic === subtopic ? { backgroundColor: '#6209e6', borderColor: '#6209e6' } : { borderColor: '#6209e6', color: '#6209e6' }}
                             >
                                 {subtopic}
                             </button>
@@ -454,15 +456,15 @@ export default function News() {
                 {loading ? (
                     <LoadingState message="Fetching latest news..." size="large" />
                 ) : error ? (
-                    <div className="bg-white rounded-2xl border border-gray-200">
+                    <div className="bg-white rounded-2xl border" style={{ borderColor: '#6209e6' }}>
                         <ErrorDisplay 
                             errorCode={error} 
                             onRetry={() => fetchNews(searchQuery || activeCategory)}
                         />
                     </div>
                 ) : news.length === 0 ? (
-                    <div className="text-center py-20 bg-white rounded-2xl border border-gray-200">
-                        <Globe className="w-16 h-16 text-gray-300 mx-auto mb-4" />
+                    <div className="text-center py-20 bg-white rounded-2xl border" style={{ borderColor: '#6209e6' }}>
+                        <Globe className="w-16 h-16 mx-auto mb-4" style={{ color: '#6209e6', opacity: 0.3 }} />
                         <h2 className="text-xl font-semibold text-gray-800 mb-2">No News Found</h2>
                         <p className="text-gray-500">Try searching for a different topic</p>
                     </div>
@@ -472,9 +474,9 @@ export default function News() {
 
                 {/* Trending Section */}
                 {!loading && news.length > 0 && (
-                    <div className="mt-8 bg-white rounded-2xl border border-gray-200 p-6">
+                    <div className="mt-8 bg-white rounded-2xl border p-6" style={{ borderColor: '#6209e6' }}>
                         <div className="flex items-center gap-2 mb-4">
-                            <TrendingUp className="w-5 h-5 text-red-600" />
+                            <TrendingUp className="w-5 h-5" style={{ color: '#6209e6' }} />
                             <h2 className="font-semibold text-gray-900">Trending Topics</h2>
                         </div>
                         <div className="flex flex-wrap gap-2">
@@ -485,7 +487,8 @@ export default function News() {
                                         setSearchQuery(topic);
                                         fetchNews(topic);
                                     }}
-                                    className="px-3 py-1.5 bg-gray-100 hover:bg-red-100 hover:text-red-700 text-gray-700 text-sm rounded-full transition-colors"
+                                    className="px-3 py-1.5 bg-white text-sm rounded-full transition-colors border hover:opacity-80"
+                                    style={{ borderColor: '#6209e6', color: '#6209e6' }}
                                 >
                                     #{topic}
                                 </button>

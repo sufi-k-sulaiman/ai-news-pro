@@ -20,15 +20,16 @@ const pages = [
 ];
 
 export default function HomePage() {
-    useEffect(() => {
-        document.title = '1cPublishing, Ai Powered Platform to boost productivity';
-        document.querySelector('meta[name="description"]')?.setAttribute('content', 'AI powered platform with smart agents designed to boost productivity, efficiency, and growth.');
-        document.querySelector('meta[name="keywords"]')?.setAttribute('content', '1cPublishing, Ai Platform, Ai Agents');
-    }, []);
 
     return (
-        <div className="p-4 md:p-8">
-            <div className="max-w-5xl mx-auto">
+        <>
+            <PageMeta 
+                title="Home - AI Platform"
+                description="AI-powered platform with smart agents designed to boost productivity, efficiency, and growth across all domains."
+                keywords="1cPublishing, AI platform, AI agents, productivity tools, smart automation"
+            />
+            <div className="p-4 md:p-8">
+                <div className="max-w-5xl mx-auto">
                 <h1 className="text-2xl md:text-3xl font-bold mb-2 text-gray-800">Welcome</h1>
                 <p className="mb-6 md:mb-8 text-gray-600">Ai Powered Platform to boost productivity and make you smarter.</p>
                 
@@ -46,7 +47,7 @@ export default function HomePage() {
                     ))}
                 </div>
             </div>
-            </div>
-        </>
-    );
+        </div>
+    </>
+);
 }

@@ -1,15 +1,18 @@
 import React, { useEffect } from 'react';
+import PageMeta from '@/components/PageMeta';
 import { Shield, Lock, Eye, Database, UserCheck, FileText, Brain, Globe, AlertTriangle } from 'lucide-react';
 
 export default function Privacy() {
-    useEffect(() => {
-        document.title = 'Privacy Policy - 1cPublishing';
-        document.querySelector('meta[name="description"]')?.setAttribute('content', 'Learn how 1cPublishing collects, uses, and protects your personal information.');
-    }, []);
 
     return (
-        <div className="min-h-screen bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
-            <div className="max-w-4xl mx-auto">
+        <>
+            <PageMeta 
+                title="Privacy Policy"
+                description="Learn how 1cPublishing collects, uses, and protects your personal information and data across all platforms."
+                keywords="privacy policy, data protection, 1cPublishing privacy, user data, GDPR, CCPA"
+            />
+            <div className="min-h-screen bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
+                <div className="max-w-4xl mx-auto">
                 <div className="text-center mb-12">
                     <div className="inline-flex items-center justify-center w-16 h-16 bg-purple-100 rounded-full mb-4">
                         <Shield className="w-8 h-8 text-purple-600" />
@@ -361,6 +364,7 @@ export default function Privacy() {
                     </section>
                 </div>
             </div>
-        </div>
+            </div>
+        </>
     );
 }

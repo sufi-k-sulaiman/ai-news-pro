@@ -621,12 +621,12 @@ export default function News() {
                                     updateUrl(activeCategory, subtopic);
                                     fetchNews(subtopic);
                                 }}
-                                className={`px-3 py-1.5 text-xs font-medium rounded-full transition-colors ${
+                                className={`font-medium rounded-full transition-colors ${
                                     activeSubtopic === subtopic
                                         ? 'text-white'
                                         : 'hover:opacity-80'
                                 }`}
-                                style={activeSubtopic === subtopic ? { backgroundColor: '#6209e6' } : { background: 'linear-gradient(135deg, #f9fafb 0%, #f3f4f6 100%)', color: '#6209e6' }}
+                                style={activeSubtopic === subtopic ? { backgroundColor: '#6209e6', fontSize: '0.96rem', padding: '0.48rem 0.96rem' } : { background: 'linear-gradient(135deg, #f9fafb 0%, #f3f4f6 100%)', color: '#6209e6', fontSize: '0.96rem', padding: '0.48rem 0.96rem' }}
                             >
                                 {subtopic}
                             </button>

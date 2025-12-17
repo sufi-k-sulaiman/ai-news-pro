@@ -410,6 +410,22 @@ export default function News() {
         ? getDynamicSuggestions().filter(topic => topic.toLowerCase().includes(searchQuery.toLowerCase())).slice(0, 8)
         : getDynamicSuggestions().slice(0, 10);
 
+    // Dynamic trending topics based on active category/subtopic
+    const getTrendingTopics = () => {
+        const currentCategory = CATEGORIES.find(c => c.id === activeCategory);
+        
+        if (activeSubtopic) {
+            // If subtopic is active, show related topics from same category + a few from others
+            const sameCategory = currentCategory?.subtopics.filter(s => s !== activeSubtopic).slice(0, 5) || [];
+            const otherCategories = CATEGORIES.filter(c => c.id !== activeCategory)
+                .flatMap(cat => cat.subtopics.slice(0, 1));
+            return [...sameCategory, ...otherCategories.slice(0, 3)];
+        } else {
+            // Show subtopics from current category
+            return currentCategory?.subtopics.slice(0, 8) || [];
+        }
+    };
+
     useEffect(() => {
         const handleClickOutside = (event) => {
             if (searchRef.current && !searchRef.current.contains(event.target)) {
@@ -668,15 +684,19 @@ export default function News() {
                     <div className="mt-8 bg-white rounded-2xl border p-6" style={{ borderColor: '#6209e6' }}>
                         <div className="flex items-center gap-2 mb-4">
                             <TrendingUp className="w-5 h-5" style={{ color: '#6209e6' }} />
-                            <h2 className="font-semibold text-gray-900">Trending Topics</h2>
+                            <h2 className="font-semibold text-gray-900">
+                                {activeSubtopic ? `Related to ${activeSubtopic}` : `Trending in ${CATEGORIES.find(c => c.id === activeCategory)?.label}`}
+                            </h2>
                         </div>
                         <div className="flex flex-wrap gap-2">
-                            {['AI', 'Climate', 'Economy', 'Elections', 'Space', 'Crypto', 'Tech Stocks', 'Healthcare'].map((topic) => (
+                            {getTrendingTopics().map((topic) => (
                                 <button
                                     key={topic}
                                     onClick={() => {
                                         setSearchQuery(topic);
+                                        setActiveSubtopic(topic);
                                         setCurrentPage(1);
+                                        updateUrl(activeCategory, topic);
                                         fetchNews(topic);
                                     }}
                                     className="px-3 py-1.5 text-sm rounded-full transition-colors hover:opacity-80"

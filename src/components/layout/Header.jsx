@@ -140,9 +140,9 @@ export default function Header({ title, sidebarOpen, setSidebarOpen, children, c
                         target="_blank" 
                         rel="noopener noreferrer"
                         className="hidden sm:inline-flex items-center gap-2 px-8 py-3.5 text-white font-semibold rounded-full transition-all shadow-lg hover:shadow-xl"
-                        style={{ backgroundColor: '#6B21F8' }}
-                        onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#5B15E0'}
-                        onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#6B21F8'}
+                        style={{ backgroundColor: '#6209e6' }}
+                        onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#5507C8'}
+                        onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#6209e6'}
                     >
                         Get started
                         <ArrowRight className="w-5 h-5" />

@@ -60,13 +60,13 @@ export const getErrorCode = (error) => {
 };
 
 const colorClasses = {
-    red: 'bg-red-100 text-red-600',
-    orange: 'bg-orange-100 text-orange-600',
-    amber: 'bg-amber-100 text-amber-600',
-    yellow: 'bg-yellow-100 text-yellow-600',
-    gray: 'bg-gray-100 text-gray-600',
-    purple: 'bg-purple-100 text-purple-600',
-    blue: 'bg-blue-100 text-blue-600',
+    red: 'text-white',
+    orange: 'text-white',
+    amber: 'text-white',
+    yellow: 'text-white',
+    gray: 'text-white',
+    purple: 'text-white',
+    blue: 'text-white',
 };
 
 export default function ErrorDisplay({ 
@@ -82,7 +82,7 @@ export default function ErrorDisplay({
     if (size === 'compact') {
         return (
             <div className="flex items-center gap-3 p-4 bg-white rounded-xl border border-gray-200">
-                <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${colorClasses[errorConfig.color]}`}>
+                <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${colorClasses[errorConfig.color]}`} style={{ backgroundColor: '#6209e6' }}>
                     <IconComponent className="w-5 h-5" />
                 </div>
                 <div className="flex-1">
@@ -101,7 +101,7 @@ export default function ErrorDisplay({
     return (
         <div className={`flex items-center justify-center ${size === 'large' ? 'min-h-[400px]' : 'py-12'}`}>
             <div className="text-center max-w-md px-4">
-                <div className={`w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 ${colorClasses[errorConfig.color]}`}>
+                <div className={`w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 ${colorClasses[errorConfig.color]}`} style={{ backgroundColor: '#6209e6' }}>
                     <IconComponent className={`${size === 'large' ? 'w-8 h-8' : 'w-6 h-6'}`} />
                 </div>
                 <h2 className={`font-bold text-gray-900 mb-2 ${size === 'large' ? 'text-2xl' : 'text-xl'}`}>
@@ -116,7 +116,7 @@ export default function ErrorDisplay({
                     </p>
                 )}
                 {onRetry && (
-                    <Button onClick={onRetry} className="gap-2">
+                    <Button onClick={onRetry} className="gap-2" style={{ backgroundColor: '#6209e6' }}>
                         <RefreshCw className="w-4 h-4" />
                         Try Again
                     </Button>

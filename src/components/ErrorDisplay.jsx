@@ -157,7 +157,7 @@ export function LoadingState({ message = 'Loading...', size = 'default' }) {
                 <img 
                     src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/694319442a278f16b6d6cf50/46592a6af_newsai.png" 
                     alt="Loading" 
-                    className={`${logoSize} object-contain`}
+                    className={`${logoSize} object-contain rounded-full`}
                     style={{ animation: 'logoPulse 1.5s ease-in-out infinite' }}
                 />
             </div>

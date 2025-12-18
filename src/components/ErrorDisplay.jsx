@@ -10,7 +10,7 @@ export const ERROR_CODES = {
     E102: { code: 'E102', title: 'Service Unavailable', message: 'The service is temporarily unavailable. Please try again later.', icon: ServerCrash, color: 'red' },
     
     // Data errors (2xx)
-    E200: { code: 'E200', title: 'No Articles Found', message: 'Could not find news related articles for that search. Try another.', icon: Database, color: 'amber' },
+    E200: { code: 'E200', title: 'No Articles Found', message: 'Could not find news related articles for that search. Try another search term.', icon: Database, color: 'amber' },
     E201: { code: 'E201', title: 'No Data Found', message: 'No data available for the selected criteria.', icon: FileQuestion, color: 'gray' },
     E202: { code: 'E202', title: 'Invalid Data', message: 'The received data is in an unexpected format.', icon: AlertTriangle, color: 'yellow' },
     

@@ -27,6 +27,18 @@ export default function ArticleView() {
                 title={articleTitle || 'Article'} 
                 description="Read the full article"
             />
+            <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes" />
+            <style>{`
+                iframe {
+                    width: 1px;
+                    min-width: 100%;
+                }
+                @media (max-width: 768px) {
+                    iframe {
+                        overflow-x: hidden;
+                    }
+                }
+            `}</style>
             <div className="min-h-screen bg-white flex flex-col">
                 <div className="sticky top-0 z-50 bg-white border-b shadow-sm">
                     <div className="max-w-[82rem] mx-auto px-4 py-3 flex items-center justify-between gap-4">

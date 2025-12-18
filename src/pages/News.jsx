@@ -471,7 +471,6 @@ export default function News() {
             setCurrentPage(1);
             updateUrl(activeCategory, searchQuery.trim());
             fetchNews(searchQuery.trim());
-            setShowSuggestions(false);
         }
     };
 

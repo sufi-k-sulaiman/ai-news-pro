@@ -1,5 +1,6 @@
 import React, { useEffect } from 'react';
 import { HelmetProvider } from 'react-helmet-async';
+import Footer from '@/components/Footer';
 
 export default function Layout({ children, currentPageName }) {
   useEffect(() => {
@@ -123,7 +124,12 @@ export default function Layout({ children, currentPageName }) {
           display: none !important;
         }
         `}</style>
-        {children}
+        <div className="flex flex-col min-h-screen">
+          <div className="flex-1">
+            {children}
+          </div>
+          <Footer />
+        </div>
         </HelmetProvider>
         );
         }

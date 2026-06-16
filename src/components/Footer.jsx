@@ -20,8 +20,9 @@ export default function Footer() {
             target="_blank"
             rel="noopener noreferrer"
             className="text-purple-600 hover:underline"
+            title="Sufi Khan Sulaiman - 20+ years of building scalable Ecommerce solutions"
           >
-            Sufi K Sulaiman
+            Sufi Khan Sulaiman
           </a>
           . All rights reserved.
         </p>

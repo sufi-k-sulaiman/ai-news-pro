@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import PageMeta from '@/components/PageMeta';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
 
 const pulseAnimation = `
@@ -390,6 +390,7 @@ export default function News() {
     }, []);
 
     const [searchQuery, setSearchQuery] = useState('');
+    const navigate = useNavigate();
     const [activeCategory, setActiveCategory] = useState('technology');
     const [expandedCategory, setExpandedCategory] = useState(null);
     const [news, setNews] = useState([]);
